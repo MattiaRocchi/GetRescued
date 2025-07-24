@@ -31,7 +31,7 @@ fun RequestDetailsScreen(
                 title = { Text(request.title) },  // Titolo della schermata = titolo richiesta
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Filled., contentDescription = "Back")
                     }
                 }
             )
