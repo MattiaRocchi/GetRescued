@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
+    implementation("androidx.compose.ui:ui:1.2.0")
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
@@ -59,26 +60,21 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation("androidx.navigation:navigation-compose:2.5.1")
+    implementation("androidx.compose.material:material-icons-extended:1.2.0")
+//room dependecies
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
-
+//converter dependencies
     implementation("com.google.code.gson:gson:2.13.1")
 
-
+//data store dependencies
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     // optional -RxJava2 support
     implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.7")
     // optional -RxJava3 support
     implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.7")
 
-}
-// Preferences DataStore(SharedPreferenceslike APIs)
-dependencies {
-
-}
-// Alternatively -use the following artifact without an Android dependency.
-dependencies {
-    //implementation("androidx.datastore:datastore-preferences-core:1.1.3")
 }

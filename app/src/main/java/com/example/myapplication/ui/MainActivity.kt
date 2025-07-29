@@ -3,27 +3,29 @@ package com.example.myapplication.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.ui.requests.RequestDetails
+import com.example.myapplication.ui.requests.RequestsScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import androidx.compose.material3.Scaffold
+import com.example.myapplication.navigation.BottomNavBar
+import com.example.myapplication.navigation.NavItem
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            //Nomi fittizzi da cambiare
             MyApplicationTheme {
-                // Configura il sistema di navigazione
-                val navController = rememberNavController()
-                NavHost(
-                    navController = navController,
-                    startDestination = "home"
-                ) {
-                    composable("home") { HomeScreen(navController) }
-                    composable("requests/create") { CreateRequestScreen(navController) }
-                    // Aggiungi altre rotte qui
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    AppNavigation()
                 }
             }
         }
@@ -31,17 +33,33 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun AppNavigation() {
+    val navController = rememberNavController()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MyApplicationTheme {
-        Greeting("Android")
+    Scaffold(
+        bottomBar = { BottomNavBar(navController) }
+    ) { padding ->
+        NavHost(
+            navController = navController,
+            startDestination = NavItem.Requests.route,
+            modifier = Modifier.padding(padding)
+        ) {
+            composable(NavItem.Requests.route) {
+                RequestsScreen(navController)
+            }
+            composable(NavItem.Missions.route) {
+                //MissionsScreen(navController)
+            }
+            composable(NavItem.Profile.route) {
+                //ProfileScreen(navController)
+            }
+            // Aggiungi le rotte per i dettagli
+            composable("request_details/{requestId}") { backStackEntry ->
+                /*RequestDetailsScreen(
+                    navController = navController,
+                    requestId = backStackEntry.arguments?.getString("requestId") ?: ""
+                )*/
+            }
+        }
     }
 }
