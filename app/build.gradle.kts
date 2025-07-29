@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -56,4 +58,27 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    annotationProcessor(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
+
+    implementation("com.google.code.gson:gson:2.13.1")
+
+
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+    // optional -RxJava2 support
+    implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.7")
+    // optional -RxJava3 support
+    implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.7")
+
+}
+// Preferences DataStore(SharedPreferenceslike APIs)
+dependencies {
+
+}
+// Alternatively -use the following artifact without an Android dependency.
+dependencies {
+    //implementation("androidx.datastore:datastore-preferences-core:1.1.3")
 }
