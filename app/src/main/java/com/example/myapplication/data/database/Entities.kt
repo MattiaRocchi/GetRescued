@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.data.database
+package com.example.myapplication.data.database
 
 
 import androidx.room.ColumnInfo
@@ -48,6 +48,7 @@ data class User(
     @ColumnInfo(name= "habitation") var habitation: String? = null,
     @ColumnInfo(name= "phoneNumber") var phoneNumber: String? = null,
     @ColumnInfo(name= "password") var password: String,
+    //data di creazione dell'account
     @ColumnInfo(name = "created_at") val createdAt: Long = System.currentTimeMillis()
     )
 @Entity
@@ -71,8 +72,6 @@ data class Mission(
     @ColumnInfo(name= "description") val description: String,
     @ColumnInfo(name= "exp") val exp: Int? = 0,
     @ColumnInfo(name= "titleBadge") val titleBadgeId: Int? = null
-
-
 )
 @Entity(primaryKeys = ["id", "idUser"])
 data class generalMissionUser(
@@ -91,8 +90,6 @@ data class settimanalMissionUser(
     @ColumnInfo(name= "progression") var progression: Int=0, //valore di indice di completamento
     @ColumnInfo(name= "active") var active: Boolean=true, //se questa missione è attiva o meno,
     // di default inizialmente messa a true
-
-
 )
 
 @Entity

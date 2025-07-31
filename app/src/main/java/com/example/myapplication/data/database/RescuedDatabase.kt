@@ -1,9 +1,9 @@
-package com.example.myapplication.ui.data.database
+package com.example.myapplication.data.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.myapplication.ui.data.utils.Converters
+import com.example.myapplication.data.utils.Converters
 
 @Database(
     entities = [

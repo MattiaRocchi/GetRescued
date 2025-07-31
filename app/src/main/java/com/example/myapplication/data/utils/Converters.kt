@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.data.utils
+package com.example.myapplication.data.utils
 
 
 

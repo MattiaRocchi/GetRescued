@@ -1,10 +1,7 @@
-package com.example.myapplication.ui.data.repositories
+package com.example.myapplication.data.repositories
 
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
-import com.example.myapplication.ui.data.database.User
-import com.example.myapplication.ui.data.database.UserDao
+import com.example.myapplication.data.database.User
+import com.example.myapplication.data.database.UserDao
 
 class UserDaoRepository(private val userDao: UserDao) {
 

@@ -1,8 +1,7 @@
-package com.example.myapplication.ui.data.repositories
+package com.example.myapplication.data.repositories
 
-import androidx.room.Query
-import com.example.myapplication.ui.data.database.Request
-import com.example.myapplication.ui.data.database.RequestDao
+import com.example.myapplication.data.database.Request
+import com.example.myapplication.data.database.RequestDao
 import kotlinx.coroutines.flow.Flow
 
 class RequestDaoRepository (private val requestDao: RequestDao) {

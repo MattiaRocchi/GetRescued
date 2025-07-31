@@ -1,9 +1,9 @@
-package com.example.myapplication.ui.data.repositories
+package com.example.myapplication.data.repositories
 
 
 
-import com.example.myapplication.ui.data.database.TitleBadge
-import com.example.myapplication.ui.data.database.TitleBadgeDao
+import com.example.myapplication.data.database.TitleBadge
+import com.example.myapplication.data.database.TitleBadgeDao
 
 class TitleBadgeRepository(private val dao: TitleBadgeDao) {
 
