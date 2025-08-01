@@ -77,5 +77,5 @@ dependencies {
     // optional -RxJava3 support
     implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.7")
 
-
+    implementation("io.insert-koin:koin-androidx-compose:4.0.2")
 }

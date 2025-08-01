@@ -1,30 +1,28 @@
-package com.example.myapplication.ui
+package com.example.myapplication
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.ui.requests.RequestDetails
-import com.example.myapplication.ui.requests.RequestsScreen
-import com.example.myapplication.ui.theme.MyApplicationTheme
-import androidx.compose.material3.Scaffold
 import com.example.myapplication.navigation.BottomNavBar
 import com.example.myapplication.navigation.NavItem
+import com.example.myapplication.ui.requests.RequestsScreen
+import com.example.myapplication.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
+                Surface(modifier = Modifier.Companion.fillMaxSize()) {
                     AppNavigation()
                 }
             }
@@ -42,7 +40,7 @@ fun AppNavigation() {
         NavHost(
             navController = navController,
             startDestination = NavItem.Requests.route,
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.Companion.padding(padding)
         ) {
             composable(NavItem.Requests.route) {
                 RequestsScreen(navController)
