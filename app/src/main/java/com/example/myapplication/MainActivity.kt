@@ -16,13 +16,17 @@ import com.example.myapplication.navigation.BottomNavBar
 import com.example.myapplication.navigation.NavItem
 import com.example.myapplication.ui.requests.RequestsScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.res.painterResource
+import com.example.myapplication.navigation.GetRescuedTopBar
+import com.example.myapplication.ui.profile.ProfileScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
-                Surface(modifier = Modifier.Companion.fillMaxSize()) {
+                Surface(modifier = Modifier.fillMaxSize()) {
                     AppNavigation()
                 }
             }
@@ -30,33 +34,39 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
 
     Scaffold(
+        topBar = {
+            GetRescuedTopBar(
+                navController = navController,
+                profileImage = painterResource(id = R.drawable.ic_profile_placeholder)
+            )
+        },
         bottomBar = { BottomNavBar(navController) }
     ) { padding ->
         NavHost(
             navController = navController,
             startDestination = NavItem.Requests.route,
-            modifier = Modifier.Companion.padding(padding)
+            modifier = Modifier.padding(padding)
         ) {
             composable(NavItem.Requests.route) {
                 RequestsScreen(navController)
             }
             composable(NavItem.Missions.route) {
-                //MissionsScreen(navController)
+                // MissionsScreen(navController)
             }
             composable(NavItem.Profile.route) {
-                //ProfileScreen(navController)
+                ProfileScreen(navController) // Implementata ora
             }
-            // Aggiungi le rotte per i dettagli
             composable("request_details/{requestId}") { backStackEntry ->
-                /*RequestDetailsScreen(
+                /* RequestDetailsScreen(
                     navController = navController,
                     requestId = backStackEntry.arguments?.getString("requestId") ?: ""
-                )*/
+                ) */
             }
         }
     }
