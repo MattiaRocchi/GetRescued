@@ -21,13 +21,13 @@ sealed class NavItem(
         iconResId = R.drawable.ic_requests
     )
 
-    object Profile : NavItem(
-        route = "profile",
-        title = "Profilo",
+    object Create : NavItem(
+        route = "create",
+        title = "Create",
         iconResId = R.drawable.ic_requests
     )
 
     companion object {
-        val items = listOf(Requests, Missions, Profile)
+        val items = listOf(Requests, Missions, Create)
     }
 }
