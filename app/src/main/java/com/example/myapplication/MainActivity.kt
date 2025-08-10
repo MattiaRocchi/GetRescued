@@ -22,6 +22,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.room.Room
 import com.example.myapplication.data.database.AppDatabase
 import com.example.myapplication.navigation.GetRescuedTopBar
+import com.example.myapplication.ui.GetRescuedNavGraph
+import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.ui.add.AddRequestScreen
 import com.example.myapplication.ui.add.AddRequestViewModel
 import com.example.myapplication.ui.requests.RequestsViewModel
@@ -31,14 +33,33 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
+                val navController = rememberNavController()
+                //TODO non mi piace lo scaffold nella main activity, andrà cambiato
+                Scaffold(
+                    topBar = {
+                        GetRescuedTopBar(
+                            navController = navController,
+                            profileImage = painterResource(id = R.drawable.ic_profile_placeholder)
+                        )
+                    },
+                    bottomBar = { BottomNavBar(navController) }
+                ) { padding ->
+                    GetRescuedNavGraph(
+                        navController = navController,
+                        modifier = Modifier.padding(padding)
+                    )
+                }
+               // GetRescuedNavGraph(navController)
+                /*
                 Surface(modifier = Modifier.fillMaxSize()) {
                     AppNavigation()
-                }
+                }*/
             }
         }
     }
 }
 
+/*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation() {
@@ -81,4 +102,4 @@ fun AppNavigation() {
             }
         }
     }
-}
+}*/

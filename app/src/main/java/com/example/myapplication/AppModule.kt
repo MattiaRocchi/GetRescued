@@ -12,6 +12,9 @@ import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.TitleBadgeRepository
 import com.example.myapplication.data.repositories.UserDaoRepository
 import com.example.myapplication.data.utils.Converters
+import com.example.myapplication.ui.add.AddRequestViewModel
+import com.example.myapplication.ui.registration.RegistrationViewModel
+import com.example.myapplication.ui.requests.RequestsViewModel
 
 val Context.dataStore by preferencesDataStore("settings")
 
@@ -43,4 +46,7 @@ val appModule = module {
     single { SettingsRepository(get()) }
 
     //ViewModes
+    viewModel { RegistrationViewModel() }
+    viewModel { AddRequestViewModel(get()) } // get() → RequestDaoRepository
+    viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository
 }

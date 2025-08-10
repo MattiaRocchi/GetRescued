@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     alias(libs.plugins.ksp)
+    alias(libs.plugins.serialization)
+
 }
 
 android {
@@ -48,7 +50,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
-    implementation("androidx.compose.ui:ui:1.2.0")
+    implementation("androidx.compose.ui:ui:1.8.3")
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
@@ -60,7 +62,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation("androidx.navigation:navigation-compose:2.5.1")
+    implementation("androidx.navigation:navigation-compose:2.9.3")
     implementation("androidx.compose.material:material-icons-extended:1.2.0")
 //room dependecies
     implementation(libs.androidx.room.runtime)
@@ -78,4 +80,8 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.7")
 
     implementation("io.insert-koin:koin-androidx-compose:4.0.2")
+
+//Serialization
+    implementation(libs.navigation.compose)
+    implementation(libs.ktor.serialization.kotlinx.json)
 }
