@@ -4,11 +4,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.myapplication.ui.theme.OnPrimary
+import com.example.myapplication.ui.theme.OnPrimaryContainer
+import com.example.myapplication.ui.theme.OnSecondaryContainer
+import com.example.myapplication.ui.theme.OnTertiaryContainer
 import com.example.myapplication.ui.theme.PrimaryContainer
 import com.example.myapplication.ui.theme.SecondaryContainer
 import com.example.myapplication.ui.theme.TertiaryContainer
@@ -29,9 +35,18 @@ fun RegistrationScreen(
             value = viewModel.name,
             onValueChange = viewModel::onNameChange,
             label = { Text("Nome") },
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = OnPrimaryContainer,        // Colore testo quando attivo
+                unfocusedTextColor = OnPrimaryContainer,      // Colore testo quando inattivo
+                cursorColor = OnPrimaryContainer,             // Colore cursore
+                //focusedIndicatorColor = Color.Green, // Bordo quando attivo
+                unfocusedIndicatorColor = Color.Gray, // Bordo quando inattivo
+                focusedContainerColor = PrimaryContainer,   // Sfondo quando attivo
+                unfocusedContainerColor = PrimaryContainer  // Sfondo quando inattivo
+            ),
             modifier = Modifier
                 .fillMaxWidth()
-                .background(PrimaryContainer, RoundedCornerShape(8.dp))
+
         )
 
         Spacer(Modifier.height(8.dp))
@@ -41,8 +56,17 @@ fun RegistrationScreen(
             onValueChange = viewModel::onSurnameChange,
             label = { Text("Cognome") },
             modifier = Modifier
-                .fillMaxWidth()
-                .background(PrimaryContainer, RoundedCornerShape(8.dp))
+                .fillMaxWidth(),
+
+            colors = TextFieldDefaults.colors(
+            focusedTextColor = OnPrimaryContainer,        // Colore testo quando attivo
+            unfocusedTextColor = OnPrimaryContainer,      // Colore testo quando inattivo
+            cursorColor = OnPrimaryContainer,             // Colore cursore
+            //focusedIndicatorColor = Color.Green, // Bordo quando attivo
+            unfocusedIndicatorColor = Color.Gray, // Bordo quando inattivo
+            focusedContainerColor = PrimaryContainer,   // Sfondo quando attivo
+            unfocusedContainerColor = PrimaryContainer  // Sfondo quando inattivo
+        ),
         )
 
         Spacer(Modifier.height(8.dp))
@@ -52,8 +76,16 @@ fun RegistrationScreen(
             onValueChange = viewModel::onEmailChange,
             label = { Text("Email") },
             modifier = Modifier
-                .fillMaxWidth()
-                .background(SecondaryContainer, RoundedCornerShape(8.dp))
+                .fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = OnSecondaryContainer,        // Colore testo quando attivo
+                unfocusedTextColor = OnSecondaryContainer,      // Colore testo quando inattivo
+                cursorColor = OnSecondaryContainer,             // Colore cursore
+                //focusedIndicatorColor = Color.Green, // Bordo quando attivo
+                unfocusedIndicatorColor = Color.Gray, // Bordo quando inattivo
+                focusedContainerColor = SecondaryContainer,   // Sfondo quando attivo
+                unfocusedContainerColor = SecondaryContainer  // Sfondo quando inattivo
+            ),
         )
 
         Spacer(Modifier.height(8.dp))
@@ -63,8 +95,17 @@ fun RegistrationScreen(
             onValueChange = viewModel::onPasswordChange,
             label = { Text("Password") },
             modifier = Modifier
-                .fillMaxWidth()
-                .background(SecondaryContainer, RoundedCornerShape(8.dp))
+                .fillMaxWidth(),
+
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = OnSecondaryContainer,        // Colore testo quando attivo
+                unfocusedTextColor = OnSecondaryContainer,      // Colore testo quando inattivo
+                cursorColor = OnSecondaryContainer,             // Colore cursore
+                //focusedIndicatorColor = Color.Green, // Bordo quando attivo
+                unfocusedIndicatorColor = Color.Gray, // Bordo quando inattivo
+                focusedContainerColor = SecondaryContainer,   // Sfondo quando attivo
+                unfocusedContainerColor = SecondaryContainer  // Sfondo quando inattivo
+            ),
         )
 
         Spacer(Modifier.height(8.dp))
@@ -98,7 +139,16 @@ fun DatePickerField(selectedDate: LocalDate?, onDateSelected: (LocalDate) -> Uni
         label = { Text("Data di Nascita") },
         readOnly = true,
         modifier = Modifier
-            .fillMaxWidth()
-            .background(TertiaryContainer, RoundedCornerShape(8.dp))
+            .fillMaxWidth(),
+
+        colors = TextFieldDefaults.colors(
+            focusedTextColor = OnTertiaryContainer,        // Colore testo quando attivo
+            unfocusedTextColor = OnTertiaryContainer,      // Colore testo quando inattivo
+            cursorColor = OnTertiaryContainer,             // Colore cursore
+            //focusedIndicatorColor = Color.Green, // Bordo quando attivo
+            unfocusedIndicatorColor = Color.Gray, // Bordo quando inattivo
+            focusedContainerColor = TertiaryContainer,   // Sfondo quando attivo
+            unfocusedContainerColor = TertiaryContainer  // Sfondo quando inattivo
+    ),
     )
 }
