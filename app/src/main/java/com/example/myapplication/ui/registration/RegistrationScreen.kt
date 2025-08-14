@@ -113,7 +113,7 @@ fun RegistrationScreen(
             onClick = {
                 viewModel.registerUser(
                     onSuccess = {
-                        navController.navigate(GetRescuedRoute.addRequest)  },
+                        navController.navigate(GetRescuedRoute.AddRequest)  },
                     onError = { errorMsg -> println("Errore: $errorMsg") }
                 )
             },
