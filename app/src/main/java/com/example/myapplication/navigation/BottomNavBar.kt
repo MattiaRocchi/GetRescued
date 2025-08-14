@@ -10,11 +10,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.toRoute
+import com.example.myapplication.ui.GetRescuedRoute
 
 @Composable
 fun BottomNavBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val currentRoute = navBackStackEntry?.destination
 
     NavigationBar {
         NavItem.items.forEach { item ->
@@ -28,6 +30,7 @@ fun BottomNavBar(navController: NavController) {
                 label = { Text(item.title) },
                 selected = currentRoute == item.route,
                 onClick = {
+                    println("Navigo verso: ${item.route}")
                     navController.navigate(item.route) {
                         // Evita duplicati nello stack
                         popUpTo(navController.graph.startDestinationId)
