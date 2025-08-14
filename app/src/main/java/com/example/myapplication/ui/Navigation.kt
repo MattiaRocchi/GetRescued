@@ -4,7 +4,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,6 +12,8 @@ import androidx.room.Room
 import com.example.myapplication.data.database.AppDatabase
 import com.example.myapplication.ui.add.AddRequestScreen
 import com.example.myapplication.ui.add.AddRequestViewModel
+import com.example.myapplication.ui.login.LoginScreen
+import com.example.myapplication.ui.login.LoginViewModel
 import com.example.myapplication.ui.profile.ProfileScreen
 import com.example.myapplication.ui.registration.RegistrationScreen
 import com.example.myapplication.ui.registration.RegistrationViewModel
@@ -34,13 +35,17 @@ sealed interface GetRescuedRoute {
     data object title : GetRescuedRoute
 
 
-    //definisci come data class le route che richiedono parametri quando vendono percorse
+
     @Serializable
     data object Requests : GetRescuedRoute
 
     @Serializable
     data object Missions : GetRescuedRoute
 
+    @Serializable
+    data object Login : GetRescuedRoute
+
+    //definisci come data class le route che richiedono parametri quando vendono percorse
     @Serializable
     data class AddRequest(val requestId: Int) : GetRescuedRoute
 
@@ -75,6 +80,14 @@ fun GetRescuedNavGraph(
         }
         composable<GetRescuedRoute.Missions> {
             Text("Pagina Missioni")
+        }
+        composable<GetRescuedRoute.Registration> {
+            val viewModel: RegistrationViewModel = koinViewModel()
+            RegistrationScreen(navController, viewModel)
+        }
+        composable<GetRescuedRoute.Login> {
+            val viewModel: LoginViewModel = koinViewModel()
+            LoginScreen(navController, viewModel)
         }
 
     }

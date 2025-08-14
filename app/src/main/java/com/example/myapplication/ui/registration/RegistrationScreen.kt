@@ -6,120 +6,191 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapplication.ui.GetRescuedRoute
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun RegistrationScreen(
     navController: NavHostController,
     viewModel: RegistrationViewModel
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        OutlinedTextField(
-            value = viewModel.name,
-            onValueChange = viewModel::onNameChange,
-            label = { Text("Nome") },
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    var nameError by remember { mutableStateOf(false) }
+    var surnameError by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf(false) }
+    var passwordError by remember { mutableStateOf(false) }
+    var ageError by remember { mutableStateOf(false) }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
+
+        Column(
             modifier = Modifier
-                .fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                cursorColor = MaterialTheme.colorScheme.onPrimary,
-                //focusedIndicatorColor = Color.Green,
-                //unfocusedIndicatorColor = Color.Gray,
-                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,   // Sfondo quando attivo
-                unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer  // Sfondo quando inattivo
-            )
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = viewModel.surname,
-            onValueChange = viewModel::onSurnameChange,
-            label = { Text("Cognome") },
-            modifier = Modifier
-                .fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-            unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-            cursorColor = MaterialTheme.colorScheme.onPrimary,
-            //focusedIndicatorColor = Color.Green,
-            //unfocusedIndicatorColor = Color.Gray,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,   // Sfondo quando attivo
-            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer  // Sfondo quando inattivo
-        )
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = viewModel.email,
-            onValueChange = viewModel::onEmailChange,
-            label = { Text("Email") },
-            modifier = Modifier
-                .fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                focusedTextColor = MaterialTheme.colorScheme.onSecondary,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
-                cursorColor = MaterialTheme.colorScheme.onSecondary,
-                //focusedIndicatorColor = Color.Green,
-                //unfocusedIndicatorColor = Color.Gray,
-                focusedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,   // Sfondo quando attivo
-                unfocusedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer  // Sfondo quando inattivo
-            )
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = viewModel.password,
-            onValueChange = viewModel::onPasswordChange,
-            label = { Text("Password") },
-            modifier = Modifier
-                .fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                focusedTextColor = MaterialTheme.colorScheme.onSecondary,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
-                cursorColor = MaterialTheme.colorScheme.onSecondary,
-                //focusedIndicatorColor = Color.Green,
-                //unfocusedIndicatorColor = Color.Gray,
-                focusedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,   // Sfondo quando attivo
-                unfocusedContainerColor = MaterialTheme.colorScheme.onSecondaryContainer  // Sfondo quando inattivo
-            )
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        //TODO DatePickerDocked()
-
-        Spacer(Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                viewModel.registerUser(
-                    onSuccess = {
-                        navController.navigate(GetRescuedRoute.AddRequest)  },
-                    onError = { errorMsg -> println("Errore: $errorMsg") }
-                )
-            },
-            modifier = Modifier.fillMaxWidth()
+                .fillMaxSize()
+                .padding(16.dp)
+                .padding(padding),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Registrati")
+            // 🔹 NOME
+            OutlinedTextField(
+                value = viewModel.name,
+                onValueChange = {
+                    viewModel.onNameChange(it); nameError = it.isBlank()
+                },
+                label = { Text("Nome") },
+                isError = nameError,
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+            if (nameError) Text("Inserisci il nome", color = MaterialTheme.colorScheme.error)
+
+            Spacer(Modifier.height(8.dp))
+
+            // 🔹 COGNOME
+            OutlinedTextField(
+                value = viewModel.surname,
+                onValueChange = {
+                    viewModel.onSurnameChange(it); surnameError = it.isBlank()
+                },
+                label = { Text("Cognome") },
+                isError = surnameError,
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+            if (surnameError) Text("Inserisci il cognome", color = MaterialTheme.colorScheme.error)
+
+            Spacer(Modifier.height(8.dp))
+
+            // 🔹 EMAIL
+            OutlinedTextField(
+                value = viewModel.email,
+                onValueChange = {
+                    viewModel.onEmailChange(it)
+                    emailError = it.isBlank() || !android.util.Patterns.EMAIL_ADDRESS.matcher(it).matches()
+                },
+                label = { Text("Email") },
+                isError = emailError,
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    focusedTextColor = MaterialTheme.colorScheme.onSecondary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
+                    cursorColor = MaterialTheme.colorScheme.onSecondary
+                )
+            )
+            if (emailError) Text("Inserisci un'email valida", color = MaterialTheme.colorScheme.error)
+
+            Spacer(Modifier.height(8.dp))
+
+            // 🔹 PASSWORD
+            OutlinedTextField(
+                value = viewModel.password,
+                onValueChange = {
+                    viewModel.onPasswordChange(it); passwordError = it.length < 6
+                },
+                label = { Text("Password") },
+                isError = passwordError,
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    focusedTextColor = MaterialTheme.colorScheme.onSecondary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
+                    cursorColor = MaterialTheme.colorScheme.onSecondary
+                )
+            )
+            if (passwordError) Text("Minimo 6 caratteri", color = MaterialTheme.colorScheme.error)
+
+            Spacer(Modifier.height(8.dp))
+
+            // 🔹 ETÀ
+            OutlinedTextField(
+                value = viewModel.age?.toString() ?: "",
+                onValueChange = {
+                    viewModel.onAgeChange(it)
+                    ageError = it.toIntOrNull()?.let { n -> n <= 0 } ?: true
+                },
+                label = { Text("Età") },
+                isError = ageError,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    focusedTextColor = MaterialTheme.colorScheme.onTertiary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onTertiary,
+                    cursorColor = MaterialTheme.colorScheme.onTertiary
+                )
+            )
+            if (ageError) Text("Inserisci un'età valida", color = MaterialTheme.colorScheme.error)
+
+            Spacer(Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    viewModel.registerUser(
+                        onSuccess = {
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Registrazione avvenuta!")
+                            }
+                            navController.navigate(GetRescuedRoute.Profile)
+                        },
+                        onError = { msg ->
+                            scope.launch {
+                                snackbarHostState.showSnackbar(msg)
+                            }
+                        }
+                    )
+                },
+                enabled = !nameError && !surnameError && !emailError && !passwordError && !ageError,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Registrati")
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            TextButton(onClick = { navController.navigate(GetRescuedRoute.Login) }) {
+                Text("Hai già un account? Accedi")
+            }
         }
     }
 }

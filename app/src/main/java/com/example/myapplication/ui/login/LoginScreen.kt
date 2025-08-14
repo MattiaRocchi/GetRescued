@@ -13,8 +13,9 @@ import com.example.myapplication.ui.GetRescuedRoute
 
 @Composable
 fun LoginScreen(
-    navController: NavHostController
-    ) {
+    navController: NavHostController,
+    viewModel: LoginViewModel
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
