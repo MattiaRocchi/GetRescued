@@ -3,30 +3,15 @@ package com.example.myapplication
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.navigation.BottomNavBar
-import com.example.myapplication.navigation.NavItem
-import com.example.myapplication.ui.requests.RequestsScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.room.Room
-import com.example.myapplication.data.database.AppDatabase
 import com.example.myapplication.navigation.GetRescuedTopBar
 import com.example.myapplication.ui.GetRescuedNavGraph
-import com.example.myapplication.ui.GetRescuedRoute
-import com.example.myapplication.ui.add.AddRequestScreen
-import com.example.myapplication.ui.add.AddRequestViewModel
-import com.example.myapplication.ui.requests.RequestsViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

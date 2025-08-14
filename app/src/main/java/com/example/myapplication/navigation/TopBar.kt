@@ -1,11 +1,8 @@
 package com.example.myapplication.navigation
 
-import android.text.Layout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -15,12 +12,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.R
+import com.example.myapplication.ui.GetRescuedRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +37,7 @@ fun GetRescuedTopBar(
             }
         },
         actions = {
-            IconButton(onClick = { navController.navigate("profile") }) {
+            IconButton(onClick = { navController.navigate(GetRescuedRoute.Profile) }) {
                 Icon(
                     painter = profileImage ?: painterResource(id = R.drawable.ic_profile_placeholder),
                     contentDescription = "Profilo utente",

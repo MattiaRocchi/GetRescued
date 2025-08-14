@@ -1,22 +1,15 @@
 package com.example.myapplication.ui
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import androidx.room.Room
-import com.example.myapplication.R
 import com.example.myapplication.data.database.AppDatabase
-import com.example.myapplication.navigation.BottomNavBar
-import com.example.myapplication.navigation.GetRescuedTopBar
-import com.example.myapplication.navigation.NavItem
 import com.example.myapplication.ui.add.AddRequestScreen
 import com.example.myapplication.ui.add.AddRequestViewModel
 import com.example.myapplication.ui.profile.ProfileScreen
@@ -26,16 +19,14 @@ import com.example.myapplication.ui.requests.RequestsScreen
 import com.example.myapplication.ui.requests.RequestsViewModel
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
-
-
 sealed interface GetRescuedRoute {
     //definisci come data object le route che non richiedono parametri quando vendono percorse
 
     @Serializable
-    data object profile : GetRescuedRoute
+    data object Profile : GetRescuedRoute
 
     @Serializable
-    data object registration : GetRescuedRoute
+    data object Registration : GetRescuedRoute
 
     //TODO schermata di titolo
     @Serializable
@@ -43,8 +34,13 @@ sealed interface GetRescuedRoute {
 
     //definisci come data class le route che richiedono parametri quando vendono percorse
     @Serializable
-    data class addRequest(val requestId: Int) : GetRescuedRoute
+    data object Requests : GetRescuedRoute
 
+    @Serializable
+    data object Missions : GetRescuedRoute
+
+    @Serializable
+    data class AddRequest(val requestId: Int) : GetRescuedRoute
 
 }
 @Composable
@@ -54,19 +50,29 @@ fun GetRescuedNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = GetRescuedRoute.registration,
+        startDestination = GetRescuedRoute.Registration,
         modifier = modifier
     ) {
-        composable<GetRescuedRoute.registration> {
+        composable<GetRescuedRoute.Registration> {
             val viewModel: RegistrationViewModel = koinViewModel()
             RegistrationScreen(navController, viewModel)
         }
-        composable<GetRescuedRoute.addRequest> {
-            val viewModel: AddRequestViewModel = koinViewModel()
-            AddRequestScreen(navController, viewModel, userId = 1)
+        composable<GetRescuedRoute.AddRequest> { backStackEntry ->
+            val args = backStackEntry.toRoute<GetRescuedRoute.AddRequest>()
+            val context = LocalContext.current
+            val db = Room.databaseBuilder(context, AppDatabase::class.java, "rescued-database").build()
+            AddRequestScreen(navController, AddRequestViewModel(db.requestDao()), userId = args.requestId)
         }
-        composable<GetRescuedRoute.profile> {
+        composable<GetRescuedRoute.Profile> {
             ProfileScreen(navController)
+        }
+        composable<GetRescuedRoute.Requests> {
+            val context = LocalContext.current
+            val db = Room.databaseBuilder(context, AppDatabase::class.java, "rescued-database").build()
+            RequestsScreen(navController, RequestsViewModel(db.requestDao()))
+        }
+        composable<GetRescuedRoute.Missions> {
+            Text("Pagina Missioni")
         }
 
     }

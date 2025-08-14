@@ -2,9 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-
     alias(libs.plugins.ksp)
     alias(libs.plugins.serialization)
+
 
 }
 
@@ -62,7 +62,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation("androidx.navigation:navigation-compose:2.9.3")
     implementation("androidx.compose.material:material-icons-extended:1.2.0")
 //room dependecies
     implementation(libs.androidx.room.runtime)

@@ -1,28 +1,28 @@
 package com.example.myapplication.navigation
 
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import com.example.myapplication.R
+import com.example.myapplication.ui.GetRescuedRoute
+
 
 sealed class NavItem(
-    val route: String,
+    val route: GetRescuedRoute,
     val title: String,
     val iconResId: Int
 ) {
     object Requests : NavItem(
-        route = "requests",
+        route = GetRescuedRoute.Requests,
         title = "Richieste",
         iconResId = R.drawable.ic_requests
     )
 
     object Missions : NavItem(
-        route = "missions",
+        route = GetRescuedRoute.Missions,
         title = "Missioni",
         iconResId = R.drawable.ic_requests
     )
 
     object Create : NavItem(
-        route = "create",
+        route = GetRescuedRoute.AddRequest(1),
         title = "Create",
         iconResId = R.drawable.ic_requests
     )
