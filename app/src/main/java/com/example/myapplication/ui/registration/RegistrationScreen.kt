@@ -30,6 +30,7 @@ import androidx.navigation.NavHostController
 import com.example.myapplication.ui.GetRescuedRoute
 import kotlinx.coroutines.launch
 
+
 @Composable
 fun RegistrationScreen(
     navController: NavHostController,
@@ -102,8 +103,7 @@ fun RegistrationScreen(
                 value = viewModel.email,
                 onValueChange = {
                     viewModel.onEmailChange(it)
-                    emailError = it.isBlank() ||
-                            !android.util.Patterns.EMAIL_ADDRESS.matcher(it).matches()
+                    emailError = it.isBlank() || !android.util.Patterns.EMAIL_ADDRESS.matcher(it).matches()
                 },
                 label = { Text("Email") },
                 isError = emailError,
