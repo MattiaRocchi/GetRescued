@@ -19,6 +19,8 @@ import com.example.myapplication.navigation.GetRescuedTopBar
 import com.example.myapplication.navigation.NavItem
 import com.example.myapplication.ui.add.AddRequestScreen
 import com.example.myapplication.ui.add.AddRequestViewModel
+import com.example.myapplication.ui.login.LoginScreen
+import com.example.myapplication.ui.login.LoginViewModel
 import com.example.myapplication.ui.profile.ProfileScreen
 import com.example.myapplication.ui.registration.RegistrationScreen
 import com.example.myapplication.ui.registration.RegistrationViewModel
@@ -41,6 +43,9 @@ sealed interface GetRescuedRoute {
     @Serializable
     data object title : GetRescuedRoute
 
+    @Serializable
+    data object login : GetRescuedRoute
+
 
     //definisci come data class le route che richiedono parametri quando vendono percorse
     @Serializable
@@ -62,6 +67,11 @@ fun GetRescuedNavGraph(
             val viewModel: RegistrationViewModel = koinViewModel()
             RegistrationScreen(navController, viewModel)
         }
+        composable<GetRescuedRoute.login> {
+            val viewModel : LoginViewModel = koinViewModel()
+            LoginScreen(navController)
+        }
+
         composable<GetRescuedRoute.addRequest> {
             val viewModel: AddRequestViewModel = koinViewModel()
             AddRequestScreen(navController, viewModel, userId = 1)

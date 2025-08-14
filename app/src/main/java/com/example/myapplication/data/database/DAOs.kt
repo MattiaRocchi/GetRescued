@@ -3,14 +3,14 @@ package com.example.myapplication.data.database
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow //
 
 @Dao
 interface UserDao {
-    @Insert
-    suspend fun insert(user: User)
 
     @Query("SELECT * FROM User WHERE id = :id")
     suspend fun getById(id: Int): User?
@@ -20,6 +20,26 @@ interface UserDao {
 
     @Update
     suspend fun update(user: User)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(user: User): Long // Ritorna l'ID generato
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertInfo(userInfo: UserInfo)
+
+    @Transaction
+    suspend fun insertUserWithInfo(user: User) {
+        val userId = insert(user) // Inserisce e prende ID
+        val info = UserInfo(
+            id = userId.toInt(),
+            activeTitle = 0,
+            possessedTitles = listOf(0),
+            exp = 0,
+            profileFoto = null
+        )
+        insertInfo(info)
+    }
+
 }
 
 @Dao

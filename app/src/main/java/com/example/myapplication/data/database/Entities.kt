@@ -3,6 +3,7 @@ package com.example.myapplication.data.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 
@@ -38,17 +39,21 @@ data class TagsUser(
     val idTags: Int,
     val idUser: Int
 )
-@Entity
+@Entity(
+    tableName = "User",
+    indices = [Index(value = ["email"], unique = true)] // Email univoca
+)
 data class User(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name= "name") val name: String,
     @ColumnInfo(name= "surname") val surname: String,
     @ColumnInfo(name= "email") var email: String,
+    @ColumnInfo(name= "password") var password: String,
 
     @ColumnInfo(name= "age") var age: Int,
     @ColumnInfo(name= "habitation") var habitation: String? = null,
     @ColumnInfo(name= "phoneNumber") var phoneNumber: String? = null,
-    @ColumnInfo(name= "password") var password: String,
+
     //data di creazione dell'account
     @ColumnInfo(name = "created_at") val createdAt: Long = System.currentTimeMillis()
     )

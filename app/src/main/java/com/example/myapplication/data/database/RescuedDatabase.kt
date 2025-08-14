@@ -13,7 +13,7 @@ import com.example.myapplication.data.utils.Converters
         Tags::class, TagsMission::class, TagsUser::class,
         UserBadgeCrossRef::class
     ],
-    version = 1
+    version = 2
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

@@ -1,16 +1,21 @@
 package com.example.myapplication.ui.registration
 
+import android.database.sqlite.SQLiteConstraintException
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.data.database.User
+
+import com.example.myapplication.data.repositories.UserDaoRepository
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
-class RegistrationViewModel : ViewModel() {
+class RegistrationViewModel(
+    private val userDaoRepository: UserDaoRepository
+) : ViewModel() {
 
-    // 🔹 Variabili osservabili
     var name by mutableStateOf("")
         private set
 
@@ -23,28 +28,47 @@ class RegistrationViewModel : ViewModel() {
     var password by mutableStateOf("")
         private set
 
-    var birthDate by mutableStateOf<LocalDate?>(null)
+    var age by mutableIntStateOf(0) // non nullable, inizializzato a 0
         private set
 
-    // 🔹 Funzioni per modificare lo stato
     fun onNameChange(newValue: String) { name = newValue }
     fun onSurnameChange(newValue: String) { surname = newValue }
     fun onEmailChange(newValue: String) { email = newValue }
     fun onPasswordChange(newValue: String) { password = newValue }
-    fun onBirthDateChange(newDate: LocalDate) { birthDate = newDate }
+    fun onAgeChange(newValue: String) {
+        age = newValue.toIntOrNull() ?: 0 // se non valido, torna 0
+    }
 
-    // 🔹 Funzione di registrazione
+
+    // Stato per errore età
+    var ageError by mutableStateOf(false)
+        private set
+
     fun registerUser(onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
-            if (name.isBlank() || email.isBlank() || password.isBlank()) {
-                onError("Compila tutti i campi obbligatori")
-                return@launch
+            try {
+                if (name.isBlank() || surname.isBlank() || email.isBlank()
+                    || password.isBlank() || age == 0) {
+                    onError("Compila tutti i campi obbligatori")
+                    return@launch
+                }
+
+                val newUser = User(
+                    name = name,
+                    surname = surname,
+                    email = email,
+                    password = password,
+                    age = age
+                )
+
+                userDaoRepository.insertUserWithInfo(newUser)
+                onSuccess()
+
+            } catch (e: SQLiteConstraintException) {
+                onError("Questa email è già registrata")
+            } catch (e: Exception) {
+                onError("Errore durante la registrazione: ${e.message}")
             }
-
-            // Qui in futuro potrai chiamare un repository, esempio:
-            // userRepository.insertUser(User(...))
-
-            onSuccess()
         }
     }
 }

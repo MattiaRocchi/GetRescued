@@ -13,6 +13,7 @@ import com.example.myapplication.data.repositories.TitleBadgeRepository
 import com.example.myapplication.data.repositories.UserDaoRepository
 import com.example.myapplication.data.utils.Converters
 import com.example.myapplication.ui.add.AddRequestViewModel
+import com.example.myapplication.ui.login.LoginViewModel
 import com.example.myapplication.ui.registration.RegistrationViewModel
 import com.example.myapplication.ui.requests.RequestsViewModel
 
@@ -30,8 +31,9 @@ val appModule = module {
             AppDatabase::class.java,
             "getrescued-db"
         )
-            .addTypeConverter(Converters()) // opzionale se non hai già usato @TypeConverters nella classe DB
+            .fallbackToDestructiveMigration()
             .build()
+
     }
 
     // DAO bindings
@@ -46,7 +48,8 @@ val appModule = module {
     single { SettingsRepository(get()) }
 
     //ViewModes
-    viewModel { RegistrationViewModel() }
+    viewModel { RegistrationViewModel(get()) }
+    viewModel { LoginViewModel() }
     viewModel { AddRequestViewModel(get()) } // get() → RequestDaoRepository
     viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository
 }
