@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.core.i18n)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -83,4 +84,8 @@ dependencies {
 //Serialization
     implementation(libs.navigation.compose)
     implementation(libs.ktor.serialization.kotlinx.json)
+
+    //data picker
+    implementation(platform("androidx.compose:compose-bom:2024.02.00"))
+
 }
