@@ -25,12 +25,12 @@ fun LoginScreen(
         Spacer(Modifier.height(16.dp))
 
         Button(onClick = {
-            navController.navigate(GetRescuedRoute.profile)
+            navController.navigate(GetRescuedRoute.Profile)
         }) {
             Text("Vai al profilo")
         }
         TextButton (onClick = {
-            navController.navigate(GetRescuedRoute.registration)
+            navController.navigate(GetRescuedRoute.Registration)
         }) {
             Text("Sei nuovo? Registrati")
         }
