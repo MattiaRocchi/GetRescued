@@ -41,6 +41,7 @@ sealed interface GetRescuedRoute {
     @Serializable
     data object title : GetRescuedRoute
 
+
     //definisci come data class le route che richiedono parametri quando vendono percorse
     @Serializable
     data class addRequest(val requestId: Int) : GetRescuedRoute
