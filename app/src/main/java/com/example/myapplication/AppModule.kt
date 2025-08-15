@@ -49,7 +49,7 @@ val appModule = module {
 
     //ViewModes
     viewModel { RegistrationViewModel(get()) }
-    viewModel { LoginViewModel(get()) }
+    viewModel { LoginViewModel(get(), get()) }
     viewModel { AddRequestViewModel(get()) } // get() → RequestDaoRepository
     viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository
 }

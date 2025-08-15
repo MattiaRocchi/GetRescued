@@ -1,6 +1,8 @@
 package com.example.myapplication.ui.login
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -21,6 +23,7 @@ fun LoginScreen(
     navController: NavHostController,
     viewModel: LoginViewModel
 ) {
+    val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -34,7 +37,9 @@ fun LoginScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .padding(16.dp)
+                .verticalScroll(scrollState)
+                .imePadding()
+                .padding(16.dp),
         ) {
 
             // Campo Email
@@ -60,7 +65,7 @@ fun LoginScreen(
                 passwordError = passwordError
             )
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(24.dp))
 
             // Bottone Accedi
             Button(

@@ -5,12 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.data.repositories.UserDaoRepository
 import kotlinx.coroutines.launch
 
 //TODO
 class LoginViewModel(
-    private val userDaoRepository: UserDaoRepository
+    private val userDaoRepository: UserDaoRepository,
+    private val settingsRepository: SettingsRepository
+
 ): ViewModel() {
     var email by mutableStateOf("")
         private set
@@ -30,15 +33,22 @@ class LoginViewModel(
                 }
 
 
+                val user = userDaoRepository.getByEmail(email)
+
                 when {
-                    userDaoRepository.login(email, password) != null -> {
-                    onSuccess()
+                    user == null -> {
+                        onError("Mail non registrata")
                     }
-                    userDaoRepository.findEmail(email) != null -> {
+                    user.password != password -> {
                         onError("Password errata")
                     }
                     else -> {
-                        onError("Mail non registrata")
+                        settingsRepository.setLoggedInUser(
+                            user.id,
+                            user.email,
+                            user.name,
+                            user.surname)
+                        onSuccess()
                     }
                 }
 

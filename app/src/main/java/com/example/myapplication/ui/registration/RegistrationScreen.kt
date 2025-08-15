@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -45,6 +48,7 @@ fun RegistrationScreen(
     navController: NavHostController,
     viewModel: RegistrationViewModel
 ) {
+    val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -58,11 +62,14 @@ fun RegistrationScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
 
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .padding(padding),
+                .padding(padding)
+                .verticalScroll(scrollState)
+                .imePadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // 🔹 NOME
