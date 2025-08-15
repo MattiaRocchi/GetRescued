@@ -32,7 +32,7 @@ class LoginViewModel(
 
                 when {
                     userDaoRepository.login(email, password) != null -> {
-
+                    onSuccess()
                     }
                     userDaoRepository.findEmail(email) != null -> {
                         onError("Password errata")

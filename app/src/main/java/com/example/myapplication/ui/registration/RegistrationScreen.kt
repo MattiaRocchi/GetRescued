@@ -162,7 +162,7 @@ fun RegistrationScreen(
                             scope.launch {
                                 snackbarHostState.showSnackbar("Registrazione avvenuta!")
                             }
-                            navController.navigate(GetRescuedRoute.Profile)
+                            navController.navigate(GetRescuedRoute.Login)
                         },
                         onError = { msg ->
                             scope.launch {
