@@ -47,7 +47,8 @@ class LoginViewModel(
                             user.id,
                             user.email,
                             user.name,
-                            user.surname)
+                            user.surname,
+                            0)
                         onSuccess()
                     }
                 }
