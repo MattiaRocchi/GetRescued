@@ -7,7 +7,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -25,9 +30,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapplication.ui.GetRescuedRoute
+import com.example.myapplication.ui.composables.EmailTextField
+import com.example.myapplication.ui.composables.PasswordTextField
 import kotlinx.coroutines.launch
 
 
@@ -98,46 +107,28 @@ fun RegistrationScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            // 🔹 EMAIL
-            OutlinedTextField(
+
+
+            EmailTextField(
                 value = viewModel.email,
                 onValueChange = {
                     viewModel.onEmailChange(it)
-                    emailError = it.isBlank() || !android.util.Patterns.EMAIL_ADDRESS.matcher(it).matches()
+                    emailError = it.isBlank() ||
+                            !android.util.Patterns.EMAIL_ADDRESS.matcher(it).matches()
                 },
-                label = { Text("Email") },
-                isError = emailError,
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    focusedTextColor = MaterialTheme.colorScheme.onSecondary,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
-                    cursorColor = MaterialTheme.colorScheme.onSecondary
-                )
+                emailError = emailError
             )
-            if (emailError) Text("Inserisci un'email valida", color = MaterialTheme.colorScheme.error)
 
             Spacer(Modifier.height(8.dp))
 
-            // 🔹 PASSWORD
-            OutlinedTextField(
+            PasswordTextField(
                 value = viewModel.password,
                 onValueChange = {
-                    viewModel.onPasswordChange(it); passwordError = it.length < 6
+                    viewModel.onPasswordChange(it)
+                    passwordError = it.length < 6
                 },
-                label = { Text("Password") },
-                isError = passwordError,
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    focusedTextColor = MaterialTheme.colorScheme.onSecondary,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
-                    cursorColor = MaterialTheme.colorScheme.onSecondary
-                )
+                passwordError = passwordError
             )
-            if (passwordError) Text("Minimo 6 caratteri", color = MaterialTheme.colorScheme.error)
 
             Spacer(Modifier.height(8.dp))
 
@@ -181,6 +172,7 @@ fun RegistrationScreen(
                     )
                 },
                 enabled = !nameError && !surnameError && !emailError && !passwordError && !ageError,
+
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Registrati")

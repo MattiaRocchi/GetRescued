@@ -11,6 +11,7 @@ class UserDaoRepository(private val userDao: UserDao) {
 
     suspend fun login(email: String, password: String) = userDao.login(email, password)
 
+    suspend fun findEmail(email: String) = userDao.findEmail(email)
 
     suspend fun insertUser(user: User): Long {
         return userDao.insert(user)
