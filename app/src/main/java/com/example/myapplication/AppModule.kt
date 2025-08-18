@@ -14,6 +14,7 @@ import com.example.myapplication.data.repositories.UserDaoRepository
 import com.example.myapplication.data.utils.Converters
 import com.example.myapplication.ui.add.AddRequestViewModel
 import com.example.myapplication.ui.login.LoginViewModel
+import com.example.myapplication.ui.profile.ProfileViewModel
 import com.example.myapplication.ui.registration.RegistrationViewModel
 import com.example.myapplication.ui.requests.RequestsViewModel
 
@@ -52,4 +53,6 @@ val appModule = module {
     viewModel { LoginViewModel(get(), get()) }
     viewModel { AddRequestViewModel(get()) } // get() → RequestDaoRepository
     viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository
+    viewModel { ProfileViewModel(get(), get(),
+        get()) }
 }
