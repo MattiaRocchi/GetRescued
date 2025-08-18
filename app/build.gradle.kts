@@ -91,4 +91,12 @@ dependencies {
     //data picker
     implementation(platform("androidx.compose:compose-bom:2024.02.00"))
 
+    //fotocamera async
+    implementation("io.coil-kt:coil-compose:2.3.0")
+
+    //gps
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.2")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
+
 }

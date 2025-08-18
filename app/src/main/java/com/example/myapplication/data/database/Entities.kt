@@ -87,7 +87,6 @@ data class generalMissionUser(
     @ColumnInfo(name= "active") var active: Boolean=true, //se questa missione è attiva o meno,
     // di defaultinizialmente messa a true
 
-
 )
 @Entity(primaryKeys = ["id", "idUser"])
 data class settimanalMissionUser(
