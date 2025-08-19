@@ -16,6 +16,7 @@ import com.example.myapplication.ui.inforequest.InfoRequestScreen
 import com.example.myapplication.ui.login.LoginScreen
 import com.example.myapplication.ui.login.LoginViewModel
 import com.example.myapplication.ui.profile.ProfileScreen
+import com.example.myapplication.ui.profile.ProfileViewModel
 import com.example.myapplication.ui.registration.RegistrationScreen
 import com.example.myapplication.ui.registration.RegistrationViewModel
 import com.example.myapplication.ui.requests.RequestsScreen
@@ -75,7 +76,8 @@ fun GetRescuedNavGraph(
             AddRequestScreen(navController, AddRequestViewModel(db.requestDao()), userId = args.requestId)
         }
         composable<GetRescuedRoute.Profile> {
-            ProfileScreen(navController)
+            val viewModel: ProfileViewModel = koinViewModel()
+            ProfileScreen(navController, viewModel)
         }
         composable<GetRescuedRoute.Requests> {
             val context = LocalContext.current
