@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.ui.text)
     implementation(libs.androidx.runtime)
+    implementation(libs.androidx.foundation.layout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -95,8 +96,14 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.3.0")
 
     //gps
-    implementation(libs.lifecycle.runtime.compose)
-    implementation(libs.play.services.location)
-    implementation(libs.kotlinx.coroutines.play.services)
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.2")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
 
+    //Camerax
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+    implementation(libs.camerax.extensions)
 }
