@@ -10,9 +10,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import androidx.room.Room
 import com.example.myapplication.data.database.AppDatabase
-import com.example.myapplication.ui.addrequest.AddRequestScreen
-import com.example.myapplication.ui.addrequest.AddRequestViewModel
-import com.example.myapplication.ui.inforequest.InfoRequestScreen
+import com.example.myapplication.ui.add.AddRequestScreen
+import com.example.myapplication.ui.add.AddRequestViewModel
 import com.example.myapplication.ui.login.LoginScreen
 import com.example.myapplication.ui.login.LoginViewModel
 import com.example.myapplication.ui.profile.ProfileScreen
@@ -51,9 +50,6 @@ sealed interface GetRescuedRoute {
     @Serializable
     data class AddRequest(val requestId: Int) : GetRescuedRoute
 
-    @Serializable
-    data class InfoRequest(val requestId: Int) : GetRescuedRoute
-
 }
 @Composable
 fun GetRescuedNavGraph(
@@ -82,12 +78,7 @@ fun GetRescuedNavGraph(
         composable<GetRescuedRoute.Requests> {
             val context = LocalContext.current
             val db = Room.databaseBuilder(context, AppDatabase::class.java, "rescued-database").build()
-            RequestsScreen(navController ,RequestsViewModel(db.requestDao()))
-        }
-
-        composable<GetRescuedRoute.InfoRequest> { backStackEntry ->
-            val args = backStackEntry.toRoute<GetRescuedRoute.InfoRequest>()
-            InfoRequestScreen(navController = navController, requestId = args.requestId)
+            RequestsScreen(navController, RequestsViewModel(db.requestDao()))
         }
         composable<GetRescuedRoute.Missions> {
             Text("Pagina Missioni")
