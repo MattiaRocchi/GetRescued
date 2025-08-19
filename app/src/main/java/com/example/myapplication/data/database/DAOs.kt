@@ -52,6 +52,9 @@ interface RequestDao {
     @Insert
     suspend fun insert(request: Request)
 
+    @Query("SELECT * FROM Request WHERE id = :requestId")
+    suspend fun getRequestById(requestId: Int): Request?
+
     @Query("SELECT * FROM Request ORDER BY date DESC")
     fun getAll(): Flow<List<Request>>
 
