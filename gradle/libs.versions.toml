@@ -18,6 +18,13 @@ coreI18n = "1.0.0"
 foundation = "1.8.3"
 uiText = "1.8.3"
 runtime = "1.8.3"
+lifecycle = "2.8.7"
+playServicesLocation = "21.3.0"
+kotlinxCoroutinesPlayServices = "1.7.1"
+navigationSafeArgsGenerator = "2.9.3"
+material3Jvmstubs = "1.5.0-alpha02"
+camerax = "1.3.4"
+foundationLayout = "1.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -44,7 +51,18 @@ androidx-foundation = { group = "androidx.compose.foundation", name = "foundatio
 androidx-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
 androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 
+lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesPlayServices" }
+androidx-navigation-safe-args-generator = { group = "androidx.navigation", name = "navigation-safe-args-generator", version.ref = "navigationSafeArgsGenerator" }
+androidx-material3-jvmstubs = { group = "androidx.compose.material3", name = "material3-jvmstubs", version.ref = "material3Jvmstubs" }
 
+camerax-core = { module = "androidx.camera:camera-core", version.ref = "camerax" }
+camerax-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }
+camerax-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }
+camerax-view = { module = "androidx.camera:camera-view", version.ref = "camerax" }
+camerax-extensions = { module = "androidx.camera:camera-extensions", version.ref = "camerax" }
+androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 
 
 

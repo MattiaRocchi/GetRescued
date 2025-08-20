@@ -22,6 +22,7 @@ data class Request(
     @ColumnInfo(name = "date") val date: Long = System.currentTimeMillis(),
     @ColumnInfo(name= "completed") var completed: Boolean=false,
 )
+
 @Entity
 data class Tags(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -56,7 +57,7 @@ data class User(
 
     //data di creazione dell'account
     @ColumnInfo(name = "created_at") val createdAt: Long = System.currentTimeMillis()
-    )
+)
 @Entity
 data class UserInfo(
     @PrimaryKey val id: Int, //Id dell'utente di riferimento

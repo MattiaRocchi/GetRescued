@@ -11,11 +11,12 @@ import com.example.myapplication.data.database.AppDatabase
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.TitleBadgeRepository
 import com.example.myapplication.data.repositories.UserDaoRepository
-import com.example.myapplication.data.utils.Converters
-import com.example.myapplication.ui.add.AddRequestViewModel
+import com.example.myapplication.ui.addrequest.AddRequestViewModel
 import com.example.myapplication.ui.login.LoginViewModel
-import com.example.myapplication.ui.registration.RegistrationViewModel
 import com.example.myapplication.ui.requests.RequestsViewModel
+import com.example.myapplication.ui.registration.RegistrationViewModel
+import com.example.myapplication.ui.inforequest.InfoRequestViewModel
+import com.example.myapplication.ui.profile.ProfileViewModel
 
 val Context.dataStore by preferencesDataStore("settings")
 
@@ -52,4 +53,7 @@ val appModule = module {
     viewModel { LoginViewModel(get(), get()) }
     viewModel { AddRequestViewModel(get()) } // get() → RequestDaoRepository
     viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository
+    viewModel { InfoRequestViewModel(get(), get()) }
+    viewModel { ProfileViewModel(get(), get(),
+        get()) }
 }

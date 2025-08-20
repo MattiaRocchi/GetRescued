@@ -37,7 +37,7 @@ fun ProfileScreen(
     navController: NavHostController,
     viewModel: ProfileViewModel,
 
-) {
+    ) {
 
     val name by viewModel.name.collectAsState()
     val surname by viewModel.surname.collectAsState()

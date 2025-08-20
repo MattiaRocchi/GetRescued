@@ -1,3 +1,4 @@
+
 package com.example.myapplication.data.database
 
 import androidx.room.Dao
@@ -52,6 +53,9 @@ interface RequestDao {
     @Insert
     suspend fun insert(request: Request)
 
+    @Query("SELECT * FROM Request WHERE id = :requestId")
+    suspend fun getRequestById(requestId: Int): Request?
+
     @Query("SELECT * FROM Request ORDER BY date DESC")
     fun getAll(): Flow<List<Request>>
 
@@ -93,5 +97,3 @@ interface TitleBadgeDao {
     @Query("SELECT * FROM TitleBadge WHERE id = :id")
     suspend fun getById(id: Int): TitleBadge?
 }
-
-

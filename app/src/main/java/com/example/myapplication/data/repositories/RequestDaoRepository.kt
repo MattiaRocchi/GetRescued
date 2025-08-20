@@ -3,6 +3,7 @@ package com.example.myapplication.data.repositories
 import com.example.myapplication.data.database.Request
 import com.example.myapplication.data.database.RequestDao
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 
 class RequestDaoRepository (private val requestDao: RequestDao) {
 
@@ -11,12 +12,21 @@ class RequestDaoRepository (private val requestDao: RequestDao) {
     fun getRequestsForUser(userId: Int): Flow<List<Request>> =
         requestDao.getAvailableRequestsForUser(userId)
 
-    fun getOpenRequest(): Flow<List<Request>> = requestDao.getOpenRequests()
+    fun getOpenRequests(): Flow<List<Request>> = requestDao.getOpenRequests()
 
     //trova le richieste di aiuto mandate da uno specifico utente
     fun getRequestFromUser(userId: Int): Flow<List<Request>> =
         requestDao.getRequestsByUser(userId)
 
+    suspend fun getRequestById(requestId: Int): Request? {
+        return try {
+            // Prova a recuperare direttamente dal database
+            requestDao.getRequestById(requestId)
+        } catch (e: Exception) {
+            // Fallback: cerca nella lista delle richieste aperte
+            requestDao.getAll().firstOrNull()?.find { it.id == requestId }
+        }
+    }
 
     suspend fun insertRequest(request: Request) = requestDao.insert(request)
 

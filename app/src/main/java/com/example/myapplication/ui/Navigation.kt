@@ -10,8 +10,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import androidx.room.Room
 import com.example.myapplication.data.database.AppDatabase
-import com.example.myapplication.ui.add.AddRequestScreen
-import com.example.myapplication.ui.add.AddRequestViewModel
+import com.example.myapplication.ui.addrequest.AddRequestScreen
+import com.example.myapplication.ui.addrequest.AddRequestViewModel
+import com.example.myapplication.ui.inforequest.InfoRequestScreen
 import com.example.myapplication.ui.login.LoginScreen
 import com.example.myapplication.ui.login.LoginViewModel
 import com.example.myapplication.ui.profile.ProfileScreen
@@ -22,6 +23,8 @@ import com.example.myapplication.ui.requests.RequestsScreen
 import com.example.myapplication.ui.requests.RequestsViewModel
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
+
+
 sealed interface GetRescuedRoute {
     //definisci come data object le route che non richiedono parametri quando vendono percorse
 
@@ -49,6 +52,9 @@ sealed interface GetRescuedRoute {
     //definisci come data class le route che richiedono parametri quando vendono percorse
     @Serializable
     data class AddRequest(val requestId: Int) : GetRescuedRoute
+
+    @Serializable
+    data class InfoRequest(val requestId: Int) : GetRescuedRoute
 
 }
 @Composable
@@ -78,7 +84,12 @@ fun GetRescuedNavGraph(
         composable<GetRescuedRoute.Requests> {
             val context = LocalContext.current
             val db = Room.databaseBuilder(context, AppDatabase::class.java, "rescued-database").build()
-            RequestsScreen(navController, RequestsViewModel(db.requestDao()))
+            RequestsScreen(navController ,RequestsViewModel(db.requestDao()))
+        }
+
+        composable<GetRescuedRoute.InfoRequest> { backStackEntry ->
+            val args = backStackEntry.toRoute<GetRescuedRoute.InfoRequest>()
+            InfoRequestScreen(navController = navController, requestId = args.requestId)
         }
         composable<GetRescuedRoute.Missions> {
             Text("Pagina Missioni")
@@ -124,5 +135,3 @@ fun GetRescuedNavGraph(navController: NavHostController
         }
     }
 }*/
-
-
