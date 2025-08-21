@@ -37,7 +37,7 @@ sealed interface GetRescuedRoute {
 
     //TODO schermata di titolo
     @Serializable
-    data object title : GetRescuedRoute
+    data object Title : GetRescuedRoute
 
     @Serializable
     data class InfoRequest(val requestId: Int) : GetRescuedRoute
