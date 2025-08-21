@@ -11,9 +11,11 @@ import com.example.myapplication.data.utils.Converters
         Mission::class, TitleBadge::class,
         generalMissionUser::class, settimanalMissionUser::class,
         Tags::class, TagsMission::class, TagsUser::class,
-        UserBadgeCrossRef::class
+        UserBadgeCrossRef::class, UserPart::class,
     ],
-    version = 2
+    version = 5,
+    exportSchema = true
+
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

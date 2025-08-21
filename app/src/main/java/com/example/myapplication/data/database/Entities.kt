@@ -22,6 +22,14 @@ data class Request(
     @ColumnInfo(name = "date") val date: Long = System.currentTimeMillis(),
     @ColumnInfo(name= "completed") var completed: Boolean=false,
 )
+
+@Entity(primaryKeys = ["idUser", "idMissionId"])
+data class UserPart(
+    //tag necessari per poter dare
+    // una mano nel soccorrimento
+    val idUser: Int,
+    val idMissionId: Int,
+)
 @Entity
 data class Tags(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -65,6 +73,7 @@ data class UserInfo(
     @ColumnInfo(name= "exp") val exp: Int,
     @ColumnInfo(name= "profileFoto") val profileFoto: String?, //quale tipo sarebbe meglio utilizzare?
 )
+
 @Entity(primaryKeys = ["userId", "badgeId"])
 data class UserBadgeCrossRef(
     val userId: Int,

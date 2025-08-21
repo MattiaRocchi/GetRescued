@@ -18,6 +18,10 @@ class RequestDaoRepository (private val requestDao: RequestDao) {
         requestDao.getRequestsByUser(userId)
 
 
+    fun getTakenRequestsForUser(userId: Int): Flow<List<Request>> =
+        requestDao.getUserRequests(userId)
+
+
     suspend fun insertRequest(request: Request) = requestDao.insert(request)
 
     suspend fun updateRequest(request: Request) = requestDao.update(request)

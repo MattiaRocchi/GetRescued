@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import androidx.room.Room
 import com.example.myapplication.data.database.AppDatabase
+import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.ui.add.AddRequestScreen
 import com.example.myapplication.ui.add.AddRequestViewModel
 import com.example.myapplication.ui.login.LoginScreen
@@ -54,11 +55,14 @@ sealed interface GetRescuedRoute {
 @Composable
 fun GetRescuedNavGraph(
     navController: NavHostController,
+    startDestination: GetRescuedRoute,
     modifier: Modifier = Modifier
 ) {
+
+
     NavHost(
         navController = navController,
-        startDestination = GetRescuedRoute.Registration,
+        startDestination = startDestination,
         modifier = modifier
     ) {
         composable<GetRescuedRoute.Registration> {

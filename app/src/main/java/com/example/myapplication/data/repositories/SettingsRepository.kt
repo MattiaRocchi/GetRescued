@@ -10,10 +10,16 @@ import kotlinx.coroutines.flow.map
 import java.io.Serializable
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.example.myapplication.data.database.UserDao
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 
-
+//TODO da snellire
 class SettingsRepository(
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val userDao: UserDao
 ) {
     companion object {
         val LOGGED_IN_USER_ID = intPreferencesKey("logged_in_user_id")
@@ -24,9 +30,24 @@ class SettingsRepository(
 
     }
 
+
+
     val userIdFlow: Flow<Int> = dataStore.data.map { prefs ->
         prefs[LOGGED_IN_USER_ID] ?: -1
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val validUserFlow: Flow<Int?> =
+        userIdFlow.flatMapLatest { id ->
+            if (id == -1) {
+                flowOf(null)
+            } else {
+                flow {
+                    val user = userDao.getById(id)
+                    emit(user?.id) // null se non trovato
+                }
+            }
+        }
 
     val emailFlow: Flow<String?> = dataStore.data.map { prefs ->
         prefs[LOGGED_IN_EMAIL]
@@ -70,46 +91,3 @@ class SettingsRepository(
         }
     }
 }
-
-
-
-/*
-class UserDSRepository(private val dataStore: DataStore<Preferences>) {
-    companion object {
-        private val EMAIL =
-            stringPreferencesKey("userDS")
-    }
-
-    val email = dataStore.data.map { preferences ->
-        preferences[EMAIL]
-    }
-
-    suspend fun setUser(email: String) =
-        dataStore.edit { it[EMAIL] = email }
-
-    suspend fun clearEmail() {
-        dataStore.edit { it.remove(EMAIL) }
-    }
-
-    suspend fun incrementScore(email: String, points: Int) {
-        try {
-            val user = supabase.from("users")
-                .select() {
-                    filter {
-                        eq("email", email)
-                    }
-                }
-                .decodeList<UserServer>()
-
-            val newScore = user[0].points + points
-            supabase.from("users")
-                .update(mapOf("points" to newScore)) {
-                    filter {
-                        eq("email", email)
-                    }
-                }
-        } catch (e: Exception) {
-            Log.e("Supabase", "Error incrementing score: ${e.message}")
-        }
-    }
-}*/

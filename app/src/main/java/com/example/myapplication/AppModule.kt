@@ -46,7 +46,7 @@ val appModule = module {
     single { UserDaoRepository(get()) }
     single { RequestDaoRepository(get()) }
     single { TitleBadgeRepository(get()) }
-    single { SettingsRepository(get()) }
+    single { SettingsRepository(get(), get()) }
 
     //ViewModes
     viewModel { RegistrationViewModel(get()) }

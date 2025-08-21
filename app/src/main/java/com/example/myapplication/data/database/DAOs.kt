@@ -45,6 +45,12 @@ interface UserDao {
         insertInfo(info)
     }
 
+    @Query("SELECT * FROM UserInfo WHERE id = :id")
+    suspend fun getUserInfo(id: Int): UserInfo?
+
+    @Query("UPDATE UserInfo SET profileFoto = :newFotoUri WHERE id = :id")
+    suspend fun updateProfPic(id: Int, newFotoUri: String): Int
+
 }
 
 @Dao
@@ -80,6 +86,14 @@ interface RequestDao {
 
     @Delete
     suspend fun delete(request: Request)
+
+    @Query("""
+    SELECT r.* 
+    FROM UserPart u, Request r 
+    WHERE r.id = u.idMissionId AND u.idUser = :userID
+""")
+    fun getUserRequests(userID: Int): Flow<List<Request>>
+
 }
 
 @Dao
