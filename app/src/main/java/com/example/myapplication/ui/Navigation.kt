@@ -39,7 +39,8 @@ sealed interface GetRescuedRoute {
     @Serializable
     data object title : GetRescuedRoute
 
-
+    @Serializable
+    data class InfoRequest(val requestId: Int) : GetRescuedRoute
 
     @Serializable
     data object Requests : GetRescuedRoute
@@ -58,11 +59,12 @@ sealed interface GetRescuedRoute {
 @Composable
 fun GetRescuedNavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    startDestination: GetRescuedRoute
 ) {
     NavHost(
         navController = navController,
-        startDestination = GetRescuedRoute.Registration,
+        startDestination = startDestination,
         modifier = modifier
     ) {
         composable<GetRescuedRoute.Registration> {
@@ -94,6 +96,10 @@ fun GetRescuedNavGraph(
         composable<GetRescuedRoute.Login> {
             val viewModel: LoginViewModel = koinViewModel()
             LoginScreen(navController, viewModel)
+        }
+        composable<GetRescuedRoute.InfoRequest> { backStackEntry ->
+            val args = backStackEntry.toRoute<GetRescuedRoute.InfoRequest>()
+            InfoRequestScreen(navController = navController, requestId = args.requestId)
         }
 
     }
