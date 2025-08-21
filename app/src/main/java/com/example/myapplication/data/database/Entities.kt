@@ -30,6 +30,7 @@ data class UserPart(
     val idUser: Int,
     val idMissionId: Int,
 )
+
 @Entity
 data class Tags(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -73,7 +74,6 @@ data class UserInfo(
     @ColumnInfo(name= "exp") val exp: Int,
     @ColumnInfo(name= "profileFoto") val profileFoto: String?, //quale tipo sarebbe meglio utilizzare?
 )
-
 @Entity(primaryKeys = ["userId", "badgeId"])
 data class UserBadgeCrossRef(
     val userId: Int,

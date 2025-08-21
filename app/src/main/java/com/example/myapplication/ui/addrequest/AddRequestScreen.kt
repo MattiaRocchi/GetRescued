@@ -1,4 +1,5 @@
-package com.example.myapplication.ui.add
+
+package com.example.myapplication.ui.addrequest
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -6,8 +7,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import openAddressInMaps
 
 @Composable
 fun AddRequestScreen(
@@ -19,6 +22,8 @@ fun AddRequestScreen(
     val description by viewModel.description.collectAsState()
     val peopleRequired by viewModel.peopleRequired.collectAsState()
     val difficulty by viewModel.difficulty.collectAsState()
+    val location by viewModel.location.collectAsState()
+    val context = LocalContext.current
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -74,6 +79,24 @@ fun AddRequestScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        //Posizione
+        OutlinedTextField(
+            value = location,
+            onValueChange = viewModel::onLocationChange,
+            label = { Text("Posizione (es: Piazza Duomo, Milano)") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Bottone Maps (solo se la posizione è valida)
+        if (location.isNotBlank()) {
+            Button(
+                onClick = { openAddressInMaps(context, location) },
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+            ) {
+                Text("Visualizza posizione in Maps")
+            }
+        }
+
         Button(
             onClick = {
                 viewModel.submitRequest(userId) {
@@ -82,7 +105,7 @@ fun AddRequestScreen(
             },
             modifier = Modifier.align(Alignment.End)
         ) {
-            Text("Invia richiesta")
+            Text("Crea Richiesta")
         }
     }
 }

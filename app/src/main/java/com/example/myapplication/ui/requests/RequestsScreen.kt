@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.requests
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.data.database.Request
+import com.example.myapplication.ui.GetRescuedRoute
 
 @Composable
 fun RequestsScreen(
@@ -29,7 +31,12 @@ fun RequestsScreen(
         } else {
             LazyColumn {
                 items(requests) { request ->
-                    RequestItem(request = request)
+                    RequestItem(
+                        request = request,
+                        onClick = {
+                            navController.navigate(GetRescuedRoute.InfoRequest(request.id))
+                        }
+                    )
                     Divider()
                 }
             }
@@ -38,13 +45,22 @@ fun RequestsScreen(
 }
 
 @Composable
-fun RequestItem(request: Request) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)) {
-        Text("Titolo: ${request.title}", style = MaterialTheme.typography.titleMedium)
-        Text("Difficoltà: ${request.difficulty}")
-        Text("Descrizione: ${request.description}")
-        Text("Persone richieste: ${request.peopleRequired}")
+fun RequestItem(
+    request: Request,
+    onClick: () -> Unit // Aggiunto onClick handler
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable(onClick = onClick), // Trasforma in elemento cliccabile
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Titolo: ${request.title}", style = MaterialTheme.typography.titleMedium)
+            Text("Difficoltà: ${request.difficulty}")
+            Text("Descrizione: ${request.description}")
+            Text("Persone richieste: ${request.peopleRequired}")
+        }
     }
 }

@@ -10,9 +10,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import androidx.room.Room
 import com.example.myapplication.data.database.AppDatabase
-import com.example.myapplication.data.repositories.SettingsRepository
-import com.example.myapplication.ui.add.AddRequestScreen
-import com.example.myapplication.ui.add.AddRequestViewModel
+
+import com.example.myapplication.ui.addrequest.AddRequestScreen
+import com.example.myapplication.ui.addrequest.AddRequestViewModel
+import com.example.myapplication.ui.inforequest.InfoRequestScreen
 import com.example.myapplication.ui.login.LoginScreen
 import com.example.myapplication.ui.login.LoginViewModel
 import com.example.myapplication.ui.profile.ProfileScreen
@@ -23,6 +24,8 @@ import com.example.myapplication.ui.requests.RequestsScreen
 import com.example.myapplication.ui.requests.RequestsViewModel
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
+
+
 sealed interface GetRescuedRoute {
     //definisci come data object le route che non richiedono parametri quando vendono percorse
 
@@ -55,14 +58,11 @@ sealed interface GetRescuedRoute {
 @Composable
 fun GetRescuedNavGraph(
     navController: NavHostController,
-    startDestination: GetRescuedRoute,
     modifier: Modifier = Modifier
 ) {
-
-
     NavHost(
         navController = navController,
-        startDestination = startDestination,
+        startDestination = GetRescuedRoute.Registration,
         modifier = modifier
     ) {
         composable<GetRescuedRoute.Registration> {
