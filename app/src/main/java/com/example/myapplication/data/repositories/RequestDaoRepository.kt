@@ -3,41 +3,31 @@ package com.example.myapplication.data.repositories
 import com.example.myapplication.data.database.Request
 import com.example.myapplication.data.database.RequestDao
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 
 class RequestDaoRepository (private val requestDao: RequestDao) {
 
+
+    suspend fun insertRequest(request: Request) = requestDao.insert(request)
+    suspend fun updateRequest(request: Request) = requestDao.update(request)
+    suspend fun deleteRequest(request: Request) = requestDao.delete(request)
+
     fun getAllRequests(): Flow<List<Request>> = requestDao.getAll()
-
-    fun getRequestsForUser(userId: Int): Flow<List<Request>> =
-        requestDao.getAvailableRequestsForUser(userId)
-
     fun getOpenRequests(): Flow<List<Request>> = requestDao.getOpenRequests()
+    fun getRequestsByUser(userId: Int): Flow<List<Request>> = requestDao.getRequestsByUser(userId)
+    fun getAvailableRequestsForUser(userId: Int): Flow<List<Request>> = requestDao.getAvailableRequestsForUser(userId)
+    fun getRequestByIdFlow(requestId: Int): Flow<Request?> = requestDao.getRequestByIdFlow(requestId)
 
-    //trova le richieste di aiuto mandate da uno specifico utente
-    fun getRequestFromUser(userId: Int): Flow<List<Request>> =
-        requestDao.getRequestsByUser(userId)
-
-    suspend fun getRequestById(requestId: Int): Request? {
+    suspend fun getRequestById(requestId: Int): List<Request> {
         return try {
             // Prova a recuperare direttamente dal database
             requestDao.getRequestById(requestId)
         } catch (e: Exception) {
             // Fallback: cerca nella lista delle richieste aperte
-            requestDao.getAll().firstOrNull()?.find { it.id == requestId }
+            requestDao.getRequestById(requestId)
         }
     }
-
-    fun getTakenRequestsForUser(userId: Int): Flow<List<Request>> =
-        requestDao.getUserRequests(userId)
-
-
-    suspend fun insertRequest(request: Request) = requestDao.insert(request)
-
-    suspend fun updateRequest(request: Request) = requestDao.update(request)
-
-    suspend fun deleteRequest(request: Request) = requestDao.delete(request)
 }
+
 /*@Dao
 interface TripsDAO {
     @Query("SELECT * FROM trip ORDER BY name ASC")

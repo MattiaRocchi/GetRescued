@@ -10,11 +10,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import androidx.room.Room
 import com.example.myapplication.data.database.AppDatabase
+import com.example.myapplication.data.repositories.RequestDaoRepository
+import com.example.myapplication.data.repositories.SettingsRepository
+import com.example.myapplication.dataStore
 
 import com.example.myapplication.ui.addrequest.AddRequestScreen
 import com.example.myapplication.ui.addrequest.AddRequestViewModel
+import com.example.myapplication.ui.addrequest.ManageRequestsScreen
 import com.example.myapplication.ui.changeProfile.ChangeProfileScreen
 import com.example.myapplication.ui.changeProfile.ChangeProfileViewModel
+import com.example.myapplication.ui.editrequest.EditRequestScreen
 import com.example.myapplication.ui.inforequest.InfoRequestScreen
 import com.example.myapplication.ui.login.LoginScreen
 import com.example.myapplication.ui.login.LoginViewModel
@@ -57,6 +62,13 @@ sealed interface GetRescuedRoute {
     @Serializable
     data class AddRequest(val requestId: Int) : GetRescuedRoute
 
+    @Serializable
+    object ManageRequests : GetRescuedRoute
+
+    @Serializable
+    data class EditRequest(val requestId: Int) : GetRescuedRoute
+
+
 }
 @Composable
 fun GetRescuedNavGraph(
@@ -77,7 +89,9 @@ fun GetRescuedNavGraph(
             val args = backStackEntry.toRoute<GetRescuedRoute.AddRequest>()
             val context = LocalContext.current
             val db = Room.databaseBuilder(context, AppDatabase::class.java, "rescued-database").build()
-            AddRequestScreen(navController, AddRequestViewModel(db.requestDao()), userId = args.requestId)
+            val requestRepository = RequestDaoRepository(db.requestDao())
+            val settingsRepository = SettingsRepository(context.dataStore, db.userDao())
+            AddRequestScreen(AddRequestViewModel(repository = requestRepository, settingsRepository = settingsRepository), onCreated = {navController.popBackStack()})
         }
         composable<GetRescuedRoute.Profile> {
             val viewModel: ProfileViewModel = koinViewModel()
@@ -106,6 +120,29 @@ fun GetRescuedNavGraph(
         composable<GetRescuedRoute.InfoRequest> { backStackEntry ->
             val args = backStackEntry.toRoute<GetRescuedRoute.InfoRequest>()
             InfoRequestScreen(navController = navController, requestId = args.requestId)
+        }
+
+        composable<GetRescuedRoute.ManageRequests> {
+            val context = LocalContext.current
+            val db = Room.databaseBuilder(context, AppDatabase::class.java, "rescued-database").build()
+            val requestRepository = RequestDaoRepository(db.requestDao())
+            val settingsRepository = SettingsRepository(context.dataStore, db.userDao())
+            ManageRequestsScreen(
+                navController = navController,
+                requestRepository = requestRepository,
+                settingsRepository = settingsRepository
+            )
+        }
+        composable<GetRescuedRoute.EditRequest> { backStackEntry ->
+            val args = backStackEntry.toRoute<GetRescuedRoute.EditRequest>()
+            val context = LocalContext.current
+            val db = Room.databaseBuilder(context, AppDatabase::class.java, "rescued-database").build()
+            val requestRepository = RequestDaoRepository(db.requestDao())
+            EditRequestScreen(
+                navController = navController,
+                requestId = args.requestId,
+                repository = requestRepository
+            )
         }
 
     }

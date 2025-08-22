@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.Request
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
+import com.example.myapplication.data.database.RequestDao
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -41,14 +42,11 @@ class InfoRequestViewModel(
             try {
                 println("DEBUG: Cerco richiesta ID: $requestId")
 
-                val allRequests = requestRepository.getOpenRequests().first()
-                println("DEBUG: Tutte le richieste: ${allRequests.map { it.id }}")
-
                 val request = requestRepository.getRequestById(requestId)
                 println("DEBUG: Richiesta trovata: $request")
 
                 if (request != null) {
-                    _uiState.value = UiState.Success(request)
+                    _uiState.value = UiState.Success(request.first())
                 } else {
                     _uiState.value = UiState.Error("Richiesta non trovata. ID: $requestId")
                 }

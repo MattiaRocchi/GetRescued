@@ -1,4 +1,3 @@
-
 package com.example.myapplication.ui.addrequest
 
 import androidx.compose.foundation.clickable
@@ -9,14 +8,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import openAddressInMaps
 
 @Composable
 fun AddRequestScreen(
-    navController: NavController,
     viewModel: AddRequestViewModel,
-    userId: Int // Lo passi dal chiamante, es. dal MainActivity
+    onCreated: () -> Unit
 ) {
     val title by viewModel.title.collectAsState()
     val description by viewModel.description.collectAsState()
@@ -25,26 +22,18 @@ fun AddRequestScreen(
     val location by viewModel.location.collectAsState()
     val context = LocalContext.current
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
-
+    Column(Modifier.fillMaxSize().padding(16.dp)) {
         Text("Crea una nuova richiesta", style = MaterialTheme.typography.titleLarge)
-
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = title,
-            onValueChange = viewModel::onTitleChange,
-            label = { Text("Titolo") },
-            modifier = Modifier.fillMaxWidth()
+            value = title, onValueChange = viewModel::onTitleChange,
+            label = { Text("Titolo") }, modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
-            value = description,
-            onValueChange = viewModel::onDescriptionChange,
-            label = { Text("Descrizione") },
-            modifier = Modifier.fillMaxWidth()
+            value = description, onValueChange = viewModel::onDescriptionChange,
+            label = { Text("Descrizione") }, modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
@@ -54,58 +43,41 @@ fun AddRequestScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Dropdown per difficoltà
         var expanded by remember { mutableStateOf(false) }
         Box {
             OutlinedTextField(
-                value = difficulty,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Difficoltà") },
+                value = difficulty, onValueChange = {},
+                readOnly = true, label = { Text("Difficoltà") },
                 modifier = Modifier.fillMaxWidth().clickable { expanded = true }
             )
             DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                 listOf("Bassa", "Media", "Alta").forEach {
-                    DropdownMenuItem(
-                        text = { Text(it) },
-                        onClick = {
-                            viewModel.onDifficultyChange(it)
-                            expanded = false
-                        }
-                    )
+                    DropdownMenuItem(text = { Text(it) }, onClick = {
+                        viewModel.onDifficultyChange(it); expanded = false
+                    })
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
 
-        //Posizione
         OutlinedTextField(
-            value = location,
-            onValueChange = viewModel::onLocationChange,
+            value = location, onValueChange = viewModel::onLocationChange,
             label = { Text("Posizione (es: Piazza Duomo, Milano)") },
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Bottone Maps (solo se la posizione è valida)
         if (location.isNotBlank()) {
             Button(
                 onClick = { openAddressInMaps(context, location) },
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-            ) {
-                Text("Visualizza posizione in Maps")
-            }
+            ) { Text("Visualizza posizione in Maps") }
         }
 
+        Spacer(Modifier.height(12.dp))
         Button(
-            onClick = {
-                viewModel.submitRequest(userId) {
-                    navController.popBackStack() // Torna indietro dopo l’inserimento
-                }
-            },
+            onClick = { viewModel.submitRequest(onCreated) },
             modifier = Modifier.align(Alignment.End)
-        ) {
-            Text("Crea Richiesta")
-        }
+        ) { Text("Crea Richiesta") }
     }
 }

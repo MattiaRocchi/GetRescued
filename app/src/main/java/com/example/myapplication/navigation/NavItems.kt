@@ -9,6 +9,7 @@ sealed class NavItem(
     val title: String,
     val iconResId: Int
 ) {
+
     object Requests : NavItem(
         route = GetRescuedRoute.Requests,
         title = "Richieste",
@@ -22,8 +23,8 @@ sealed class NavItem(
     )
 
     object Create : NavItem(
-        route = GetRescuedRoute.AddRequest(1),
-        title = "Create",
+        route = GetRescuedRoute.ManageRequests,
+        title = "Gestisci",
         iconResId = R.drawable.ic_requests
     )
 

@@ -107,4 +107,9 @@ dependencies {
     implementation(libs.camerax.view)
     implementation(libs.camerax.extensions)
     implementation("com.google.code.gson:gson:2.13.1")
+
+
+    //Slide
+    implementation("com.google.accompanist:accompanist-pager:0.32.0")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.32.0")
 }

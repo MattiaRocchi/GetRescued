@@ -19,7 +19,7 @@ object TitleTheme {
 }
 @Entity
 data class Request(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Int =0,
     @ColumnInfo(name= "title") val title: String,
     @ColumnInfo(name= "sender") val sender: Int, //id dell'utente richiedente
     @ColumnInfo(name= "rescuers") val rescuers: List<Int>, //list di id dei soccorritori

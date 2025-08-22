@@ -27,7 +27,7 @@ fun InfoRequestScreen(
     requestId: Int,
     viewModel: InfoRequestViewModel = koinViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState = viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
     LaunchedEffect(requestId) {
@@ -46,7 +46,7 @@ fun InfoRequestScreen(
             )
         },
         floatingActionButton = {
-            if (uiState is InfoRequestViewModel.UiState.Success) {
+            if (uiState.value is InfoRequestViewModel.UiState.Success) {
                 val request = (uiState as InfoRequestViewModel.UiState.Success).request
                 FloatingActionButton(
                     onClick = { shareRequestDetails(context, request) },
@@ -62,7 +62,7 @@ fun InfoRequestScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            when (val state = uiState) {
+            when (val state = uiState.value) {
                 InfoRequestViewModel.UiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }

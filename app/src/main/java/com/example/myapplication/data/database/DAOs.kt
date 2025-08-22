@@ -66,8 +66,11 @@ interface RequestDao {
     @Insert
     suspend fun insert(request: Request)
 
-    @Query("SELECT * FROM Request WHERE id = :requestId")
-    suspend fun getRequestById(requestId: Int): Request?
+    @Query("SELECT * FROM Request WHERE id in (:requestId) LIMIT 1")
+    suspend fun getRequestById(requestId: Int): List<Request>
+
+    @Query("SELECT * FROM Request WHERE id = :requestId LIMIT 1")
+    fun getRequestByIdFlow(requestId: Int): Flow<Request?>
 
     @Query("SELECT * FROM Request ORDER BY date DESC")
     fun getAll(): Flow<List<Request>>
@@ -75,7 +78,7 @@ interface RequestDao {
     @Query("SELECT * FROM Request WHERE completed = 0")
     fun getOpenRequests(): Flow<List<Request>>
 
-    @Query("SELECT * FROM Request WHERE sender = :userId")
+    @Query("SELECT * FROM Request WHERE sender = :userId ORDER BY date DESC")
     fun getRequestsByUser(userId: Int): Flow<List<Request>>
 
     /*

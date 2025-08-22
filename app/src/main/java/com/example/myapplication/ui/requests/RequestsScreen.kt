@@ -61,6 +61,8 @@ fun RequestItem(
             Text("Difficoltà: ${request.difficulty}")
             Text("Descrizione: ${request.description}")
             Text("Persone richieste: ${request.peopleRequired}")
+            Text("Id richiesta: ${request.id}")
+
         }
     }
 }
