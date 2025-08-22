@@ -13,6 +13,8 @@ import com.example.myapplication.data.database.AppDatabase
 
 import com.example.myapplication.ui.addrequest.AddRequestScreen
 import com.example.myapplication.ui.addrequest.AddRequestViewModel
+import com.example.myapplication.ui.changeProfile.ChangeProfileScreen
+import com.example.myapplication.ui.changeProfile.ChangeProfileViewModel
 import com.example.myapplication.ui.inforequest.InfoRequestScreen
 import com.example.myapplication.ui.login.LoginScreen
 import com.example.myapplication.ui.login.LoginViewModel
@@ -35,15 +37,15 @@ sealed interface GetRescuedRoute {
     @Serializable
     data object Registration : GetRescuedRoute
 
-    //TODO schermata di titolo
-    @Serializable
-    data object Title : GetRescuedRoute
 
     @Serializable
     data class InfoRequest(val requestId: Int) : GetRescuedRoute
 
     @Serializable
     data object Requests : GetRescuedRoute
+
+    @Serializable
+    data object ChangeProfile : GetRescuedRoute
 
     @Serializable
     data object Missions : GetRescuedRoute
@@ -80,6 +82,10 @@ fun GetRescuedNavGraph(
         composable<GetRescuedRoute.Profile> {
             val viewModel: ProfileViewModel = koinViewModel()
             ProfileScreen(navController, viewModel)
+        }
+        composable<GetRescuedRoute.ChangeProfile> {
+            val viewModel: ChangeProfileViewModel = koinViewModel()
+            ChangeProfileScreen(navController, viewModel)
         }
         composable<GetRescuedRoute.Requests> {
             val context = LocalContext.current

@@ -141,7 +141,7 @@ fun RegistrationScreen(
 
             // 🔹 ETÀ
             OutlinedTextField(
-                value = viewModel.age?.toString() ?: "",
+                value = viewModel.age.toString(),
                 onValueChange = {
                     viewModel.onAgeChange(it)
                     ageError = it.toIntOrNull()?.let { n -> n <= 0 } ?: true

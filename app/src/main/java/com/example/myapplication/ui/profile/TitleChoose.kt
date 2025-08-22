@@ -17,6 +17,9 @@ import io.ktor.websocket.Frame
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +38,8 @@ import com.example.myapplication.ui.theme.NonCommon
 import com.example.myapplication.ui.theme.NonCommonDark
 import com.example.myapplication.ui.theme.Rare
 import com.example.myapplication.ui.theme.RareDark
+import com.example.myapplication.ui.theme.SuperRare
+import com.example.myapplication.ui.theme.SuperRareDark
 import com.example.myapplication.ui.theme.UnpressableButtonDark
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -50,9 +55,15 @@ fun TitlePickerDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {},
+
         title = { Frame.Text("Scegli un titolo") },
         text = {
-            Column {
+            Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 400.dp) // limita l'altezza massima
+                        .verticalScroll(rememberScrollState())
+                    ){
                 titles.forEach { title ->
                     Row(
                         modifier = Modifier
@@ -93,6 +104,7 @@ fun rarityToColor(rarity: String): Color {
         "Common" -> if (darkTheme) CommonDark else Common
         "Uncommon" -> if (darkTheme) NonCommonDark else NonCommon
         "Rare" -> if (darkTheme) RareDark else Rare
+        "SuperRare" -> if (darkTheme) SuperRareDark else SuperRare
         "Epic" -> if (darkTheme) EpicDark else Epic
         "Mythic" -> if (darkTheme) MythicDark else Mythic
         "Legendary" -> if (darkTheme) LeggendaryDark else Leggendary

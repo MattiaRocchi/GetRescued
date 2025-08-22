@@ -25,7 +25,9 @@ interface UserDao {
     @Query("SELECT * FROM User WHERE email = :email")
     suspend fun findEmail(email: String): User?
     @Update
-    suspend fun update(user: User)
+    suspend fun updateUser(user: User)
+    @Update
+    suspend fun updateUserInfo(userInfo: UserInfo)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(user: User): Long // Ritorna l'ID generato
@@ -52,6 +54,11 @@ interface UserDao {
     @Query("UPDATE UserInfo SET profileFoto = :newFotoUri WHERE id = :id")
     suspend fun updateProfPic(id: Int, newFotoUri: String): Int
 
+    @Query("SELECT u.phoneNumber FROM User u WHERE id = :userId")
+    suspend fun getUserPhoneNumber(userId: Int): String?
+
+    @Query("SELECT u.created_at FROM User u WHERE id = :userId")
+    suspend fun getUserCreation(userId: Int): Long
 }
 
 @Dao

@@ -12,36 +12,47 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+
+
 import kotlinx.coroutines.launch
-
 class ProfileViewModel(
-
     private val titleBadgeRepository: TitleBadgeRepository,
     private val userDaoRepository: UserDaoRepository,
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
+    // UserId dallo store
     val userId = settingsRepository.userIdFlow
-        .stateIn(viewModelScope,
-            SharingStarted.WhileSubscribed(5000), -1)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), -1)
+
+    // Stato UI
+    private val _user = MutableStateFlow<UserWithInfo?>(null)
+    val user: StateFlow<UserWithInfo?> = _user
+
     private val _userTitles = MutableStateFlow<List<TitleBadge>>(emptyList())
     val userTitles: StateFlow<List<TitleBadge>> = _userTitles
-
 
     private val _userActiveTitle = MutableStateFlow<TitleBadge?>(null)
     val userActiveTitle: StateFlow<TitleBadge?> = _userActiveTitle
 
     private val _allTitles = MutableStateFlow<List<TitleBadge>>(emptyList())
     val allTitles: StateFlow<List<TitleBadge>> = _allTitles
-    private val _user = MutableStateFlow<UserWithInfo?>(null)
-    val user: StateFlow<UserWithInfo?> = _user
 
     init {
+        // 🔹 ogni volta che cambia userId → ricarico tutto
         viewModelScope.launch {
-            settingsRepository.userIdFlow.collect { id ->
+            userId.collect { id ->
                 if (id != -1) {
-                    val data = userDaoRepository.getUserWithInfo(id)
-                    _user.value = data
+                    _user.value = userDaoRepository.getUserWithInfo(id)
+                    _userTitles.value = titleBadgeRepository.getUserTitles(id)
+                    _userActiveTitle.value = titleBadgeRepository.getActiveTitleByUserId(id)
+                    _allTitles.value = titleBadgeRepository.getAll()
+                } else {
+                    // Reset se non loggato
+                    _user.value = null
+                    _userTitles.value = emptyList()
+                    _userActiveTitle.value = null
+                    _allTitles.value = emptyList()
                 }
             }
         }
@@ -49,58 +60,26 @@ class ProfileViewModel(
 
     fun updateProfilePhoto(newUri: String) {
         viewModelScope.launch {
-            val userId = userId.first() // dal tuo SettingsRepository
-            if (userId != -1) {
-                val success = userDaoRepository.updateProfPic(userId, newUri)
+            val id = userId.value
+            if (id != -1) {
+                val success = userDaoRepository.updateProfPic(id, newUri)
                 if (success) {
-                    // refresh user data
-                    _user.value = userDaoRepository.getUserWithInfo(userId)
+                    _user.value = userDaoRepository.getUserWithInfo(id) // refresh
                 }
             }
         }
     }
 
-    fun updateActiveTitle(newTitle: Int) {
+    fun updateActiveTitle(newTitleId: Int) {
         viewModelScope.launch {
-            val userId = userId.first()
-            if (userId != -1) {
-                titleBadgeRepository.updateActiveTitle(userId, newTitle)
-                // refresh user data
-                _user.value = userDaoRepository.getUserWithInfo(userId)
+            val id = userId.value
+            if (id != -1) {
+                titleBadgeRepository.updateActiveTitle(id, newTitleId)
+                _user.value = userDaoRepository.getUserWithInfo(id) // refresh user
+                _userActiveTitle.value = titleBadgeRepository.getActiveTitleByUserId(id)
             }
         }
     }
-
-    fun getAllTitles() {
-        viewModelScope.launch {
-            val titles = titleBadgeRepository.getAll()
-            _allTitles.value = titles
-        }
-    }
-    fun getUserTitles() {
-        viewModelScope.launch {
-            val userId = userId.first()
-            if (userId != -1) {
-                val titles = titleBadgeRepository.getUserTitles(userId)
-                _userTitles.value = titles
-            }
-        }
-    }
-    fun getActiveTitle() {
-        viewModelScope.launch {
-            val userId = userId.first()
-            if (userId != -1) {
-                val title = titleBadgeRepository.getActiveTitleByUserId(userId)
-                _userActiveTitle.value = title
-            } else {
-                _userActiveTitle.value = null
-            }
-        }
-    }
-
-
-
-
 
     fun logout(onSuccess: () -> Unit) {
         viewModelScope.launch {

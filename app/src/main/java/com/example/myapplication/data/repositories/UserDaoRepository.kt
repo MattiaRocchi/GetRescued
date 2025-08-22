@@ -1,5 +1,6 @@
 package com.example.myapplication.data.repositories
 
+import androidx.room.Query
 import com.example.myapplication.data.database.User
 import com.example.myapplication.data.database.UserDao
 import com.example.myapplication.data.database.UserInfo
@@ -26,10 +27,22 @@ class UserDaoRepository(private val userDao: UserDao) {
         return userDao.insertUserWithInfo(user)
     }
 
-    suspend fun update(user: User) = userDao.update(user)
+    suspend fun updateUser(user: User) {
+        //TODO CONTROLLARE SE FUNZIONA
+        userDao.updateUser(user)
+    }
 
     suspend fun getUserInfo(id: Int) = userDao.getUserInfo(id)
 
+
+    suspend fun getUserPhoneNumber(userId: Int): String? {
+        return userDao.getUserPhoneNumber(userId)
+    }
+
+
+    suspend fun getUserCreation(userId: Int): Long {
+        return userDao.getUserCreation(userId)
+    }
     suspend fun updateProfPic(id: Int, newFotoUri: String): Boolean {
         return userDao.updateProfPic(id, newFotoUri) > 0
     }

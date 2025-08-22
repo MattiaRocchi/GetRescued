@@ -40,21 +40,23 @@ fun ProfileScreen(
     viewModel: ProfileViewModel,
 ) {
     val context = LocalContext.current
-    val user by viewModel.user.collectAsState()
 
-    //titolo attivo
+
+    // Dati dal ViewModel
+    val user by viewModel.user.collectAsState()
     val activeTitle by viewModel.userActiveTitle.collectAsState()
+    val titles by viewModel.userTitles.collectAsState()
+    val allTitles by viewModel.allTitles.collectAsState()
+
+
 
     // Stati UI
     var showChangePicDialog by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
     var showTitleDialog by remember { mutableStateOf(false) }
-    val titles by viewModel.userTitles.collectAsState()
-    //togli dopo
-    val allTitles by viewModel.userTitles.collectAsState()
-    LaunchedEffect(Unit) {
-        viewModel.getUserTitles()
-    }
+
+
+
     // 📂 Launcher per la galleria
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -158,29 +160,35 @@ fun ProfileScreen(
 
 
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
-                    onClick = {  },
-                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { /* eventualmente aprire dialogo qui */ },
+                    modifier = Modifier.weight(1f), // usa peso invece di fillMaxWidth
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = rarityToColor(activeTitle?.rarity ?: "Common"),   // sfondo
-                        contentColor = MaterialTheme.colorScheme.primary,     // testo/icona
+                        containerColor = rarityToColor(activeTitle?.rarity ?: "Common"),
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                         disabledContainerColor = UnpressableButtonDark,
-                        disabledContentColor = MaterialTheme.colorScheme.primary
+                        disabledContentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
                     Text(
-                    text = activeTitle?.name ?: "Nessun titolo",
-                    style = MaterialTheme.typography.bodyLarge
-                ) }
+                        text = activeTitle?.name ?: "Nessun titolo",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
 
+                Spacer(Modifier.width(8.dp))
 
                 IconButton(
                     onClick = { showTitleDialog = true },
                     modifier = Modifier
-                        .size(32.dp)
-                        .background(MaterialTheme.colorScheme.onSecondaryContainer, CircleShape)
+                        .size(40.dp)
+                        .background(
+                            MaterialTheme.colorScheme.onSecondaryContainer,
+                            CircleShape
+                        )
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
@@ -188,6 +196,16 @@ fun ProfileScreen(
                         tint = MaterialTheme.colorScheme.secondaryContainer
                     )
                 }
+            }
+
+            Spacer(Modifier.height(18.dp))
+            Button(
+                onClick = {
+                        navController.navigate(GetRescuedRoute.ChangeProfile)
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Cambia i tuoi dati")
             }
 
             Spacer(Modifier.height(32.dp))
