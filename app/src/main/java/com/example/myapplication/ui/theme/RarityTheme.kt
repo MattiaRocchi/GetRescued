@@ -20,17 +20,3 @@ data class TitleColors(
 val LocalTitleColors = staticCompositionLocalOf { LightTitleColors }
 
 
-@Composable
-fun rarityToColor(rarity: String): Color {
-    val darkTheme = isSystemInDarkTheme()
-
-    return when (rarity) {
-        "Common" -> if (darkTheme) CommonDark else Common
-        "Uncommon" -> if (darkTheme) NonCommonDark else NonCommon
-        "Rare" -> if (darkTheme) RareDark else Rare
-        "Epic" -> if (darkTheme) EpicDark else Epic
-        "Mythic" -> if (darkTheme) MythicDark else Mythic
-        "Legendary" -> if (darkTheme) LeggendaryDark else Leggendary
-        else -> Color.Gray
-    }
-}

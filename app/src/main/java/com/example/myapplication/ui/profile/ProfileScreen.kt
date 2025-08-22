@@ -28,6 +28,9 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.ui.composables.CameraCapture
 import com.example.myapplication.ui.composables.ImagePickerDialog
+import com.example.myapplication.ui.theme.LocalTitleColors
+import com.example.myapplication.ui.theme.TitleColors
+import com.example.myapplication.ui.theme.UnpressableButtonDark
 import com.example.myapplication.utils.PermissionStatus
 import com.example.myapplication.utils.rememberMultiplePermissions
 
@@ -38,6 +41,9 @@ fun ProfileScreen(
 ) {
     val context = LocalContext.current
     val user by viewModel.user.collectAsState()
+
+    //titolo attivo
+    val activeTitle by viewModel.userActiveTitle.collectAsState()
 
     // Stati UI
     var showChangePicDialog by remember { mutableStateOf(false) }
@@ -154,10 +160,21 @@ fun ProfileScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = titles.firstOrNull { it.id == user?.activeTitle }?.name ?: "Nessun titolo",
+                Button(
+                    onClick = {  },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = rarityToColor(activeTitle?.rarity ?: "Common"),   // sfondo
+                        contentColor = MaterialTheme.colorScheme.primary,     // testo/icona
+                        disabledContainerColor = UnpressableButtonDark,
+                        disabledContentColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text(
+                    text = activeTitle?.name ?: "Nessun titolo",
                     style = MaterialTheme.typography.bodyLarge
-                )
+                ) }
+
 
                 IconButton(
                     onClick = { showTitleDialog = true },

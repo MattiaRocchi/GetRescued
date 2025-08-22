@@ -13,6 +13,7 @@ class TitleBadgeRepository(private val dao: TitleBadgeDao) {
 
     suspend fun getById(id: Int): TitleBadge? = dao.getById(id)
 
+    suspend fun getActiveTitleByUserId(id: Int): TitleBadge? = dao.getActiveTitleByUserId(id)
     suspend fun updateActiveTitle(userId: Int, newTitle: Int) {
         dao.updateActiveTitle(userId, newTitle)
     }
