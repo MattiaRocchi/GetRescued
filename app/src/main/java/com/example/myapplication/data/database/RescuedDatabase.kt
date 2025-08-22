@@ -7,10 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.myapplication.data.utils.Converters
-import com.example.myapplication.ui.profile.loadTitlesFromJson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+
 
 @Database(
     entities = [

@@ -27,6 +27,10 @@ class ProfileViewModel(
     private val _userTitles = MutableStateFlow<List<TitleBadge>>(emptyList())
     val userTitles: StateFlow<List<TitleBadge>> = _userTitles
 
+
+    private val _userActiveTitle = MutableStateFlow<TitleBadge?>(null)
+    val userActiveTitle: StateFlow<TitleBadge?> = _userActiveTitle
+
     private val _allTitles = MutableStateFlow<List<TitleBadge>>(emptyList())
     val allTitles: StateFlow<List<TitleBadge>> = _allTitles
     private val _user = MutableStateFlow<UserWithInfo?>(null)
@@ -82,7 +86,17 @@ class ProfileViewModel(
             }
         }
     }
-
+    fun getActiveTitle() {
+        viewModelScope.launch {
+            val userId = userId.first()
+            if (userId != -1) {
+                val title = titleBadgeRepository.getActiveTitleByUserId(userId)
+                _userActiveTitle.value = title
+            } else {
+                _userActiveTitle.value = null
+            }
+        }
+    }
 
 
 

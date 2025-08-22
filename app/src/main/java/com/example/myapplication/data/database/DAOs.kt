@@ -114,6 +114,9 @@ interface TitleBadgeDao {
     @Query("SELECT * FROM TitleBadge WHERE id = :id")
     suspend fun getById(id: Int): TitleBadge?
 
+    @Query("SELECT t.* FROM TitleBadge t, UserInfo u WHERE u.id = :id and u.activeTitle = t.id LIMIT 1")
+    suspend fun getActiveTitleByUserId(id: Int): TitleBadge?
+
     @Query("SELECT * FROM TitleBadge t, UserBadgeCrossRef u WHERE u.badgeId = t.id AND u.userId = :idUser")
     suspend fun getUserTitles(idUser: Int): List<TitleBadge>
 
