@@ -35,33 +35,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun titleBadgeDao(): TitleBadgeDao
 
 
-    companion object {
-        @Volatile
-        private var INSTANCE: AppDatabase? = null
-
-        fun getDatabase(context: Context): AppDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    "rescued-database"
-                )
-                    .addCallback(object : Callback() {
-                        override fun onCreate(db: SupportSQLiteDatabase) {
-                            super.onCreate(db)
-                            // Quando il DB viene creato → inserisco i TitleBadge
-                            CoroutineScope(Dispatchers.IO).launch {
-                                val titles = loadTitlesFromJson(context) // <-- funzione helper che legge il JSON in assets
-                                getDatabase(context).titleBadgeDao().insertAll(titles)
-                            }
-                        }
-                    })
-                    .build()
-                INSTANCE = instance
-                instance
-            }
-        }
-    }
 }
 /*
 istanzia
