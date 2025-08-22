@@ -11,7 +11,6 @@ data class UserWithInfo(
     val createdAt: Long,
 
     val activeTitle: Int,
-    val possessedTitles: List<Int>,
     val exp: Int,
     val profileFoto: String?
 )

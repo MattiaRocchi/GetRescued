@@ -1,12 +1,22 @@
 package com.example.myapplication.data.database
 
 
+import android.graphics.Color
+import androidx.compose.runtime.Composable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.myapplication.ui.theme.LocalTitleColors
+import com.example.myapplication.ui.theme.TitleColors
 
 
+
+object TitleTheme {
+    val colors: TitleColors
+        @Composable
+        get() = LocalTitleColors.current
+}
 @Entity
 data class Request(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -70,7 +80,6 @@ data class User(
 data class UserInfo(
     @PrimaryKey val id: Int, //Id dell'utente di riferimento
     @ColumnInfo(name= "activeTitle") var activeTitle: Int,
-    @ColumnInfo(name= "possessedTitles") val possessedTitles: List<Int>,
     @ColumnInfo(name= "exp") val exp: Int,
     @ColumnInfo(name= "profileFoto") val profileFoto: String?, //quale tipo sarebbe meglio utilizzare?
 )
@@ -108,8 +117,7 @@ data class settimanalMissionUser(
 
 @Entity
 data class TitleBadge(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey val id: Int = 0,
     @ColumnInfo(name= "name") val name: String,
-    @ColumnInfo(name= "color") val color: String,
-    @ColumnInfo(name= "rarity") val rarity: String,
+    @ColumnInfo(name= "rarity") val rarity: String
 )

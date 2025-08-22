@@ -12,4 +12,18 @@ class TitleBadgeRepository(private val dao: TitleBadgeDao) {
     suspend fun getAll(): List<TitleBadge> = dao.getAll()
 
     suspend fun getById(id: Int): TitleBadge? = dao.getById(id)
+
+    suspend fun updateActiveTitle(userId: Int, newTitle: Int) {
+        dao.updateActiveTitle(userId, newTitle)
+    }
+    suspend fun getUserTitles (idUser: Int): List<TitleBadge> {
+        return dao.getUserTitles(idUser)
+    }
+    suspend fun insertUserBadgeCrossRef(userId: Int, badgeId: Int) {
+        dao.insertUserBadgeCrossRef(userId, badgeId)
+    }
+
+    suspend fun insertAll(titles: List<TitleBadge>) {
+        dao.insertAll(titles)
+    }
 }

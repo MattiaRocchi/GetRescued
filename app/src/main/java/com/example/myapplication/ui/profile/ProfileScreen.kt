@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,7 +42,13 @@ fun ProfileScreen(
     // Stati UI
     var showChangePicDialog by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
-
+    var showTitleDialog by remember { mutableStateOf(false) }
+    val titles by viewModel.userTitles.collectAsState()
+    //togli dopo
+    val allTitles by viewModel.userTitles.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.getUserTitles()
+    }
     // 📂 Launcher per la galleria
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -50,6 +59,7 @@ fun ProfileScreen(
             }
         }
     }
+
 
     // 📸 Gestione permessi fotocamera
     val cameraPermissions = rememberMultiplePermissions(
@@ -140,6 +150,29 @@ fun ProfileScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = titles.firstOrNull { it.id == user?.activeTitle }?.name ?: "Nessun titolo",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                IconButton(
+                    onClick = { showTitleDialog = true },
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(MaterialTheme.colorScheme.onSecondaryContainer, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Cambia titolo",
+                        tint = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                }
+            }
+
             Spacer(Modifier.height(32.dp))
             Button(
                 onClick = {
@@ -167,6 +200,20 @@ fun ProfileScreen(
             onPickFromGallery = {
                 showChangePicDialog = false
                 galleryLauncher.launch("image/*")
+            }
+        )
+    }
+
+
+
+    if (showTitleDialog) {
+        TitlePickerDialog(
+            titles = allTitles,
+            activeTitleId = user?.activeTitle,
+            onDismiss = { showTitleDialog = false },
+            onSelect = { title ->
+                viewModel.updateActiveTitle(title.id)
+                showTitleDialog = false
             }
         )
     }

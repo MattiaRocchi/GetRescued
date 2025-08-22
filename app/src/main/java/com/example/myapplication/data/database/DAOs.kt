@@ -34,16 +34,16 @@ interface UserDao {
     suspend fun insertInfo(userInfo: UserInfo)
 
     @Transaction
-    suspend fun insertUserWithInfo(user: User) {
+    suspend fun insertUserWithInfo(user: User): Long {
         val userId = insert(user) // Inserisce e prende ID
         val info = UserInfo(
             id = userId.toInt(),
             activeTitle = 0,
-            possessedTitles = listOf(0),
             exp = 0,
             profileFoto = null
         )
         insertInfo(info)
+        return userId
     }
 
     @Query("SELECT * FROM UserInfo WHERE id = :id")
@@ -105,9 +105,21 @@ interface TitleBadgeDao {
     @Insert
     suspend fun insert(badge: TitleBadge)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(titles: List<TitleBadge>)
+
     @Query("SELECT * FROM TitleBadge")
     suspend fun getAll(): List<TitleBadge>
 
     @Query("SELECT * FROM TitleBadge WHERE id = :id")
     suspend fun getById(id: Int): TitleBadge?
+
+    @Query("SELECT * FROM TitleBadge t, UserBadgeCrossRef u WHERE u.badgeId = t.id AND u.userId = :idUser")
+    suspend fun getUserTitles(idUser: Int): List<TitleBadge>
+
+    @Query("UPDATE UserInfo SET activeTitle = :newTitle WHERE id = :userId")
+    suspend fun updateActiveTitle(userId: Int, newTitle: Int)
+
+    @Query("INSERT INTO UserBadgeCrossRef (userId, badgeId) VALUES (:userId, :badgeId)")
+    suspend fun insertUserBadgeCrossRef(userId: Int, badgeId: Int)
 }

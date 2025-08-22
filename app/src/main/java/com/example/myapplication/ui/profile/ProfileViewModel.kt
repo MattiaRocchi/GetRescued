@@ -2,6 +2,7 @@ package com.example.myapplication.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.data.database.TitleBadge
 import com.example.myapplication.data.database.UserWithInfo
 import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.data.repositories.TitleBadgeRepository
@@ -23,6 +24,11 @@ class ProfileViewModel(
     val userId = settingsRepository.userIdFlow
         .stateIn(viewModelScope,
             SharingStarted.WhileSubscribed(5000), -1)
+    private val _userTitles = MutableStateFlow<List<TitleBadge>>(emptyList())
+    val userTitles: StateFlow<List<TitleBadge>> = _userTitles
+
+    private val _allTitles = MutableStateFlow<List<TitleBadge>>(emptyList())
+    val allTitles: StateFlow<List<TitleBadge>> = _allTitles
     private val _user = MutableStateFlow<UserWithInfo?>(null)
     val user: StateFlow<UserWithInfo?> = _user
 
@@ -49,6 +55,37 @@ class ProfileViewModel(
             }
         }
     }
+
+    fun updateActiveTitle(newTitle: Int) {
+        viewModelScope.launch {
+            val userId = userId.first()
+            if (userId != -1) {
+                titleBadgeRepository.updateActiveTitle(userId, newTitle)
+                // refresh user data
+                _user.value = userDaoRepository.getUserWithInfo(userId)
+            }
+        }
+    }
+
+    fun getAllTitles() {
+        viewModelScope.launch {
+            val titles = titleBadgeRepository.getAll()
+            _allTitles.value = titles
+        }
+    }
+    fun getUserTitles() {
+        viewModelScope.launch {
+            val userId = userId.first()
+            if (userId != -1) {
+                val titles = titleBadgeRepository.getUserTitles(userId)
+                _userTitles.value = titles
+            }
+        }
+    }
+
+
+
+
 
 
     fun logout(onSuccess: () -> Unit) {

@@ -32,7 +32,7 @@ val appModule = module {
             AppDatabase::class.java,
             "getrescued-db"
         )
-            //.fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration()
             .build()
 
     }
@@ -49,7 +49,7 @@ val appModule = module {
     single { SettingsRepository(get(), get()) }
 
     //ViewModes
-    viewModel { RegistrationViewModel(get()) }
+    viewModel { RegistrationViewModel(get(), get()) }
     viewModel { LoginViewModel(get(), get()) }
     viewModel { AddRequestViewModel(get()) } // get() → RequestDaoRepository
     viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository

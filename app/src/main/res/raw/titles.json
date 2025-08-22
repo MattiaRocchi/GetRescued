@@ -1,0 +1,31 @@
+
+
+
+[
+  { "id": 0, "name": "Novellino", "rarity": "Common" },
+  { "id": 1, "name": "Apprendista", "rarity": "NonCommon" },
+  { "id": 2, "name": "Diligente", "rarity": "Rare" },
+  { "id": 3, "name": "Altruista", "rarity": "SuperRaro" },
+  { "id": 4, "name": "Caritatevole", "rarity": "Epic" },
+  { "id": 5, "name": "Esperto Soccorritore", "rarity": "Mitic" },
+  { "id": 6, "name": "Filantropo", "rarity": "Leggendary" },
+  { "id": 7, "name": "Idraulico Novello", "rarity": "Raro" },
+  { "id": 8, "name": "Idraulico Amatoriale", "rarity": "SuperRaro" },
+  { "id": 9, "name": "Idraulico Diligente", "rarity": "Epic" },
+  { "id": 10, "name": "Idraulico Esperto", "rarity": "Mitic" },
+  { "id": 11, "name": "Maestro Idraulico", "rarity": "Leggendary" },
+  { "id": 12, "name": "MedioMan!", "rarity": "Leggendary" },
+  { "id": 13, "name": "Pompiere Novello", "rarity": "Raro" },
+  { "id": 14, "name": "Pompiere Amatoriale", "rarity": "SuperRaro" },
+  { "id": 15, "name": "Pompiere Diligente", "rarity": "Epic" },
+  { "id": 16, "name": "Pompiere Esperto", "rarity": "Mitic" },
+  { "id": 17, "name": "Pompiere Eroe", "rarity": "Leggendary" },
+  { "id": 18, "name": "Elettricista Novello", "rarity": "Raro" },
+  { "id": 19, "name": "Elettricista Amatoriale", "rarity": "SuperRaro" },
+  { "id": 20, "name": "Elettricista Diligente", "rarity": "Epic" },
+  { "id": 21, "name": "Elettricista Esperto", "rarity": "Mitic" },
+  { "id": 22, "name": "Elettricista Idraulico", "rarity": "Leggendary" },
+  { "id": 23, "name": "Amante delle palle di pelo", "rarity": "Epic" }
+
+]
+

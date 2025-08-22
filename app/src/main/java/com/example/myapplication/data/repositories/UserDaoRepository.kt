@@ -22,8 +22,8 @@ class UserDaoRepository(private val userDao: UserDao) {
 
    // suspend fun insertUserInfo(userInfo: UserInfo) = userDao.insertInfo(userInfo)
 
-    suspend fun insertUserWithInfo(user: User) {
-        userDao.insertUserWithInfo(user)
+    suspend fun insertUserWithInfo(user: User): Long {
+        return userDao.insertUserWithInfo(user)
     }
 
     suspend fun update(user: User) = userDao.update(user)
@@ -49,7 +49,6 @@ class UserDaoRepository(private val userDao: UserDao) {
                 phoneNumber = user.phoneNumber,
                 createdAt = user.createdAt,
                 activeTitle = info.activeTitle,
-                possessedTitles = info.possessedTitles,
                 exp = info.exp,
                 profileFoto = info.profileFoto
             )
