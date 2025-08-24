@@ -2,18 +2,19 @@ package com.example.myapplication.ui.changeProfile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
+import com.example.myapplication.ui.composables.*
+import androidx.compose.foundation.layout.imePadding
 
 @Composable
 fun ChangeProfileScreen(
@@ -22,6 +23,7 @@ fun ChangeProfileScreen(
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    val scrollState = rememberScrollState()
 
     // bind ai campi del VM
     val name by remember { derivedStateOf { viewModel.name } }
@@ -29,16 +31,26 @@ fun ChangeProfileScreen(
     val email by remember { derivedStateOf { viewModel.email } }
     val ageText by remember { derivedStateOf { viewModel.ageText } }
     val habitation by remember { derivedStateOf { viewModel.habitation } }
-    val phoneNumber by remember { derivedStateOf { viewModel.phoneNumber } }
+    val phone by remember { derivedStateOf { viewModel.phoneNumber } }
+    val newPassword by remember { derivedStateOf { viewModel.newPassword } }
+    val confirmPassword by remember { derivedStateOf { viewModel.confirmPassword } }
 
     val isLoading by remember { derivedStateOf { viewModel.isLoading } }
     val isSaving by remember { derivedStateOf { viewModel.isSaving } }
+
+    var nameError by remember { mutableStateOf(false) }
+    var surnameError by remember { mutableStateOf(false) }
+    var ageError by remember { mutableStateOf(false) }
+    var passwordError by remember { mutableStateOf(false) }
+    var confirmPassError by remember { mutableStateOf(false) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         if (isLoading) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
             return@Scaffold
@@ -49,83 +61,85 @@ fun ChangeProfileScreen(
                 .fillMaxSize()
                 .padding(16.dp)
                 .padding(padding)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            OutlinedTextField(
-                value = name,
-                onValueChange = { viewModel.name = it },
-                label = { Text("Nome") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            ProfileTextField(value = name, onValueChange = {
+                viewModel.onNameChange(it); nameError = it.isBlank()
+            }, label = "Nome")
 
             Spacer(Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = surname,
-                onValueChange = { viewModel.surname = it },
-                label = { Text("Cognome") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            ProfileTextField(value = surname, onValueChange = {
+                viewModel.onSurnameChange(it); surnameError = it.isBlank()
+            }, label = "Cognome")
 
             Spacer(Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = email,
-                onValueChange = { viewModel.email = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                enabled = false // se non vuoi permettere la modifica metti false
-            )
+            ProfileTextField(value = email, onValueChange = {
+                viewModel.onEmailChange(it)
+            }, label = "Email")
 
             Spacer(Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = ageText,
-                onValueChange = { viewModel.ageText = it },
-                label = { Text("Età") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
+            ProfileTextField(value = ageText, onValueChange = {
+                viewModel.onAgeTextChange(it); ageError = it.toIntOrNull()?.let { n -> n <= 0 } ?: true
+            }, label = "Età")
+
+            if (ageError) Text("Inserisci un'età valida", color = MaterialTheme.colorScheme.error)
 
             Spacer(Modifier.height(8.dp))
 
-            OutlinedTextField(
+            ProfileTextField(
                 value = habitation ?: "",
-                onValueChange = { viewModel.habitation = it },
-                label = { Text("Residenza (facoltativo)") },
-                modifier = Modifier.fillMaxWidth()
+                onValueChange = { viewModel.onHabitationChange(it) },
+                label = "Residenza (facoltativo)"
             )
 
             Spacer(Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = phoneNumber ?: "",
-                onValueChange = { viewModel.phoneNumber = it },
-                label = { Text("Telefono (facoltativo)") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+            ProfileTextField(
+                value = phone ?: "",
+                onValueChange = { viewModel.onPhoneNumberChange(it) },
+                label = "Telefono (facoltativo)"
             )
+
+            Spacer(Modifier.height(12.dp))
+
+            // Password + confirm
+            PasswordTextField(
+                value = newPassword,
+                onValueChange = {
+                    viewModel.onNewPasswordChange(it)
+                    passwordError = it.isNotBlank() && it.length < 6
+                },
+                passwordError = passwordError
+            )
+            Spacer(Modifier.height(8.dp))
+            PasswordTextField(
+                value = confirmPassword,
+                onValueChange = {
+                    viewModel.onConfirmPasswordChange(it)
+                    confirmPassError = (newPassword.isNotBlank() && it != newPassword)
+                },
+                passwordError = confirmPassError
+            )
+            if (confirmPassError) {
+                Text("Le password non corrispondono", color = MaterialTheme.colorScheme.error)
+            }
 
             Spacer(Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    viewModel.updateProfile(
-                        onSuccess = {
-                            scope.launch {
-                                snackbarHostState.showSnackbar("Profilo aggiornato")
-                                // torna alla schermata profilo
-                                navController.popBackStack()
-                            }
-                        },
-                        onError = { msg ->
-                            scope.launch {
-                                snackbarHostState.showSnackbar(msg)
-                            }
+                    viewModel.updateProfile(onSuccess = {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Profilo aggiornato")
+                            navController.popBackStack()
                         }
-                    )
+                    }, onError = { msg ->
+                        scope.launch { snackbarHostState.showSnackbar(msg) }
+                    })
                 },
                 enabled = !isSaving,
                 modifier = Modifier.fillMaxWidth()
@@ -140,10 +154,7 @@ fun ChangeProfileScreen(
             }
 
             Spacer(Modifier.height(8.dp))
-
-            TextButton(onClick = { navController.popBackStack() }) {
-                Text("Annulla")
-            }
+            TextButton(onClick = { navController.popBackStack() }) { Text("Annulla") }
         }
     }
 }

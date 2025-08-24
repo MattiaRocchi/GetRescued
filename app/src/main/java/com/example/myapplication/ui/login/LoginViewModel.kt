@@ -7,9 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.data.repositories.UserDaoRepository
+import com.example.myapplication.utils.PasswordHasher
 import kotlinx.coroutines.launch
 
-//TODO
 class LoginViewModel(
     private val userDaoRepository: UserDaoRepository,
     private val settingsRepository: SettingsRepository
@@ -39,16 +39,12 @@ class LoginViewModel(
                     user == null -> {
                         onError("Mail non registrata")
                     }
-                    user.password != password -> {
+                    user.password != PasswordHasher.hash(password) -> {
                         onError("Password errata")
                     }
                     else -> {
                         settingsRepository.setLoggedInUser(
-                            user.id,
-                            user.email,
-                            user.name,
-                            user.surname,
-                            0)
+                            user.id)
                         onSuccess()
                     }
                 }

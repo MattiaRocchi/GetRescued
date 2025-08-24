@@ -13,17 +13,13 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 
-//TODO da snellire
+
 class SettingsRepository(
     private val dataStore: DataStore<Preferences>,
     private val userDao: UserDao
 ) {
     companion object {
         val LOGGED_IN_USER_ID = intPreferencesKey("logged_in_user_id")
-        val LOGGED_IN_EMAIL = stringPreferencesKey("logged_in_email")
-        val LOGGED_IN_NAME = stringPreferencesKey("logged_in_name")
-        val LOGGED_IN_SURNAME = stringPreferencesKey("logged_in_surname")
-        val LOGGED_IN_ACTIVE_TITLE = intPreferencesKey("logged_in_title_badge")
 
     }
 
@@ -46,39 +42,11 @@ class SettingsRepository(
             }
         }
 
-    val emailFlow: Flow<String?> = dataStore.data.map { prefs ->
-        prefs[LOGGED_IN_EMAIL]
-    }
-
-    val nameFlow: Flow<String?> = dataStore.data.map { prefs ->
-        prefs[LOGGED_IN_NAME]
-    }
-
-    val surnameFlow: Flow<String?> = dataStore.data.map { prefs ->
-        prefs[LOGGED_IN_SURNAME]
-    }
-    val activeTitleBadge: Flow<Int> = dataStore.data.map { prefs ->
-        prefs[LOGGED_IN_ACTIVE_TITLE] ?: 0
-    }
-
-    suspend fun updateActiveTitle(activeTitle: Int) {
-        dataStore.edit { prefs ->
-            prefs[LOGGED_IN_ACTIVE_TITLE] = activeTitle
-        }
-    }
     suspend fun setLoggedInUser(
         id: Int,
-        email: String,
-        name: String,
-        surname: String,
-        activeTitle: Int
     ) {
         dataStore.edit { prefs ->
             prefs[LOGGED_IN_USER_ID] = id
-            prefs[LOGGED_IN_EMAIL] = email
-            prefs[LOGGED_IN_NAME] = name
-            prefs[LOGGED_IN_SURNAME] = surname
-            prefs[LOGGED_IN_ACTIVE_TITLE] = activeTitle
         }
     }
 

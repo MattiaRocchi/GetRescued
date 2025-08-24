@@ -27,6 +27,9 @@ class UserDaoRepository(private val userDao: UserDao) {
         return userDao.insertUserWithInfo(user)
     }
 
+    suspend fun insertUserWithInfoChange(user: User, idOld: Int): Long{
+        return userDao.insertUserWithInfoChange(user, idOld)
+    }
     suspend fun updateUser(user: User) {
         //TODO CONTROLLARE SE FUNZIONA
         userDao.updateUser(user)

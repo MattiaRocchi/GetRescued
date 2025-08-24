@@ -11,6 +11,7 @@ import com.example.myapplication.data.database.User
 import com.example.myapplication.data.repositories.TitleBadgeRepository
 
 import com.example.myapplication.data.repositories.UserDaoRepository
+import com.example.myapplication.utils.PasswordHasher
 import kotlinx.coroutines.launch
 
 class RegistrationViewModel(
@@ -54,12 +55,12 @@ class RegistrationViewModel(
                     onError("Compila tutti i campi obbligatori")
                     return@launch
                 }
-
+                val hashedPassword = PasswordHasher.hash(password)
                 val newUser = User(
                     name = name,
                     surname = surname,
                     email = email,
-                    password = password,
+                    password = hashedPassword,
                     age = age
                 )
                 val id = userDaoRepository.insertUserWithInfo(newUser).toInt()

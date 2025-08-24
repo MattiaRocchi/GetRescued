@@ -143,7 +143,7 @@ fun ProfileScreen(
             }
 
             Spacer(Modifier.height(8.dp))
-            LevelProgressBar(90000)
+            LevelProgressBar(user?.exp ?: 0)
 
             Spacer(Modifier.height(16.dp))
             Text(
@@ -158,6 +158,27 @@ fun ProfileScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
+
+
+                Text(
+                    text = "📞 ${user?.phoneNumber?: ("Non inserita, " +
+                            "cambia i tuoi dati per aggiungere numero di telefono")
+                    }",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+
+            // 🔹 Abitazione (se disponibile)
+
+                Text(
+                    text = "🏠 ${
+                        user?.habitation ?: ("Non inserita, " +
+                                "cambia i tuoi dati per aggiungere abitazione")
+                    }",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,

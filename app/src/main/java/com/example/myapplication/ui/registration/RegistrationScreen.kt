@@ -38,8 +38,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapplication.ui.GetRescuedRoute
+import com.example.myapplication.ui.composables.AgeTextField
 import com.example.myapplication.ui.composables.EmailTextField
+import com.example.myapplication.ui.composables.NameTextField
 import com.example.myapplication.ui.composables.PasswordTextField
+import com.example.myapplication.ui.composables.SurnameTextField
 import kotlinx.coroutines.launch
 
 
@@ -72,45 +75,24 @@ fun RegistrationScreen(
                 .imePadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 🔹 NOME
-            OutlinedTextField(
+            NameTextField(
                 value = viewModel.name,
                 onValueChange = {
-                    viewModel.onNameChange(it); nameError = it.isBlank()
+                    viewModel.onNameChange(it)
+                    nameError = it.isBlank()
                 },
-                label = { Text("Nome") },
-                isError = nameError,
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
-                )
+                nameError = nameError
             )
-            if (nameError) Text("Inserisci il nome", color = MaterialTheme.colorScheme.error)
-
             Spacer(Modifier.height(8.dp))
 
-            // 🔹 COGNOME
-            OutlinedTextField(
+            SurnameTextField(
                 value = viewModel.surname,
                 onValueChange = {
-                    viewModel.onSurnameChange(it); surnameError = it.isBlank()
+                    viewModel.onSurnameChange(it)
+                    surnameError = it.isBlank()
                 },
-                label = { Text("Cognome") },
-                isError = surnameError,
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
-                )
+                surnameError = surnameError
             )
-            if (surnameError) Text("Inserisci il cognome", color = MaterialTheme.colorScheme.error)
 
             Spacer(Modifier.height(8.dp))
 
@@ -139,26 +121,14 @@ fun RegistrationScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            // 🔹 ETÀ
-            OutlinedTextField(
+            AgeTextField(
                 value = viewModel.age.toString(),
                 onValueChange = {
                     viewModel.onAgeChange(it)
                     ageError = it.toIntOrNull()?.let { n -> n <= 0 } ?: true
                 },
-                label = { Text("Età") },
-                isError = ageError,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    focusedTextColor = MaterialTheme.colorScheme.onTertiary,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onTertiary,
-                    cursorColor = MaterialTheme.colorScheme.onTertiary
-                )
+                ageError = ageError
             )
-            if (ageError) Text("Inserisci un'età valida", color = MaterialTheme.colorScheme.error)
 
             Spacer(Modifier.height(16.dp))
 
@@ -193,100 +163,3 @@ fun RegistrationScreen(
         }
     }
 }
-
-/*
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerDocked() {
-    var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-    val selectedDate = datePickerState.selectedDateMillis?.let {
-        convertMillisToDate(it)
-    } ?: ""
-
-    Box(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        OutlinedTextField(
-            value = selectedDate,
-            onValueChange = { },
-            label = { Text("DOB") },
-            readOnly = true,
-            trailingIcon = {
-                IconButton(onClick = { showDatePicker = !showDatePicker }) {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "Select date"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-        )
-
-        if (showDatePicker) {
-            Popup(
-                onDismissRequest = { showDatePicker = false },
-                alignment = Alignment.TopStart
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .offset(y = 64.dp)
-                        .shadow(elevation = 4.dp)
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(16.dp)
-                ) {
-                    DatePicker(
-                        state = datePickerState,
-                        showModeToggle = false
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun DatePickerFieldToModal(modifier: Modifier = Modifier) {
-    var selectedDate by remember { mutableStateOf<Long?>(null) }
-    var showModal by remember { mutableStateOf(false) }
-
-    OutlinedTextField(
-        value = selectedDate?.let { convertMillisToDate(it) } ?: "",
-        onValueChange = { },
-        label = { Text("DOB") },
-        placeholder = { Text("MM/DD/YYYY") },
-        trailingIcon = {
-            Icon(Icons.Default.DateRange, contentDescription = "Select date")
-        },
-        modifier = modifier
-            .fillMaxWidth()
-            .pointerInput(selectedDate) {
-                awaitEachGesture {
-                    // Modifier.clickable doesn't work for text fields, so we use Modifier.pointerInput
-                    // in the Initial pass to observe events before the text field consumes them
-                    // in the Main pass.
-                    awaitFirstDown(pass = PointerEventPass.Initial)
-                    val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
-                    if (upEvent != null) {
-                        showModal = true
-                    }
-                }
-            }
-    )
-
-    if (showModal) {
-        DatePickerModal(
-            onDateSelected = { selectedDate = it },
-            onDismiss = { showModal = false }
-        )
-    }
-}
-
-
-fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
-    return formatter.format(Date(millis))
-}*/

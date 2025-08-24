@@ -47,6 +47,39 @@ interface UserDao {
         insertInfo(info)
         return userId
     }
+    @Transaction
+    suspend fun insertUserWithInfoChange(user: User, idOld: Int): Long {
+        // Inserisce nuovo utente e ottiene nuovo ID
+        val newUserId = insert(user)
+
+        // Carica vecchia UserInfo, se esiste
+        val oldInfo = getUserInfo(idOld)
+
+        // Costruisce nuova UserInfo per il nuovo utente
+        val newInfo = if (oldInfo == null) {
+            UserInfo(
+                id = newUserId.toInt(),
+                activeTitle = 0,
+                exp = 0,
+                profileFoto = null
+            )
+        } else {
+            // copia i dati ma cambia l'id con quello nuovo
+            oldInfo.copy(id = newUserId.toInt())
+        }
+
+        // Elimina la vecchia UserInfo se esiste
+        if (oldInfo != null) {
+            deleteUserInfo(idOld)
+        }
+
+        // Inserisce la nuova UserInfo
+        insertInfo(newInfo)
+
+        return newUserId
+    }
+    @Query("DELETE FROM UserInfo WHERE id = :id")
+    suspend fun deleteUserInfo(id: Int)
 
     @Query("SELECT * FROM UserInfo WHERE id = :id")
     suspend fun getUserInfo(id: Int): UserInfo?
