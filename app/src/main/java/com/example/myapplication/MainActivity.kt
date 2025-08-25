@@ -65,6 +65,18 @@ class MainActivity : ComponentActivity() {
         }
         
     }
+    override fun onPause(){
+        super.onPause()
+        val musicIntent = Intent(this, MusicService::class.java)
+        stopService(musicIntent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val musicIntent = Intent(this@MainActivity,
+            MusicService::class.java)
+        startService(musicIntent)
+    }
     override fun onDestroy(){
         super.onDestroy()
         val musicIntent = Intent(this, MusicService::class.java)

@@ -17,6 +17,7 @@ object TitleTheme {
         @Composable
         get() = LocalTitleColors.current
 }
+
 @Entity
 data class Request(
     @PrimaryKey(autoGenerate = true) val id: Int =0,
