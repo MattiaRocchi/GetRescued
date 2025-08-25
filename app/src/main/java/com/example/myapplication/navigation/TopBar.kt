@@ -3,6 +3,8 @@ package com.example.myapplication.navigation
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,7 +25,8 @@ import com.example.myapplication.ui.GetRescuedRoute
 @Composable
 fun GetRescuedTopBar(
     navController: NavController,
-    profileImage: Painter? = null
+    profileImage: Painter? = null,
+    isUserLoggedIn: Boolean = false
 ) {
     TopAppBar(
         title = {
@@ -44,6 +47,17 @@ fun GetRescuedTopBar(
                     modifier = Modifier.size(32.dp)
                 )
             }
+            // Mostra icona settings solo se loggato
+            if (isUserLoggedIn) {
+                IconButton(onClick = { navController.navigate(GetRescuedRoute.Settings) }) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Impostazioni",
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            }
         }
+
     )
 }

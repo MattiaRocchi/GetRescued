@@ -11,6 +11,7 @@ import com.example.myapplication.data.database.AppDatabase
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.TitleBadgeRepository
 import com.example.myapplication.data.repositories.UserDaoRepository
+import com.example.myapplication.ui.SettingsScreen.SettingsViewModel
 import com.example.myapplication.ui.addrequest.AddRequestViewModel
 import com.example.myapplication.ui.changeProfile.ChangeProfileScreen
 import com.example.myapplication.ui.changeProfile.ChangeProfileViewModel
@@ -68,4 +69,5 @@ val appModule = module {
     viewModel { EditRequestViewModel(get(), get()) }
     viewModel { UserRequestListViewModel(get(), get()) }
     viewModel { ChangeProfileViewModel(get(), get()) }
+    viewModel { SettingsViewModel(get()) }
 }

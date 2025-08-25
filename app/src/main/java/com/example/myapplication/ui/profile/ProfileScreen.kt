@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.profile
 
 import android.Manifest
+import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -31,6 +32,7 @@ import com.example.myapplication.ui.composables.ImagePickerDialog
 import com.example.myapplication.ui.theme.LocalTitleColors
 import com.example.myapplication.ui.theme.TitleColors
 import com.example.myapplication.ui.theme.UnpressableButtonDark
+import com.example.myapplication.utils.MusicService
 import com.example.myapplication.utils.PermissionStatus
 import com.example.myapplication.utils.rememberMultiplePermissions
 
@@ -233,6 +235,11 @@ fun ProfileScreen(
             Button(
                 onClick = {
                     viewModel.logout {
+
+                        val musicIntent = Intent(context,
+                            MusicService::class.java)
+                        context.stopService(musicIntent)
+
                         navController.navigate(GetRescuedRoute.Login) {
                             popUpTo(0) { inclusive = true }
                         }

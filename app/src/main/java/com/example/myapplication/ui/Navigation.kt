@@ -13,6 +13,8 @@ import com.example.myapplication.data.database.AppDatabase
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.dataStore
+import com.example.myapplication.ui.SettingsScreen.SettingsScreen
+import com.example.myapplication.ui.SettingsScreen.SettingsViewModel
 
 import com.example.myapplication.ui.addrequest.AddRequestScreen
 import com.example.myapplication.ui.addrequest.AddRequestViewModel
@@ -58,6 +60,9 @@ sealed interface GetRescuedRoute {
     @Serializable
     data object Login : GetRescuedRoute
 
+    @Serializable
+    data object Settings : GetRescuedRoute
+
     //definisci come data class le route che richiedono parametri quando vendono percorse
     @Serializable
     data class AddRequest(val requestId: Int) : GetRescuedRoute
@@ -67,6 +72,7 @@ sealed interface GetRescuedRoute {
 
     @Serializable
     data class EditRequest(val requestId: Int) : GetRescuedRoute
+
 
 
 }
@@ -117,6 +123,12 @@ fun GetRescuedNavGraph(
             val viewModel: LoginViewModel = koinViewModel()
             LoginScreen(navController, viewModel)
         }
+
+        composable<GetRescuedRoute.Settings> {
+            val viewModel: SettingsViewModel = koinViewModel()
+            SettingsScreen(navController, viewModel)
+        }
+
         composable<GetRescuedRoute.InfoRequest> { backStackEntry ->
             val args = backStackEntry.toRoute<GetRescuedRoute.InfoRequest>()
             InfoRequestScreen(navController = navController, requestId = args.requestId)

@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.login
 
+import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -11,11 +12,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.ui.composables.EmailTextField
 import com.example.myapplication.ui.composables.PasswordTextField
+import com.example.myapplication.utils.MusicService
 import kotlinx.coroutines.launch
 
 @Composable
@@ -29,7 +32,7 @@ fun LoginScreen(
 
     var emailError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
@@ -73,8 +76,12 @@ fun LoginScreen(
                     viewModel.loginUser(
                         onSuccess = {
                             scope.launch {
-                                snackbarHostState.showSnackbar("Login avvenuto con successo!")
+                                snackbarHostState
+                                    .showSnackbar("Login avvenuto con successo!")
                             }
+                            val musicIntent =
+                                Intent(context, MusicService::class.java)
+                            context.startService(musicIntent)
                             navController.navigate(GetRescuedRoute.Profile) {
                                 popUpTo(GetRescuedRoute.Login) { inclusive = true }
                             }
