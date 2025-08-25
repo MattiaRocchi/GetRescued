@@ -1,4 +1,5 @@
-package com.example.myapplication.ui.requests
+package com.example.myapplication.ui.participationrequests
+
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,18 +13,18 @@ import androidx.navigation.NavController
 import com.example.myapplication.ui.GetRescuedRoute
 
 @Composable
-fun RequestsScreen(
+fun ParticipatingRequests(
     navController: NavController,
-    viewModel: RequestsViewModel
+    viewModel: ParticipatingRequestsViewModel
 ) {
-    val requests by viewModel.requests.collectAsState()
+    val requests by viewModel.participation.collectAsState()
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         if (requests.isEmpty()) {
-            item { Text("Non ci sono richieste.", style = MaterialTheme.typography.bodyLarge) }
+            item { Text("Non stai partecipando a nessuna richiesta.", style = MaterialTheme.typography.bodyLarge) }
         } else {
             items(requests) { req ->
                 Card(
@@ -34,9 +35,7 @@ fun RequestsScreen(
                 ) {
                     Column(Modifier.padding(16.dp)) {
                         Text(req.title, style = MaterialTheme.typography.titleMedium)
-                        Text("Difficoltà: ${req.difficulty}", style = MaterialTheme.typography.bodySmall)
-                        Text("Persone richieste: ${req.peopleRequired}", style = MaterialTheme.typography.bodySmall)
-                        Text("Partecipanti: ${req.rescuers.size}", style = MaterialTheme.typography.bodySmall)
+                        Text("Partecipanti: ${req.rescuers.size}/${req.peopleRequired}", style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }

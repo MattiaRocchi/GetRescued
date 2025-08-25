@@ -1,21 +1,29 @@
 package com.example.myapplication.ui.requests
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.Request
-import com.example.myapplication.data.database.RequestDao
+import com.example.myapplication.data.repositories.RequestDaoRepository
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
-class RequestsViewModel(private val requestDao: RequestDao) : ViewModel() {
+class RequestsViewModel(
+    private val repository: RequestDaoRepository
+) : ViewModel() {
 
-    private val _requests = MutableStateFlow<List<Request>>(emptyList())
-    val requests: StateFlow<List<Request>> = _requests
+    val requests: StateFlow<List<Request>> =
+        repository.getAllRequests()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+}
 
-    init {
-        viewModelScope.launch {
-            requestDao.getOpenRequests()
-                .collect { _requests.value = it }
+class RequestsViewModelFactory(
+    private val repository: RequestDaoRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(RequestsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return RequestsViewModel(repository) as T
         }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

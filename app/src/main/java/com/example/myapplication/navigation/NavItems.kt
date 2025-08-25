@@ -11,7 +11,7 @@ sealed class NavItem(
 ) {
 
     object Requests : NavItem(
-        route = GetRescuedRoute.Requests,
+        route = GetRescuedRoute.BrowseRequests,
         title = "Richieste",
         iconResId = R.drawable.ic_requests
     )

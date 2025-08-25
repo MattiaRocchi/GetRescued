@@ -1,85 +1,175 @@
 package com.example.myapplication.ui.inforequest
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.Request
+import com.example.myapplication.data.database.UserWithInfo
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
-import com.example.myapplication.data.database.RequestDao
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import com.example.myapplication.data.repositories.UserDaoRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel per la schermata di dettaglio richiesta.
+ *
+ * - Non blocca la visualizzazione della richiesta in attesa di userId/creatorName.
+ * - Mostra la request non appena Room emette la riga.
+ * - Arricchisce con creatorName in modo asincrono.
+ * - Espone eventi one-shot tramite SharedFlow (snackbar).
+ */
 class InfoRequestViewModel(
     private val requestRepository: RequestDaoRepository,
-    private val settingsRepository: SettingsRepository
+    private val userDaoRepository: UserDaoRepository,
+    private val settingsRepository: SettingsRepository,
+    private val requestId: Int
 ) : ViewModel() {
 
     sealed class UiState {
         object Loading : UiState()
-        data class Success(val request: Request) : UiState()
-        data class Error(val message: String) : UiState()
+        object NotFound : UiState()
+        data class Ready(
+            val request: Request,
+            val creator: UserWithInfo? = null,
+            val isCreator: Boolean = false,
+            val isParticipating: Boolean = false,
+            val isFull: Boolean = false
+        ) : UiState()
     }
 
-    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
-    val uiState: StateFlow<UiState> = _uiState
+    // eventi one-shot (snackbars)
+    private val _events = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val events: SharedFlow<String> = _events.asSharedFlow()
 
-    private val _currentUserId = MutableStateFlow<Int?>(null)
+    // Flow diretto dalla richiesta (Room)
+    private val requestFlow: Flow<Request?> = requestRepository.getRequestByIdFlow(requestId)
+
+    // userIdFlow (emette anche -1 se non loggato). NON filtrare per evitare blocchi.
+    private val userIdFlow: Flow<Int> = settingsRepository.userIdFlow
+
+    // Stato UI: inizialmente Loading
+    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     init {
+        // 1) Combina requestFlow + userIdFlow per avere subito uno stato Ready minimale (creator=null)
         viewModelScope.launch {
-            settingsRepository.userIdFlow.collect { userId ->
-                _currentUserId.value = userId
-            }
-
-        }
-    }
-
-    fun loadRequest(requestId: Int) {
-        viewModelScope.launch {
-            _uiState.value = UiState.Loading
-            try {
-                println("DEBUG: Cerco richiesta ID: $requestId")
-
-                val request = requestRepository.getRequestById(requestId)
-                println("DEBUG: Richiesta trovata: $request")
-
-                if (request != null) {
-                    _uiState.value = UiState.Success(request.first())
+            combine(requestFlow, userIdFlow) { req, uid ->
+                if (req == null) {
+                    UiState.NotFound
                 } else {
-                    _uiState.value = UiState.Error("Richiesta non trovata. ID: $requestId")
+                    val isCreator = (uid != -1 && uid == req.sender)
+                    val isParticipating = (uid != -1 && uid in req.rescuers)
+                    val isFull = req.rescuers.size >= req.peopleRequired
+                    UiState.Ready(
+                        request = req,
+                        creator = null,
+                        isCreator = isCreator,
+                        isParticipating = isParticipating,
+                        isFull = isFull
+                    )
                 }
-            } catch (e: Exception) {
-                println("DEBUG: Errore: ${e.message}")
-                _uiState.value = UiState.Error("Errore: ${e.message}")
+            }
+                .distinctUntilChanged() // piccolo ottimizzazione
+                .collect { s -> _uiState.value = s }
+        }
+
+        // 2) Ogni volta che arriva una request valida, carica (async) il creator (UserWithInfo)
+        viewModelScope.launch {
+            requestFlow
+                .filterNotNull()
+                .collect { req ->
+                    // carichiamo il creator con repository (suspend) su IO
+                    launch(Dispatchers.IO) {
+                        try {
+                            val creator: UserWithInfo? = userDaoRepository.getUserWithInfo(req.sender)
+                            // aggiorna stato solo se la request corrente è la stessa (evitiamo race)
+                            _uiState.update { current ->
+                                when (current) {
+                                    is UiState.Ready -> {
+                                        // se la request è ancora la stessa id, aggiorna creator
+                                        if (current.request.id == req.id) {
+                                            current.copy(creator = creator)
+                                        } else current
+                                    }
+                                    else -> current
+                                }
+                            }
+                        } catch (t: Throwable) {
+                            // non blocchiamo la UI per un errore nel caricamento del creator
+                            _events.tryEmit("Impossibile caricare informazioni creatore")
+                        }
+                    }
+                }
+        }
+
+        // 3) Se la request viene aggiornata (es. partecipazione), vogliamo ricomputare flags;
+        //    userIdFlow + requestFlow combinati sopra si occupano di questo, quindi niente altro qui.
+    }
+
+    /**
+     * Tenta di partecipare alla richiesta:
+     *  - controlla utente valido;
+     *  - evita duplicati;
+     *  - aggiorna DB via repository.
+     */
+    fun participate() {
+        viewModelScope.launch {
+            val current = _uiState.value
+            if (current !is UiState.Ready) {
+                _events.tryEmit("Richiesta non pronta")
+                return@launch
+            }
+
+            // prendi userId attuale (sospende finché non emette il primo valore)
+            val uid = userIdFlow.first()
+            if (uid == -1) {
+                _events.emit("Devi effettuare il login per partecipare")
+                return@launch
+            }
+
+            val req = current.request
+            if (uid == req.sender) {
+                _events.emit("Sei il creatore della richiesta")
+                return@launch
+            }
+            if (uid in req.rescuers) {
+                _events.emit("Hai già partecipato")
+                return@launch
+            }
+            if (req.rescuers.size >= req.peopleRequired) {
+                _events.emit("Posti esauriti")
+                return@launch
+            }
+
+            try {
+                val updated = req.copy(rescuers = req.rescuers + uid)
+                requestRepository.updateRequest(updated)
+                _events.emit("Partecipazione registrata")
+                // Room emetterà la request aggiornata -> combine sopra ricalcolerà stato
+            } catch (t: Throwable) {
+                _events.emit("Errore durante la partecipazione: ${t.message ?: "sconosciuto"}")
             }
         }
     }
+}
 
-    fun participateInRequest(request: Request) {
-        viewModelScope.launch {
-            try {
-                val currentUserId = _currentUserId.value ?: run {
-                    _uiState.value = UiState.Error("Devi essere loggato per partecipare")
-                    return@launch
-                }
-
-                if (currentUserId in request.rescuers) {
-                    _uiState.value = UiState.Error("Hai già partecipato a questa richiesta")
-                    return@launch
-                }
-
-                val updatedRequest = request.copy(
-                    rescuers = request.rescuers + currentUserId
-                )
-
-                requestRepository.updateRequest(updatedRequest)
-                // Il Flow si aggiornerà automaticamente con i nuovi dati
-
-            } catch (e: Exception) {
-                _uiState.value = UiState.Error("Errore: ${e.message}")
-            }
+/**
+ * Factory manuale per InfoRequestViewModel (senza Hilt)
+ */
+class InfoRequestViewModelFactory(
+    private val requestRepository: RequestDaoRepository,
+    private val userDaoRepository: UserDaoRepository,
+    private val settingsRepository: SettingsRepository,
+    private val requestId: Int
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(InfoRequestViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return InfoRequestViewModel(requestRepository, userDaoRepository, settingsRepository, requestId) as T
         }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

@@ -17,6 +17,7 @@ import com.example.myapplication.ui.login.LoginViewModel
 import com.example.myapplication.ui.requests.RequestsViewModel
 import com.example.myapplication.ui.registration.RegistrationViewModel
 import com.example.myapplication.ui.inforequest.InfoRequestViewModel
+import com.example.myapplication.ui.participationrequests.ParticipatingRequestsViewModel
 import com.example.myapplication.ui.profile.ProfileViewModel
 import com.example.myapplication.ui.profile.loadTitleBadgesFromRaw
 import kotlinx.coroutines.CoroutineScope
@@ -78,12 +79,17 @@ val appModule = module {
     // ViewModels
     viewModel { RegistrationViewModel(get(), get()) }
     viewModel { LoginViewModel(get(), get()) }
+    viewModel { AddRequestViewModel(get(), get()) } // get() → RequestDaoRepository
+    viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository
+    viewModel { InfoRequestViewModel(get(), get(), get(),get()) }
     viewModel { AddRequestViewModel(get(), get()) }
     viewModel { RequestsViewModel(get()) }
-    viewModel { InfoRequestViewModel(get(), get()) }
+    viewModel { InfoRequestViewModel(get(), get(), get(), get()) }
     viewModel { ProfileViewModel(get(), get(), get()) }
     viewModel { EditRequestViewModel(get(), get()) }
     viewModel { UserRequestListViewModel(get(), get()) }
     viewModel { ChangeProfileViewModel(get(), get()) }
     viewModel { SettingsViewModel(get()) }
+    viewModel { ParticipatingRequestsViewModel(get(), get()) }
+
 }
