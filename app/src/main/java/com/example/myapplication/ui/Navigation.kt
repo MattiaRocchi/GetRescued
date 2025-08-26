@@ -29,6 +29,7 @@ import com.example.myapplication.ui.inforequest.InfoRequestViewModel
 import com.example.myapplication.ui.inforequest.InfoRequestViewModelFactory
 import com.example.myapplication.ui.login.LoginScreen
 import com.example.myapplication.ui.login.LoginViewModel
+import com.example.myapplication.ui.missions.MissionGeneralScreen
 import com.example.myapplication.ui.missions.MissionViewModel
 import com.example.myapplication.ui.missions.MissionWeekScreen
 import com.example.myapplication.ui.profile.ProfileScreen
@@ -60,9 +61,6 @@ sealed interface GetRescuedRoute {
 
     @Serializable
     data object ChangeProfile : GetRescuedRoute
-
-    @Serializable
-    data object Missions : GetRescuedRoute
 
     @Serializable
     data object Login : GetRescuedRoute
@@ -131,9 +129,6 @@ fun GetRescuedNavGraph(
             val requestRepository = RequestDaoRepository(db.requestDao())
             RequestsScreen(navController, RequestsViewModel(requestRepository))
         }
-        composable<GetRescuedRoute.Missions> {
-            Text("Pagina Missioni")
-        }
         composable<GetRescuedRoute.Registration> {
             val viewModel: RegistrationViewModel = koinViewModel()
             RegistrationScreen(navController, viewModel)
@@ -151,6 +146,11 @@ fun GetRescuedNavGraph(
         composable<GetRescuedRoute.MissionWeek> {
             val viewModel: MissionViewModel = koinViewModel()
             MissionWeekScreen(navController, viewModel)
+        }
+
+        composable<GetRescuedRoute.MissionGeneral> {
+            val viewModel: MissionViewModel = koinViewModel()
+            MissionGeneralScreen(navController, viewModel)
         }
 
 

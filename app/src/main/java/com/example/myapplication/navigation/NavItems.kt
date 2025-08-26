@@ -17,7 +17,7 @@ sealed class NavItem(
     )
 
     object Missions : NavItem(
-        route = GetRescuedRoute.Missions,
+        route = GetRescuedRoute.MissionWeek,
         title = "Missioni",
         iconResId = R.drawable.ic_requests
     )

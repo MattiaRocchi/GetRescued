@@ -18,6 +18,7 @@ import com.example.myapplication.ui.login.LoginViewModel
 import com.example.myapplication.ui.requests.RequestsViewModel
 import com.example.myapplication.ui.registration.RegistrationViewModel
 import com.example.myapplication.ui.inforequest.InfoRequestViewModel
+import com.example.myapplication.ui.missions.MissionViewModel
 import com.example.myapplication.ui.participationrequests.ParticipatingRequestsViewModel
 import com.example.myapplication.ui.profile.ProfileViewModel
 import com.example.myapplication.ui.profile.loadTitleBadgesFromRaw
@@ -95,5 +96,7 @@ val appModule = module {
     viewModel { ChangeProfileViewModel(get(), get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { ParticipatingRequestsViewModel(get(), get()) }
+    viewModel { MissionViewModel(get(), get(),
+        get(),get()) }
 
 }

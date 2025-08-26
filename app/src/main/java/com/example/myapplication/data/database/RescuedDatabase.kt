@@ -17,7 +17,7 @@ import com.example.myapplication.data.utils.Converters
         Tags::class, TagsMission::class, TagsUser::class,
         UserBadgeCrossRef::class, UserPart::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = true
 
 )
