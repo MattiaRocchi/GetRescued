@@ -60,6 +60,7 @@ class InfoRequestViewModel(
                 .collect { s -> _uiState.value = s }
         }
 
+        // Carica informazioni del creatore
         viewModelScope.launch {
             requestFlow
                 .filterNotNull()
@@ -116,9 +117,43 @@ class InfoRequestViewModel(
             try {
                 val updated = req.copy(rescuers = req.rescuers + uid)
                 requestRepository.updateRequest(updated)
-                _events.emit("Partecipazione registrata")
+                _events.emit("✅ Partecipazione registrata con successo!")
             } catch (t: Throwable) {
-                _events.emit("Errore durante la partecipazione: ${t.message ?: "sconosciuto"}")
+                _events.emit("❌ Errore durante la partecipazione: ${t.message ?: "sconosciuto"}")
+            }
+        }
+    }
+
+    fun leaveRequest() {
+        viewModelScope.launch {
+            val current = _uiState.value
+            if (current !is UiState.Ready) {
+                _events.tryEmit("Richiesta non pronta")
+                return@launch
+            }
+
+            val uid = userIdFlow.first()
+            if (uid == -1) {
+                _events.emit("Devi effettuare il login")
+                return@launch
+            }
+
+            val req = current.request
+            if (uid == req.sender) {
+                _events.emit("Non puoi abbandonare una richiesta che hai creato tu")
+                return@launch
+            }
+            if (uid !in req.rescuers) {
+                _events.emit("Non stavi partecipando a questa richiesta")
+                return@launch
+            }
+
+            try {
+                val updated = req.copy(rescuers = req.rescuers - uid)
+                requestRepository.updateRequest(updated)
+                _events.emit("🚪 Ti sei tirato indietro dalla richiesta")
+            } catch (t: Throwable) {
+                _events.emit("❌ Errore nel ritirarsi dalla richiesta: ${t.message ?: "sconosciuto"}")
             }
         }
     }

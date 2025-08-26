@@ -50,18 +50,8 @@ val appModule = module {
             .fallbackToDestructiveMigration()
             .build()
 
-        // Precarica i TitleBadge E i Tags dal JSON in res/raw se il DB è vuoto.
+        // Precarica i TitleBadge dal JSON in res/raw se il DB è vuoto.
         // Nota: questo è lanciato in background e non blocca la creazione del singleton.
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val isEmpty = db.tagDao().getAllTags().firstOrNull().isNullOrEmpty() // o una count sync se preferisci
-                if (isEmpty) {
-                    val tags = loadTagsFromRaw(ctx)
-                    if (tags.isNotEmpty()) db.tagDao().insertAll(tags)
-                }
-            } catch (t: Throwable) { t.printStackTrace() }
-        }
-
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 // Se hai una query count() sul DAO sarebbe preferibile usarla
@@ -99,9 +89,8 @@ val appModule = module {
     // ViewModels
     viewModel { RegistrationViewModel(get(), get()) }
     viewModel { LoginViewModel(get(), get()) }
-    viewModel { AddRequestViewModel(get(), get()) } // get() → RequestDaoRepository
+    viewModel { AddRequestViewModel(get(), get(), get()) } // get() → RequestDaoRepository
     viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository
-    viewModel { AddRequestViewModel(get(), get()) }
     viewModel { RequestsViewModel(get()) }
     viewModel { ProfileViewModel(get(), get(), get(), get()) }
     viewModel { UserRequestListViewModel(get(), get()) }
@@ -124,6 +113,7 @@ val appModule = module {
     viewModel { (requestId: Int) ->
         EditRequestViewModel(
             repository = get(),
+            titleBadgeRepository = get(),
             requestId = requestId
         )
     }

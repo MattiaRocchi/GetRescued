@@ -139,7 +139,6 @@ fun GetRescuedNavGraph(
                 BrowseRequestsScreen(navController = navController)
             }
 
-
             composable<GetRescuedRoute.InfoRequest> { backStackEntry ->
                 val args = backStackEntry.toRoute<GetRescuedRoute.InfoRequest>()
                 val viewModel: InfoRequestViewModel = koinViewModel { parametersOf(args.requestId) }

@@ -1,15 +1,16 @@
 package com.example.myapplication.ui.requests
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.ui.GetRescuedRoute
+import com.example.myapplication.ui.composables.DynamicRequestCard
 
 @Composable
 fun RequestsScreen(
@@ -20,25 +21,23 @@ fun RequestsScreen(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         if (requests.isEmpty()) {
-            item { Text("Non ci sono richieste.", style = MaterialTheme.typography.bodyLarge) }
-        } else {
-            items(requests) { req ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { navController.navigate(GetRescuedRoute.InfoRequest(req.id)) },
-                    elevation = CardDefaults.cardElevation(4.dp)
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text(req.title, style = MaterialTheme.typography.titleMedium)
-                        Text("Difficoltà: ${req.difficulty}", style = MaterialTheme.typography.bodySmall)
-                        Text("Persone richieste: ${req.peopleRequired}", style = MaterialTheme.typography.bodySmall)
-                        Text("Partecipanti: ${req.rescuers.size}", style = MaterialTheme.typography.bodySmall)
-                    }
+                    Text("Non ci sono richieste.", style = MaterialTheme.typography.bodyLarge)
                 }
+            }
+        } else {
+            items(requests) { request ->
+                DynamicRequestCard(
+                    request = request,
+                    onClick = { navController.navigate(GetRescuedRoute.InfoRequest(request.id)) }
+                )
             }
         }
     }
