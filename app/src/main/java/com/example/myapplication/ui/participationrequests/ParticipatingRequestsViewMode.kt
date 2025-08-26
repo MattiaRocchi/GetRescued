@@ -1,7 +1,6 @@
 package com.example.myapplication.ui.participationrequests
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.Request
 import com.example.myapplication.data.repositories.RequestDaoRepository
@@ -21,17 +20,4 @@ class ParticipatingRequestsViewModel(
         userIdFlow
             .flatMapLatest { uid -> requestRepository.getRequestsParticipatingByUser(uid) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-}
-
-class ParticipatingRequestsViewModelFactory(
-    private val requestRepository: RequestDaoRepository,
-    private val settingsRepository: SettingsRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ParticipatingRequestsViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return ParticipatingRequestsViewModel(requestRepository, settingsRepository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
 }

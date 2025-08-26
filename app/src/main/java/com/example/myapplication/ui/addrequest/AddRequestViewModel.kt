@@ -1,15 +1,11 @@
 package com.example.myapplication.ui.addrequest
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.Request
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class AddRequestViewModel(
@@ -42,7 +38,6 @@ class AddRequestViewModel(
         viewModelScope.launch {
             val userId = settingsRepository.userIdFlow.firstOrNull()
                 ?: run {
-                    // qui potresti emettere un evento/snackbar
                     return@launch
                 }
 
@@ -59,7 +54,7 @@ class AddRequestViewModel(
 
             repository.insertRequest(request)
 
-            // reset (opzionale)
+            // reset
             _title.value = ""
             _description.value = ""
             _peopleRequired.value = 1
@@ -68,18 +63,5 @@ class AddRequestViewModel(
 
             onSuccess()
         }
-    }
-}
-
-class AddRequestViewModelFactory(
-    private val repository: RequestDaoRepository,
-    private val settingsRepository: SettingsRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(AddRequestViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return AddRequestViewModel(repository, settingsRepository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

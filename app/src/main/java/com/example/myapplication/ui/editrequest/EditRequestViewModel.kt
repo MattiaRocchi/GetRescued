@@ -1,7 +1,6 @@
 package com.example.myapplication.ui.editrequest
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.Request
 import com.example.myapplication.data.repositories.RequestDaoRepository
@@ -10,15 +9,13 @@ import kotlinx.coroutines.launch
 
 class EditRequestViewModel(
     private val repository: RequestDaoRepository,
-    private val requestId: Int
+    private val requestId: Int // Ora iniettato da Koin con parametersOf
 ) : ViewModel() {
 
-    // Request reattiva dal DB
     val requestFlow: StateFlow<Request?> =
         repository.getRequestByIdFlow(requestId)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    // Campi di editing (si sincronizzano quando arriva la request)
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> = _title
 
@@ -65,18 +62,5 @@ class EditRequestViewModel(
             repository.updateRequest(updated)
             onDone()
         }
-    }
-}
-
-class EditRequestViewModelFactory(
-    private val repository: RequestDaoRepository,
-    private val requestId: Int
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(EditRequestViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return EditRequestViewModel(repository, requestId) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

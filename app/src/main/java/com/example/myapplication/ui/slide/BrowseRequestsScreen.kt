@@ -7,37 +7,26 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.myapplication.data.repositories.RequestDaoRepository
-import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.ui.participationrequests.ParticipatingRequests
 import com.example.myapplication.ui.participationrequests.ParticipatingRequestsViewModel
-import com.example.myapplication.ui.participationrequests.ParticipatingRequestsViewModelFactory
 import com.example.myapplication.ui.requests.RequestsScreen
 import com.example.myapplication.ui.requests.RequestsViewModel
-import com.example.myapplication.ui.requests.RequestsViewModelFactory
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BrowseRequestsScreen(
-    navController: NavController,
-    requestRepository: RequestDaoRepository,
-    settingsRepository: SettingsRepository
+    navController: NavController
+    // NON PIÙ parametri repository/settings - Koin gestisce tutto!
 ) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 2 })
     val scope = rememberCoroutineScope()
 
-    val allVM: RequestsViewModel = viewModel(
-        factory = RequestsViewModelFactory(requestRepository)
-    )
-    val participatingVM: ParticipatingRequestsViewModel = viewModel(
-        factory = ParticipatingRequestsViewModelFactory(
-            requestRepository = requestRepository,
-            settingsRepository = settingsRepository
-        )
-    )
+    // SEMPLICISSIMO - tutto tramite Koin
+    val allVM: RequestsViewModel = koinViewModel()
+    val participatingVM: ParticipatingRequestsViewModel = koinViewModel()
 
     Column(Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = pagerState.currentPage) {

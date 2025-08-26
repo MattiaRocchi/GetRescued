@@ -7,44 +7,26 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.myapplication.data.repositories.RequestDaoRepository
-import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.ui.addrequest.AddRequestScreen
 import com.example.myapplication.ui.addrequest.AddRequestViewModel
-import com.example.myapplication.ui.addrequest.AddRequestViewModelFactory
 import com.example.myapplication.ui.userrequest.UserRequestListViewModel
-import com.example.myapplication.ui.userrequest.UserRequestListViewModelFactory
 import com.example.myapplication.ui.userrequest.UserRequestsList
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ManageRequestsScreen(
-    navController: NavController,
-    requestRepository: RequestDaoRepository,
-    settingsRepository: SettingsRepository
+    navController: NavController
+    // NON PIÙ parametri repository/settings - Koin gestisce tutto!
 ) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 2 })
     val scope = rememberCoroutineScope()
 
-    // VM che ricavano internamente userId da SettingsRepository (NON lo passiamo)
-    val createdVM: UserRequestListViewModel =
-        viewModel(
-            factory = UserRequestListViewModelFactory(
-                repository = requestRepository,
-                settingsRepository = settingsRepository
-            )
-        )
-
-    val addVM: AddRequestViewModel =
-        viewModel(
-            factory = AddRequestViewModelFactory(
-                repository = requestRepository,
-                settingsRepository = settingsRepository
-            )
-        )
+    // SEMPLICISSIMO - tutto tramite Koin
+    val createdVM: UserRequestListViewModel = koinViewModel()
+    val addVM: AddRequestViewModel = koinViewModel()
 
     Column(Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = pagerState.currentPage) {

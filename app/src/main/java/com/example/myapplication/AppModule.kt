@@ -86,17 +86,31 @@ val appModule = module {
     viewModel { LoginViewModel(get(), get()) }
     viewModel { AddRequestViewModel(get(), get()) } // get() → RequestDaoRepository
     viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository
-    viewModel { InfoRequestViewModel(get(), get(), get(),get()) }
     viewModel { AddRequestViewModel(get(), get()) }
     viewModel { RequestsViewModel(get()) }
-    viewModel { InfoRequestViewModel(get(), get(), get(), get()) }
     viewModel { ProfileViewModel(get(), get(), get()) }
-    viewModel { EditRequestViewModel(get(), get()) }
     viewModel { UserRequestListViewModel(get(), get()) }
     viewModel { ChangeProfileViewModel(get(), get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { ParticipatingRequestsViewModel(get(), get()) }
     viewModel { MissionViewModel(get(), get(),
         get(),get()) }
+
+    // ViewModel con parametri - usando parametersOf
+    viewModel { (requestId: Int) ->
+        InfoRequestViewModel(
+            requestRepository = get(),
+            userDaoRepository = get(),
+            settingsRepository = get(),
+            requestId = requestId
+        )
+    }
+
+    viewModel { (requestId: Int) ->
+        EditRequestViewModel(
+            repository = get(),
+            requestId = requestId
+        )
+    }
 
 }
