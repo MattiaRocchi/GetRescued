@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.navigation.BottomNavBar
@@ -19,31 +20,42 @@ import com.example.myapplication.ui.GetRescuedNavGraph
 import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.utils.MusicService
 import org.koin.android.ext.android.get
+import kotlinx.coroutines.flow.first
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
+    private var isMusicServiceRunning = false
+    private lateinit var settingsRepository: SettingsRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Inizializza il repository una sola volta
+        settingsRepository = get<SettingsRepository>()
 
         setContent {
             MyApplicationTheme {
                 val navController = rememberNavController()
 
-                // ⚡ Ottieni repository (con Koin o Hilt se già usi DI)
-                val settingsRepository = get<SettingsRepository>()
-
                 val validUserId by settingsRepository.validUserFlow.collectAsState(initial = null)
+                val musicEnabled by settingsRepository.musicEnabledFlow.collectAsState(initial = true)
 
                 val startDestination = if (validUserId != null) {
                     GetRescuedRoute.Profile
                 } else {
                     GetRescuedRoute.Login
                 }
-                // se l'utente è loggato, avvio la musica
-                    if (validUserId != null) {
-                        val musicIntent = Intent(this@MainActivity,
-                            MusicService::class.java)
-                        startService(musicIntent)
+
+                // 🎵 Gestione musica reattiva ai cambiamenti di stato
+                LaunchedEffect(validUserId, musicEnabled) {
+                    if (validUserId != null && musicEnabled) {
+                        startMusicIfNotRunning()
+                    } else {
+                        stopMusicService()
                     }
+                }
 
                 Scaffold(
                     topBar = {
@@ -57,29 +69,52 @@ class MainActivity : ComponentActivity() {
                 ) { padding ->
                     GetRescuedNavGraph(
                         navController = navController,
-                        startDestination = startDestination, // 👈 passo io la startDest
+                        startDestination = startDestination,
                         modifier = Modifier.padding(padding)
                     )
                 }
             }
         }
-        
     }
-    override fun onPause(){
+
+    override fun onPause() {
         super.onPause()
-        val musicIntent = Intent(this, MusicService::class.java)
-        stopService(musicIntent)
+        // Ferma la musica quando l'app va in background
+        stopMusicService()
     }
 
     override fun onResume() {
         super.onResume()
-        val musicIntent = Intent(this@MainActivity,
-            MusicService::class.java)
-        startService(musicIntent)
+        // Riavvia la musica solo se necessario
+        lifecycleScope.launch {
+            val validUserId = settingsRepository.validUserFlow.first()
+            val musicEnabled = settingsRepository.musicEnabledFlow.first()
+
+            if (validUserId != null && musicEnabled) {
+                startMusicIfNotRunning()
+            }
+        }
     }
-    override fun onDestroy(){
+
+    override fun onDestroy() {
         super.onDestroy()
-        val musicIntent = Intent(this, MusicService::class.java)
-        stopService(musicIntent)
+        stopMusicService()
+    }
+
+    // 🎵 Metodi helper per gestire il servizio musica
+    private fun startMusicIfNotRunning() {
+        if (!isMusicServiceRunning) {
+            val musicIntent = Intent(this, MusicService::class.java)
+            startService(musicIntent)
+            isMusicServiceRunning = true
+        }
+    }
+
+    private fun stopMusicService() {
+        if (isMusicServiceRunning) {
+            val musicIntent = Intent(this, MusicService::class.java)
+            stopService(musicIntent)
+            isMusicServiceRunning = false
+        }
     }
 }
