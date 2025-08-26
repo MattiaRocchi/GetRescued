@@ -9,9 +9,7 @@ import com.example.myapplication.data.database.User
 import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.data.repositories.UserDaoRepository
 import com.example.myapplication.utils.PasswordHasher
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ChangeProfileViewModel(
@@ -19,8 +17,9 @@ class ChangeProfileViewModel(
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
-    val userId = settingsRepository.userIdFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), -1)
+    // id utente corrente, null se non loggato
+    private val _currentUserId = MutableStateFlow<Int?>(null)
+    val userId: StateFlow<Int?> = _currentUserId.asStateFlow()
 
     // campi UI
     var name by mutableStateOf("")
@@ -36,7 +35,7 @@ class ChangeProfileViewModel(
     var phoneNumber by mutableStateOf<String?>(null)
         private set
 
-    // password (nuovi campi)
+    // password
     var newPassword by mutableStateOf("")
         private set
     var confirmPassword by mutableStateOf("")
@@ -51,9 +50,15 @@ class ChangeProfileViewModel(
     private var originalUser: User? = null
 
     init {
+        // ascolta sempre l'id utente valido dal repo
         viewModelScope.launch {
-            settingsRepository.userIdFlow.collect { id ->
-                if (id != -1) loadCurrentUser(id) else resetFields()
+            settingsRepository.validUserFlow.collect { id ->
+                _currentUserId.value = id
+                if (id != null) {
+                    loadCurrentUser(id)
+                } else {
+                    resetFields()
+                }
             }
         }
     }
@@ -83,7 +88,9 @@ class ChangeProfileViewModel(
                 ageText = u.age.toString()
                 habitation = u.habitation
                 phoneNumber = u.phoneNumber
-            } else resetFields()
+            } else {
+                resetFields()
+            }
         } catch (t: Throwable) {
             t.printStackTrace()
             resetFields()
@@ -102,17 +109,10 @@ class ChangeProfileViewModel(
     fun onNewPasswordChange(v: String) { newPassword = v }
     fun onConfirmPasswordChange(v: String) { confirmPassword = v }
 
-    /**
-     * updateProfile:
-     * - se e-mail invariata -> semplice updateUser
-     * - se e-mail cambiata -> opzione (ricreare user) (vedi commenti sotto)
-     *
-     * onSuccess/onError come callback.
-     */
     fun updateProfile(onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
-            val id = userId.first()
-            if (id == -1) { onError("Utente non loggato"); return@launch }
+            val id = userId.value
+            if (id == null) { onError("Utente non loggato"); return@launch }
 
             // validazioni
             if (name.isBlank()) { onError("Inserisci il nome"); return@launch }
@@ -120,7 +120,6 @@ class ChangeProfileViewModel(
             val age = ageText.toIntOrNull()
             if (age == null || age <= 0) { onError("Inserisci un'età valida"); return@launch }
 
-            // se cambia password -> valida
             val wantChangePassword = newPassword.isNotBlank() || confirmPassword.isNotBlank()
             if (wantChangePassword) {
                 if (newPassword.length < 6) { onError("La password deve avere almeno 6 caratteri"); return@launch }
@@ -132,59 +131,43 @@ class ChangeProfileViewModel(
 
             isSaving = true
             try {
-                // Se la mail è rimasta uguale -> update standard
                 if (email.trim() == orig.email.trim()) {
-                    val updatedUser = User(
-                        id = orig.id,
-                        name = name.trim(),
-                        surname = surname.trim(),
-                        email = email.trim(),
-                        password = if (wantChangePassword) PasswordHasher.hash(newPassword)
-                                    else orig.password,
-                        age = age,
-                        habitation = habitation?.trim(),
-                        phoneNumber = phoneNumber?.trim(),
-                        createdAt = orig.createdAt
-                    )
-
-                    userDaoRepository.updateUser(updatedUser)
-                    // aggiorna copia e reload
-                    originalUser = updatedUser
-                    loadCurrentUser(orig.id)
-                    onSuccess()
-                } else {
-                    // ==== EMAIL CHANGED FLOW ====
-                    // Due opzioni:
-                    // 1) **Consigliato**: provare ad aggiornare l'email con updateUser (se la unique constraint lo permette).
-                    //    Se la tua schema impone email unica in DB, updateUser provvederà (o fallirà con constraint).
-                    // 2) **Ricreare** l'utente: inserire nuovo User (con stessa UserInfo), aggiornare sessione (settingsRepository)
-                    //    e cancellare il vecchio user. ATTENZIONE: questo può rompere FK riferimenti ad es. request/mission ecc.
-                    //
-                    // Qui ti mostro la soluzione che *ricrea l'utente* (se preferisci usare updateUser semplice, sostituisci con updateUser).
-
-                    // crea nuovo user usando i dati + password (nuova se impostata o la vecchia)
-                    val newUser = User(
+                    // update standard
+                    val updatedUser = orig.copy(
                         name = name.trim(),
                         surname = surname.trim(),
                         email = email.trim(),
                         password = if (wantChangePassword) PasswordHasher.hash(newPassword) else orig.password,
                         age = age,
                         habitation = habitation?.trim(),
-                        phoneNumber = phoneNumber?.trim(),
-                        createdAt = orig.createdAt
+                        phoneNumber = phoneNumber?.trim()
                     )
-                    // repository: supponiamo ci sia insertUserWithInfo che ritorna Long id (adattare se diverso)
-                    val newIdLong = userDaoRepository.insertUserWithInfo(newUser) // **suspend** che ritorna Long
+                    userDaoRepository.updateUser(updatedUser)
+                    originalUser = updatedUser
+                    loadCurrentUser(orig.id)
+                    onSuccess()
+                } else {
+                    // ==== EMAIL CHANGED FLOW ====
+                    val newUser = orig.copy(
+                        id = 0, // nuovo record
+                        name = name.trim(),
+                        surname = surname.trim(),
+                        email = email.trim(),
+                        password = if (wantChangePassword) PasswordHasher.hash(newPassword) else orig.password,
+                        age = age,
+                        habitation = habitation?.trim(),
+                        phoneNumber = phoneNumber?.trim()
+                    )
+
+                    val newIdLong = userDaoRepository.insertUserWithInfo(newUser)
                     val newId = newIdLong.toInt()
 
-                    // cancella utente vecchio (opzionale, attento)
-                    userDaoRepository.insertUserWithInfoChange(newUser,orig.id)
-
-                    // aggiorna sessione: qui assumo che SettingsRepository abbia setUserId(Int)
-                    // se il metodo ha nome diverso adattalo
+                    // aggiorna sessione
                     settingsRepository.setLoggedInUser(newId)
 
-                    // ricarica dati
+                    // eventuale migrazione dati vecchio utente
+                    userDaoRepository.insertUserWithInfoChange(newUser, orig.id)
+
                     loadCurrentUser(newId)
                     onSuccess()
                 }

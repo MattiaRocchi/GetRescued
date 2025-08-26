@@ -20,26 +20,3 @@ class RequestDaoRepository (private val requestDao: RequestDao) {
     fun getRequestsParticipatingByUser(userId: Int): Flow<List<Request>> =
         getAllRequests().map { list -> list.filter { req -> userId in req.rescuers } }
 }
-
-/*@Dao
-interface TripsDAO {
-    @Query("SELECT * FROM trip ORDER BY name ASC")
-    fun getAll(): Flow<List<Trip>>
-
-    @Upsert
-    suspend fun upsert(trip: Trip)
-
-    @Delete
-    suspend fun delete(item: Trip)
-}
-
-class TripsRepository(
-    private val dao: TripsDAO
-) {
-    val trips: Flow<List<Trip>> = dao.getAll()
-
-    suspend fun upsert(trip: Trip) = dao.upsert(trip)
-
-    suspend fun delete(trip: Trip) = dao.delete(trip)
-}
-*/

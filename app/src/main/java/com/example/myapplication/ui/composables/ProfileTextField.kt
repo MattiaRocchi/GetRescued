@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import kotlin.String
 
 @Composable
 fun ProfileTextField(
@@ -74,14 +75,15 @@ fun PasswordTextField(
     value: String,
     onValueChange: (String) -> Unit,
     passwordError: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    label: String = "Password"
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
     OutlinedTextField(
         value = value,
         onValueChange = { onValueChange(it) },
-        label = { Text("Password") },
+        label = { Text(label) },
         isError = passwordError,
         modifier = modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(

@@ -45,6 +45,7 @@ class LoginViewModel(
                     else -> {
                         settingsRepository.setLoggedInUser(
                             user.id)
+                        settingsRepository.setMusicEnabled(true)
                         onSuccess()
                     }
                 }

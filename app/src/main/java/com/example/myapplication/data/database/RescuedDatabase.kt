@@ -31,6 +31,8 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun titleBadgeDao(): TitleBadgeDao
 
+    abstract fun missionDao(): MissionDao
+
 
 }
 /*

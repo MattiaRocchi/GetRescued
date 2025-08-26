@@ -19,10 +19,6 @@ class UserDaoRepository(private val userDao: UserDao) {
     suspend fun insertUser(user: User): Long {
         return userDao.insert(user)
     }
-    //suspend fun insertUser(user: User) = userDao.insert(user)
-
-   // suspend fun insertUserInfo(userInfo: UserInfo) = userDao.insertInfo(userInfo)
-
     suspend fun insertUserWithInfo(user: User): Long {
         return userDao.insertUserWithInfo(user)
     }
@@ -31,7 +27,6 @@ class UserDaoRepository(private val userDao: UserDao) {
         return userDao.insertUserWithInfoChange(user, idOld)
     }
     suspend fun updateUser(user: User) {
-        //TODO CONTROLLARE SE FUNZIONA
         userDao.updateUser(user)
     }
 
@@ -71,13 +66,3 @@ class UserDaoRepository(private val userDao: UserDao) {
         } else null
     }
 }
-
-/*
-es view model
-class UserViewModel(private val repository: UserRepository) : ViewModel() {
-
-    fun login(email: String, password: String) = liveData {
-        val user = repository.login(email, password)
-        emit(user)
-    }
-}*/

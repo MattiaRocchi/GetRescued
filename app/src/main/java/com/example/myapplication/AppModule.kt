@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.example.myapplication.data.database.AppDatabase
+import com.example.myapplication.data.repositories.MissionRepository
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.TitleBadgeRepository
 import com.example.myapplication.data.repositories.UserDaoRepository
@@ -69,12 +70,15 @@ val appModule = module {
     single { get<AppDatabase>().userDao() }
     single { get<AppDatabase>().requestDao() }
     single { get<AppDatabase>().titleBadgeDao() }
+    single { get<AppDatabase>().missionDao() }
 
     // Repository bindings
     single { UserDaoRepository(get()) }
     single { RequestDaoRepository(get()) }
     single { TitleBadgeRepository(get()) }
     single { SettingsRepository(get(), get()) }
+    single { MissionRepository(get()) }
+
 
     // ViewModels
     viewModel { RegistrationViewModel(get(), get()) }

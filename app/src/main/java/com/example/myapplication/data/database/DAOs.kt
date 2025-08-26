@@ -169,3 +169,20 @@ interface TitleBadgeDao {
     @Query("INSERT INTO UserBadgeCrossRef (userId, badgeId) VALUES (:userId, :badgeId)")
     suspend fun insertUserBadgeCrossRef(userId: Int, badgeId: Int)
 }
+@Dao
+interface MissionDao {
+    @Insert
+    suspend fun insert(mission: Mission)
+
+    @Query("SELECT * FROM Mission WHERE id = :id")
+    suspend fun getById(id: Int): Mission?
+
+    @Query("SELECT * FROM Mission")
+    fun getAll(): Flow<List<Mission>>
+
+    @Update
+    suspend fun update(mission: Mission)
+
+    @Delete
+    suspend fun delete(mission: Mission)
+}

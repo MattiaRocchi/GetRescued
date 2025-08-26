@@ -106,6 +106,8 @@ fun ChangeProfileScreen(
 
             Spacer(Modifier.height(12.dp))
 
+            Text("Cambia password", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
             // Password + confirm
             PasswordTextField(
                 value = newPassword,
@@ -113,7 +115,8 @@ fun ChangeProfileScreen(
                     viewModel.onNewPasswordChange(it)
                     passwordError = it.isNotBlank() && it.length < 6
                 },
-                passwordError = passwordError
+                passwordError = passwordError,
+                label = "Nuova password"
             )
             Spacer(Modifier.height(8.dp))
             PasswordTextField(
@@ -122,7 +125,8 @@ fun ChangeProfileScreen(
                     viewModel.onConfirmPasswordChange(it)
                     confirmPassError = (newPassword.isNotBlank() && it != newPassword)
                 },
-                passwordError = confirmPassError
+                passwordError = confirmPassError,
+                label = "Conferma password"
             )
             if (confirmPassError) {
                 Text("Le password non corrispondono", color = MaterialTheme.colorScheme.error)
