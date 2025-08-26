@@ -20,7 +20,7 @@ import com.example.myapplication.ui.SettingsScreen.SettingsViewModel
 
 import com.example.myapplication.ui.addrequest.AddRequestScreen
 import com.example.myapplication.ui.addrequest.AddRequestViewModel
-import com.example.myapplication.ui.addrequest.ManageRequestsScreen
+import com.example.myapplication.ui.slide.ManageRequestsScreen
 import com.example.myapplication.ui.changeProfile.ChangeProfileScreen
 import com.example.myapplication.ui.changeProfile.ChangeProfileViewModel
 import com.example.myapplication.ui.editrequest.EditRequestScreen
@@ -33,7 +33,7 @@ import com.example.myapplication.ui.profile.ProfileScreen
 import com.example.myapplication.ui.profile.ProfileViewModel
 import com.example.myapplication.ui.registration.RegistrationScreen
 import com.example.myapplication.ui.registration.RegistrationViewModel
-import com.example.myapplication.ui.requests.BrowseRequestsScreen
+import com.example.myapplication.ui.slide.BrowseRequestsScreen
 import com.example.myapplication.ui.requests.RequestsScreen
 import com.example.myapplication.ui.requests.RequestsViewModel
 import kotlinx.serialization.Serializable

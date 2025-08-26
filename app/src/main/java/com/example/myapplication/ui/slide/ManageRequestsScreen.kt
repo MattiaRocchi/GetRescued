@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.addrequest
+package com.example.myapplication.ui.slide
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
@@ -7,9 +7,16 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
+import com.example.myapplication.ui.addrequest.AddRequestScreen
+import com.example.myapplication.ui.addrequest.AddRequestViewModel
+import com.example.myapplication.ui.addrequest.AddRequestViewModelFactory
+import com.example.myapplication.ui.userrequest.UserRequestListViewModel
+import com.example.myapplication.ui.userrequest.UserRequestListViewModelFactory
+import com.example.myapplication.ui.userrequest.UserRequestsList
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -24,7 +31,7 @@ fun ManageRequestsScreen(
 
     // VM che ricavano internamente userId da SettingsRepository (NON lo passiamo)
     val createdVM: UserRequestListViewModel =
-        androidx.lifecycle.viewmodel.compose.viewModel(
+        viewModel(
             factory = UserRequestListViewModelFactory(
                 repository = requestRepository,
                 settingsRepository = settingsRepository
@@ -32,7 +39,7 @@ fun ManageRequestsScreen(
         )
 
     val addVM: AddRequestViewModel =
-        androidx.lifecycle.viewmodel.compose.viewModel(
+        viewModel(
             factory = AddRequestViewModelFactory(
                 repository = requestRepository,
                 settingsRepository = settingsRepository

@@ -12,7 +12,7 @@ import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.ui.SettingsScreen.SettingsViewModel
 import com.example.myapplication.ui.addrequest.AddRequestViewModel
 import com.example.myapplication.ui.changeProfile.ChangeProfileViewModel
-import com.example.myapplication.ui.addrequest.UserRequestListViewModel
+import com.example.myapplication.ui.userrequest.UserRequestListViewModel
 import com.example.myapplication.ui.editrequest.EditRequestViewModel
 import com.example.myapplication.ui.login.LoginViewModel
 import com.example.myapplication.ui.requests.RequestsViewModel

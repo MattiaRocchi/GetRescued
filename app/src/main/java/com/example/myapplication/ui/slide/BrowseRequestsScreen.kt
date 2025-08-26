@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.requests
+package com.example.myapplication.ui.slide
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
@@ -7,13 +7,16 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.ui.participationrequests.ParticipatingRequests
 import com.example.myapplication.ui.participationrequests.ParticipatingRequestsViewModel
 import com.example.myapplication.ui.participationrequests.ParticipatingRequestsViewModelFactory
+import com.example.myapplication.ui.requests.RequestsScreen
+import com.example.myapplication.ui.requests.RequestsViewModel
+import com.example.myapplication.ui.requests.RequestsViewModelFactory
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -26,10 +29,10 @@ fun BrowseRequestsScreen(
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 2 })
     val scope = rememberCoroutineScope()
 
-    val allVM: RequestsViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+    val allVM: RequestsViewModel = viewModel(
         factory = RequestsViewModelFactory(requestRepository)
     )
-    val participatingVM: ParticipatingRequestsViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+    val participatingVM: ParticipatingRequestsViewModel = viewModel(
         factory = ParticipatingRequestsViewModelFactory(
             requestRepository = requestRepository,
             settingsRepository = settingsRepository
