@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.data.database.Request
+import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.ui.composables.DynamicRequestCard
 import com.example.myapplication.ui.participationrequests.ParticipatingRequestsViewModel
@@ -23,6 +24,7 @@ import com.example.myapplication.ui.requests.RequestsViewModel
 import com.example.myapplication.ui.theme.*
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -34,6 +36,10 @@ fun BrowseRequestsScreen(
 
     val allVM: RequestsViewModel = koinViewModel()
     val participatingVM: ParticipatingRequestsViewModel = koinViewModel()
+    val settingsRepository: SettingsRepository = koinInject()
+
+    // Ottieni l'ID utente corrente
+    val currentUserId by settingsRepository.userIdFlow.collectAsState(initial = -1)
 
     var searchQuery by remember { mutableStateOf("") }
     var showFilters by remember { mutableStateOf(false) }
@@ -134,18 +140,20 @@ fun BrowseRequestsScreen(
         HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
             when (page) {
                 0 -> FilteredRequestsList(
-                    requests = allVM.requests.collectAsState().value,
+                    requests = allVM.availableRequests.collectAsState().value,
                     searchQuery = searchQuery,
                     selectedDifficulty = selectedDifficulty,
                     sortByDate = sortByDate,
-                    navController = navController
+                    navController = navController,
+                    currentUserId = currentUserId
                 )
                 1 -> FilteredRequestsList(
                     requests = participatingVM.participation.collectAsState().value,
                     searchQuery = searchQuery,
                     selectedDifficulty = selectedDifficulty,
                     sortByDate = sortByDate,
-                    navController = navController
+                    navController = navController,
+                    currentUserId = currentUserId
                 )
             }
         }
@@ -158,7 +166,8 @@ private fun FilteredRequestsList(
     searchQuery: String,
     selectedDifficulty: String?,
     sortByDate: Boolean,
-    navController: NavController
+    navController: NavController,
+    currentUserId: Int
 ) {
     val filteredRequests = remember(requests, searchQuery, selectedDifficulty, sortByDate) {
         requests
@@ -196,7 +205,8 @@ private fun FilteredRequestsList(
             items(filteredRequests) { request ->
                 DynamicRequestCard(
                     request = request,
-                    onClick = { navController.navigate(GetRescuedRoute.InfoRequest(request.id)) }
+                    onClick = { navController.navigate(GetRescuedRoute.InfoRequest(request.id)) },
+                    currentUserId = currentUserId
                 )
             }
         }

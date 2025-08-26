@@ -16,9 +16,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.data.database.Request
+import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.ui.composables.DynamicRequestCard
 import com.example.myapplication.ui.theme.*
+import org.koin.compose.koinInject
 
 @Composable
 fun UserRequestsList(
@@ -26,6 +28,8 @@ fun UserRequestsList(
     viewModel: UserRequestListViewModel
 ) {
     val requests by viewModel.myRequests.collectAsState()
+    val settingsRepository: SettingsRepository = koinInject()
+    val currentUserId by settingsRepository.userIdFlow.collectAsState(initial = -1)
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -47,7 +51,8 @@ fun UserRequestsList(
             items(requests) { request ->
                 DynamicRequestCard(
                     request = request,
-                    onClick = { navController.navigate(GetRescuedRoute.EditRequest(request.id)) }
+                    onClick = { navController.navigate(GetRescuedRoute.EditRequest(request.id)) },
+                    currentUserId = currentUserId
                 )
             }
         }

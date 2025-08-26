@@ -1,9 +1,12 @@
 package com.example.myapplication.ui.inforequest
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
@@ -81,8 +84,13 @@ fun InfoRequestScreen(
                         }
                     }
 
+                    // DEBUG: Log dello stato
+                    println("DEBUG InfoRequest UI - isCreator: ${state.isCreator}, isParticipating: ${state.isParticipating}, isFull: ${state.isFull}")
+
                     Column(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         // Card principale con dettagli
@@ -122,7 +130,7 @@ fun InfoRequestScreen(
                                     }
                                 }
 
-                                Divider()
+                                HorizontalDivider()
 
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -159,7 +167,7 @@ fun InfoRequestScreen(
                                     }
                                 }
 
-                                Divider()
+                                HorizontalDivider()
 
                                 Text("📝 Descrizione:", style = MaterialTheme.typography.titleSmall)
                                 Text(r.description, style = MaterialTheme.typography.bodyMedium)
@@ -180,7 +188,8 @@ fun InfoRequestScreen(
                                     )
                                     Spacer(Modifier.height(8.dp))
                                     LazyRow(
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        modifier = Modifier.height(120.dp) // Altezza fissa per evitare problemi
                                     ) {
                                         items(r.fotos) { photoUri ->
                                             AsyncImage(
@@ -197,11 +206,13 @@ fun InfoRequestScreen(
                             }
                         }
 
-                        Spacer(Modifier.weight(1f))
+                        // Spazio prima dei pulsanti
+                        Spacer(Modifier.height(24.dp))
 
-                        // Pulsanti di azione
+                        // Pulsanti di azione con DEBUG
                         when {
                             state.isCreator -> {
+                                println("DEBUG InfoRequest UI - Mostrando: Sei il creatore")
                                 Card(
                                     colors = CardDefaults.cardColors(
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -219,6 +230,7 @@ fun InfoRequestScreen(
                             }
 
                             state.isParticipating -> {
+                                println("DEBUG InfoRequest UI - Mostrando: Stai partecipando")
                                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     Card(
                                         colors = CardDefaults.cardColors(
@@ -248,6 +260,7 @@ fun InfoRequestScreen(
                             }
 
                             state.isFull -> {
+                                println("DEBUG InfoRequest UI - Mostrando: Posti esauriti")
                                 Card(
                                     colors = CardDefaults.cardColors(
                                         containerColor = MaterialTheme.colorScheme.errorContainer
@@ -265,8 +278,12 @@ fun InfoRequestScreen(
                             }
 
                             else -> {
+                                println("DEBUG InfoRequest UI - Mostrando: Pulsante partecipa")
                                 Button(
-                                    onClick = { viewModel.participate() },
+                                    onClick = {
+                                        println("DEBUG InfoRequest UI - Bottone partecipa cliccato!")
+                                        viewModel.participate()
+                                    },
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = MaterialTheme.colorScheme.primary

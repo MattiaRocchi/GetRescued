@@ -19,16 +19,16 @@ sealed class NavItem(
     object Missions : NavItem(
         route = GetRescuedRoute.MissionWeek,
         title = "Missioni",
-        iconResId = R.drawable.ic_requests
+        iconResId = R.drawable.ic_missions
     )
 
-    object Create : NavItem(
+    object Gestisci : NavItem(
         route = GetRescuedRoute.ManageRequests,
         title = "Gestisci",
-        iconResId = R.drawable.ic_requests
+        iconResId = R.drawable.ic_gestisci
     )
 
     companion object {
-        val items = listOf(Requests, Missions, Create)
+        val items = listOf(Requests, Missions, Gestisci)
     }
 }

@@ -51,15 +51,18 @@ class SettingsRepository(
         prefs[LOGGED_IN_USER_ID] ?: -1
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val validUserFlow: Flow<Int?> =
         userIdFlow.flatMapLatest { id ->
-            if (id == -1) {
+            if (id <= 0) { // Cambiato da == -1 a <= 0
                 flowOf(null)
             } else {
                 flow {
-                    val user = userDao.getById(id)
-                    emit(user?.id) // null se non trovato
+                    try {
+                        val user = userDao.getById(id)
+                        emit(user?.id) // null se non trovato
+                    } catch (e: Exception) {
+                        emit(null) // In caso di errore, considera l'utente non valido
+                    }
                 }
             }
         }

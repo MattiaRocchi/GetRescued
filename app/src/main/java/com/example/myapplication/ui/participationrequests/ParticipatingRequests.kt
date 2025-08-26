@@ -9,8 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.ui.composables.DynamicRequestCard
+import org.koin.compose.koinInject
 
 @Composable
 fun ParticipatingRequests(
@@ -18,6 +20,8 @@ fun ParticipatingRequests(
     viewModel: ParticipatingRequestsViewModel
 ) {
     val requests by viewModel.participation.collectAsState()
+    val settingsRepository: SettingsRepository = koinInject()
+    val currentUserId by settingsRepository.userIdFlow.collectAsState(initial = -1)
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -39,7 +43,8 @@ fun ParticipatingRequests(
             items(requests) { request ->
                 DynamicRequestCard(
                     request = request,
-                    onClick = { navController.navigate(GetRescuedRoute.InfoRequest(request.id)) }
+                    onClick = { navController.navigate(GetRescuedRoute.InfoRequest(request.id)) },
+                    currentUserId = currentUserId
                 )
             }
         }

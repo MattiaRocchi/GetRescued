@@ -44,9 +44,17 @@ class InfoRequestViewModel(
                 if (req == null) {
                     UiState.NotFound
                 } else {
-                    val isCreator = (uid != -1 && uid == req.sender)
-                    val isParticipating = (uid != -1 && uid in req.rescuers)
+                    // DEBUG: log per capire i valori
+                    println("DEBUG InfoRequest - UID: $uid, Request sender: ${req.sender}")
+
+                    // Consideriamo l'utente valido solo se uid > 0 (non -1)
+                    val isValidUser = uid > 0
+                    val isCreator = isValidUser && uid == req.sender
+                    val isParticipating = isValidUser && uid in req.rescuers
                     val isFull = req.rescuers.size >= req.peopleRequired
+
+                    println("DEBUG InfoRequest - isValidUser: $isValidUser, isCreator: $isCreator, isParticipating: $isParticipating, isFull: $isFull")
+
                     UiState.Ready(
                         request = req,
                         creator = null,
@@ -95,12 +103,16 @@ class InfoRequestViewModel(
             }
 
             val uid = userIdFlow.first()
-            if (uid == -1) {
+            println("DEBUG participate() - UID: $uid")
+
+            if (uid <= 0) { // Cambiato da -1 a <= 0 per maggiore sicurezza
                 _events.emit("Devi effettuare il login per partecipare")
                 return@launch
             }
 
             val req = current.request
+            println("DEBUG participate() - Request sender: ${req.sender}, rescuers: ${req.rescuers}")
+
             if (uid == req.sender) {
                 _events.emit("Sei il creatore della richiesta")
                 return@launch
@@ -116,9 +128,11 @@ class InfoRequestViewModel(
 
             try {
                 val updated = req.copy(rescuers = req.rescuers + uid)
+                println("DEBUG participate() - Updating request with new rescuers: ${updated.rescuers}")
                 requestRepository.updateRequest(updated)
                 _events.emit("✅ Partecipazione registrata con successo!")
             } catch (t: Throwable) {
+                println("DEBUG participate() - Error: ${t.message}")
                 _events.emit("❌ Errore durante la partecipazione: ${t.message ?: "sconosciuto"}")
             }
         }
@@ -133,7 +147,7 @@ class InfoRequestViewModel(
             }
 
             val uid = userIdFlow.first()
-            if (uid == -1) {
+            if (uid <= 0) { // Cambiato da -1 a <= 0
                 _events.emit("Devi effettuare il login")
                 return@launch
             }

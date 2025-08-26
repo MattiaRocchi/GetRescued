@@ -28,6 +28,7 @@ import java.util.*
 fun DynamicRequestCard(
     request: Request,
     onClick: () -> Unit,
+    currentUserId: Int = -1 // Aggiungiamo il parametro per l'ID utente corrente
 ) {
     val backgroundColor = when (request.difficulty) {
         "Bassa" -> EasyTask
@@ -37,6 +38,7 @@ fun DynamicRequestCard(
     }
 
     val isCompleted = request.rescuers.size >= request.peopleRequired
+    val isCreatedByCurrentUser = currentUserId != -1 && currentUserId == request.sender
 
     Card(
         modifier = Modifier
@@ -147,18 +149,20 @@ fun DynamicRequestCard(
                     )
                 }
 
-                // Etichetta creatore
-                Surface(
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(6.dp)
-                ) {
-                    Text(
-                        text = "👤 Creata da te",
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Medium
-                    )
+                // Etichetta creatore - MOSTRA SOLO SE È CREATA DALL'UTENTE CORRENTE
+                if (isCreatedByCurrentUser) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f),
+                        shape = RoundedCornerShape(6.dp)
+                    ) {
+                        Text(
+                            text = "👤 Creata da te",
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
         }
