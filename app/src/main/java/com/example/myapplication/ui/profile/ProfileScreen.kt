@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.example.myapplication.data.database.Tags
 import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.ui.composables.CameraCapture
 import com.example.myapplication.ui.composables.ImagePickerDialog
@@ -49,6 +50,8 @@ fun ProfileScreen(
     val activeTitle by viewModel.userActiveTitle.collectAsState()
     val titles by viewModel.userTitles.collectAsState()
     val allTitles by viewModel.allTitles.collectAsState()
+    val allTags by viewModel.allTags.collectAsState()
+    val selectedIds = viewModel.getSelectedTagIds()
 
 
 
@@ -56,7 +59,7 @@ fun ProfileScreen(
     var showChangePicDialog by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
     var showTitleDialog by remember { mutableStateOf(false) }
-
+    var showTagsDialog by remember { mutableStateOf(false) }
 
 
     // 📂 Launcher per la galleria
@@ -182,6 +185,8 @@ fun ProfileScreen(
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
+
+            //Cambio titolo
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
@@ -204,6 +209,8 @@ fun ProfileScreen(
 
                 Spacer(Modifier.width(8.dp))
 
+
+
                 IconButton(
                     onClick = { showTitleDialog = true },
                     modifier = Modifier
@@ -220,6 +227,50 @@ fun ProfileScreen(
                     )
                 }
             }
+
+            Spacer(Modifier.width(18.dp))
+
+            //Gestione Tags
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+
+                Button(
+                    onClick = { /* eventualmente aprire dialogo qui */ },
+                    modifier = Modifier.weight(1f), // usa peso invece di fillMaxWidth
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        disabledContainerColor = UnpressableButtonDark,
+                        disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                ) {
+                    Text(
+                        text = "Tags Posseduti: ",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+
+                Spacer(Modifier.width(8.dp))
+
+                IconButton(
+                    onClick = { showTagsDialog = true },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(
+                            MaterialTheme.colorScheme.onSecondaryContainer,
+                            CircleShape
+                        )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Gestisci Tags",
+                        tint = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                }
+            }
+
 
             Spacer(Modifier.height(18.dp))
             Button(
@@ -277,6 +328,18 @@ fun ProfileScreen(
             onSelect = { title ->
                 viewModel.updateActiveTitle(title.id)
                 showTitleDialog = false
+            }
+        )
+    }
+
+    if (showTagsDialog) {
+        TagPickerDialog(
+            tags = allTags,
+            selectedTagIds = selectedIds,
+            onDismiss = { showTagsDialog = false },
+            onConfirm = { selectedTags ->
+                viewModel.updateUserTags(selectedTags)
+                showTagsDialog = false
             }
         )
     }

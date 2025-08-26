@@ -59,9 +59,9 @@ fun EmailTextField(
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            focusedTextColor = MaterialTheme.colorScheme.onSecondary,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
-            cursorColor = MaterialTheme.colorScheme.onSecondary
+            focusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            cursorColor = MaterialTheme.colorScheme.onSecondaryContainer
         )
     )
     if (emailError) {
@@ -89,9 +89,9 @@ fun PasswordTextField(
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            focusedTextColor = MaterialTheme.colorScheme.onSecondary,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
-            cursorColor = MaterialTheme.colorScheme.onSecondary
+            focusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            cursorColor = MaterialTheme.colorScheme.onSecondaryContainer
         ),
         visualTransformation = if (passwordVisible) VisualTransformation.None else
             PasswordVisualTransformation(),
@@ -126,9 +126,9 @@ fun NameTextField(
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-            unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-            cursorColor = MaterialTheme.colorScheme.onPrimary
+            focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            unfocusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            cursorColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
     )
     if (nameError) Text("Inserisci il nome", color = MaterialTheme.colorScheme.error)
@@ -155,9 +155,9 @@ fun SurnameTextField(
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-            unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-            cursorColor = MaterialTheme.colorScheme.onPrimary
+            focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            unfocusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            cursorColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
     )
     if (surnameError) Text("Inserisci il cognome", color = MaterialTheme.colorScheme.error)
@@ -183,9 +183,9 @@ fun AgeTextField(
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            focusedTextColor = MaterialTheme.colorScheme.onTertiary,
-            unfocusedTextColor = MaterialTheme.colorScheme.onTertiary,
-            cursorColor = MaterialTheme.colorScheme.onTertiary
+            focusedTextColor = MaterialTheme.colorScheme.onTertiaryContainer,
+            unfocusedTextColor = MaterialTheme.colorScheme.onTertiaryContainer,
+            cursorColor = MaterialTheme.colorScheme.onTertiaryContainer
         )
     )
     if (ageError) Text("Inserisci un'età valida", color = MaterialTheme.colorScheme.error)
@@ -209,9 +209,9 @@ fun HabitationTextField(
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-            unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-            cursorColor = MaterialTheme.colorScheme.onPrimary
+            focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            unfocusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            cursorColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
     )
     if (habitationError) {
@@ -241,9 +241,9 @@ fun PhoneTextField(
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-            unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-            cursorColor = MaterialTheme.colorScheme.onPrimary
+            focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            unfocusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            cursorColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
     )
     if (phoneError) {

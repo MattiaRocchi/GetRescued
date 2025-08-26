@@ -33,13 +33,5 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun missionDao(): MissionDao
 
-
+    abstract fun tagDao(): TagDao
 }
-/*
-istanzia
-val db = Room.databaseBuilder(
-    context,
-    AppDatabase::class.java,
-    "rescued-database"
-).build()
-*/

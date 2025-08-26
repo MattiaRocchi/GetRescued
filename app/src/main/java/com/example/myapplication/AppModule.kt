@@ -9,6 +9,7 @@ import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.TitleBadgeRepository
 import com.example.myapplication.data.repositories.UserDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
+import com.example.myapplication.data.repositories.TagsRepository
 import com.example.myapplication.ui.SettingsScreen.SettingsViewModel
 import com.example.myapplication.ui.addrequest.AddRequestViewModel
 import com.example.myapplication.ui.changeProfile.ChangeProfileViewModel
@@ -21,9 +22,11 @@ import com.example.myapplication.ui.inforequest.InfoRequestViewModel
 import com.example.myapplication.ui.missions.MissionViewModel
 import com.example.myapplication.ui.participationrequests.ParticipatingRequestsViewModel
 import com.example.myapplication.ui.profile.ProfileViewModel
+import com.example.myapplication.ui.profile.loadTagsFromRaw
 import com.example.myapplication.ui.profile.loadTitleBadgesFromRaw
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -47,8 +50,18 @@ val appModule = module {
             .fallbackToDestructiveMigration()
             .build()
 
-        // Precarica i TitleBadge dal JSON in res/raw se il DB è vuoto.
+        // Precarica i TitleBadge E i Tags dal JSON in res/raw se il DB è vuoto.
         // Nota: questo è lanciato in background e non blocca la creazione del singleton.
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val isEmpty = db.tagDao().getAllTags().firstOrNull().isNullOrEmpty() // o una count sync se preferisci
+                if (isEmpty) {
+                    val tags = loadTagsFromRaw(ctx)
+                    if (tags.isNotEmpty()) db.tagDao().insertAll(tags)
+                }
+            } catch (t: Throwable) { t.printStackTrace() }
+        }
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 // Se hai una query count() sul DAO sarebbe preferibile usarla
@@ -72,6 +85,7 @@ val appModule = module {
     single { get<AppDatabase>().requestDao() }
     single { get<AppDatabase>().titleBadgeDao() }
     single { get<AppDatabase>().missionDao() }
+    single { get<AppDatabase>().tagDao() }
 
     // Repository bindings
     single { UserDaoRepository(get()) }
@@ -79,6 +93,7 @@ val appModule = module {
     single { TitleBadgeRepository(get()) }
     single { SettingsRepository(get(), get()) }
     single { MissionRepository(get()) }
+    single { TagsRepository(get()) }
 
 
     // ViewModels
@@ -88,7 +103,7 @@ val appModule = module {
     viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository
     viewModel { AddRequestViewModel(get(), get()) }
     viewModel { RequestsViewModel(get()) }
-    viewModel { ProfileViewModel(get(), get(), get()) }
+    viewModel { ProfileViewModel(get(), get(), get(), get()) }
     viewModel { UserRequestListViewModel(get(), get()) }
     viewModel { ChangeProfileViewModel(get(), get()) }
     viewModel { SettingsViewModel(get()) }

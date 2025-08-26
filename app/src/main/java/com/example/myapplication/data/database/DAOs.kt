@@ -1,6 +1,7 @@
 
 package com.example.myapplication.data.database
 
+import android.nfc.Tag
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -185,4 +186,53 @@ interface MissionDao {
 
     @Delete
     suspend fun delete(mission: Mission)
+}
+
+@Dao
+interface TagDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(tags: List<Tags>)
+
+    @Query("SELECT * FROM Tags ORDER BY name")
+    fun getAllTags(): Flow<List<Tags>>
+
+    @Transaction
+    @Query("""
+        SELECT t.* FROM Tags t
+        INNER JOIN TagsUser tu ON t.id = tu.idTags
+        WHERE tu.idUser = :userId
+        ORDER BY t.name
+    """)
+    fun getTagsForUser(userId: Int): Flow<List<Tags>>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertUserTags(vararg tagUser: TagsUser)
+
+    @Query("DELETE FROM TagsUser WHERE idUser = :userId")
+    suspend fun deleteAllTagsForUser(userId: Int)
+
+    // mission joins...
+    @Transaction
+    @Query("""
+        SELECT t.* FROM Tags t
+        INNER JOIN TagsMission tm ON t.id = tm.idTags
+        WHERE tm.idMissionId = :missionId
+        ORDER BY t.name
+    """)
+    fun getTagsForMission(missionId: Int): Flow<List<Tags>>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertTagsForMission(vararg tm: TagsMission)
+
+    @Query("DELETE FROM TagsMission WHERE idMissionId = :missionId")
+    suspend fun deleteTagsForMission(missionId: Int)
+
+    @Transaction
+    suspend fun replaceUserTags(userId: Int, tagIds: List<Int>) {
+        deleteAllTagsForUser(userId)
+        if (tagIds.isNotEmpty()) {
+            val list = tagIds.map { TagsUser(idTags = it, idUser = userId) }
+            insertUserTags(*list.toTypedArray())
+        }
+    }
 }
