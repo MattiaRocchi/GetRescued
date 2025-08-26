@@ -29,6 +29,8 @@ import com.example.myapplication.ui.inforequest.InfoRequestViewModel
 import com.example.myapplication.ui.inforequest.InfoRequestViewModelFactory
 import com.example.myapplication.ui.login.LoginScreen
 import com.example.myapplication.ui.login.LoginViewModel
+import com.example.myapplication.ui.missions.MissionViewModel
+import com.example.myapplication.ui.missions.MissionWeekScreen
 import com.example.myapplication.ui.profile.ProfileScreen
 import com.example.myapplication.ui.profile.ProfileViewModel
 import com.example.myapplication.ui.registration.RegistrationScreen
@@ -77,6 +79,13 @@ sealed interface GetRescuedRoute {
 
     @Serializable
     object BrowseRequests : GetRescuedRoute
+
+    @Serializable
+    object MissionGeneral : GetRescuedRoute
+
+    @Serializable
+    object MissionWeek : GetRescuedRoute
+
 
 
 
@@ -139,9 +148,17 @@ fun GetRescuedNavGraph(
             SettingsScreen(navController, viewModel)
         }
 
+        composable<GetRescuedRoute.MissionWeek> {
+            val viewModel: MissionViewModel = koinViewModel()
+            MissionWeekScreen(navController, viewModel)
+        }
+
+
+
         composable<GetRescuedRoute.BrowseRequests> {
             val context = LocalContext.current
-            val db = Room.databaseBuilder(context, AppDatabase::class.java, "rescued-database").build()
+            val db = Room.databaseBuilder(context,
+                AppDatabase::class.java, "rescued-database").build()
             val requestRepository = RequestDaoRepository(db.requestDao())
             val settingsRepository = SettingsRepository(context.dataStore, db.userDao())
             BrowseRequestsScreen(navController = navController, requestRepository = requestRepository, settingsRepository = settingsRepository)
