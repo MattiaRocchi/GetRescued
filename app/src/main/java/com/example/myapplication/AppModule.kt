@@ -125,28 +125,17 @@ val appModule = module {
     viewModel { ChangeProfileViewModel(get(), get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { ParticipatingRequestsViewModel(get(), get()) }
-    viewModel { MissionViewModel(get(), get(),
-        get()) }
+    viewModel { MissionViewModel(get(), get(), get(),get()) }
 
-    // ViewModel con parametri - usando parametersOf
+    //Neccessitano l'id
     viewModel { (requestId: Int) ->
-        InfoRequestViewModel(
-            requestRepository = get(),
-            userDaoRepository = get(),
-            settingsRepository = get(),
-            requestId = requestId
-        )
+        InfoRequestViewModel(get(), get(),get(), requestId)
     }
-
     viewModel { (requestId: Int) ->
-        EditRequestViewModel(
-            repository = get(),
-            titleBadgeRepository = get(),
-            requestId = requestId
-        )
+        EditRequestViewModel(get(), get(), requestId)
     }
-
     viewModel { (requestId: Int) ->
-        ManageRequestViewModel(get(), get(), get(), requestId) }
+        ManageRequestViewModel(get(), get(), get(), requestId)
+    }
 
 }
