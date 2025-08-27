@@ -125,7 +125,7 @@ val appModule = module {
     viewModel { ChangeProfileViewModel(get(), get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { ParticipatingRequestsViewModel(get(), get()) }
-    viewModel { MissionViewModel(get(), get(), get(),get()) }
+    viewModel { MissionViewModel(get(), get(), get()) }
 
     //Neccessitano l'id
     viewModel { (requestId: Int) ->

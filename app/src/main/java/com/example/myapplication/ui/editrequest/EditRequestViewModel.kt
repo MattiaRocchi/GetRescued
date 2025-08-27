@@ -3,16 +3,16 @@ package com.example.myapplication.ui.editrequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.Request
-import com.example.myapplication.data.database.TitleBadge
+import com.example.myapplication.data.database.Tags
 import com.example.myapplication.data.repositories.RequestDaoRepository
-import com.example.myapplication.data.repositories.TitleBadgeRepository
+import com.example.myapplication.data.repositories.TagsRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class EditRequestViewModel(
     private val repository: RequestDaoRepository,
-    private val titleBadgeRepository: TitleBadgeRepository,
-    private val requestId: Int // Ora iniettato da Koin con parametersOf
+    private val tagsRepository: TagsRepository, // Cambiato da TitleBadgeRepository
+    private val requestId: Int
 ) : ViewModel() {
 
     val requestFlow: StateFlow<Request?> =
@@ -37,18 +37,25 @@ class EditRequestViewModel(
     private val _images = MutableStateFlow<List<String>>(emptyList())
     val images: StateFlow<List<String>> = _images
 
-    private val _selectedBadge = MutableStateFlow<TitleBadge?>(null)
-    val selectedBadge: StateFlow<TitleBadge?> = _selectedBadge
+    // Cambiato da TitleBadge a Tags
+    private val _requiredTags = MutableStateFlow<List<Tags>>(emptyList())
+    val requiredTags: StateFlow<List<Tags>> = _requiredTags
 
-    // Lista di tutti i badge disponibili
-    val availableBadges: StateFlow<List<TitleBadge>> =
-        titleBadgeRepository.getAllTitleBadges()
+    // Lista di tutti i tag disponibili
+    val availableTags: StateFlow<List<Tags>> =
+        tagsRepository.allTagsFlow()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    // Tag attualmente associati alla richiesta
+    val currentRequestTags: StateFlow<List<Tags>> =
+        tagsRepository.tagsForMissionFlow(requestId)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val _events = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val events: SharedFlow<String> = _events.asSharedFlow()
 
     init {
+        // Carica i dati della richiesta nei campi di modifica
         viewModelScope.launch {
             requestFlow.filterNotNull().collect { r ->
                 _title.value = r.title
@@ -57,6 +64,13 @@ class EditRequestViewModel(
                 _peopleRequired.value = r.peopleRequired
                 _location.value = r.place ?: ""
                 _images.value = r.fotos
+            }
+        }
+
+        // Carica i tag attualmente associati alla richiesta
+        viewModelScope.launch {
+            currentRequestTags.collect { tags ->
+                _requiredTags.value = tags
             }
         }
     }
@@ -68,15 +82,32 @@ class EditRequestViewModel(
     fun onLocationChange(v: String) { _location.value = v }
 
     fun addImage(imageUri: String) {
-        _images.value = _images.value + imageUri
+        val currentImages = _images.value.toMutableList()
+        if (!currentImages.contains(imageUri)) {
+            currentImages.add(imageUri)
+            _images.value = currentImages
+        }
     }
 
     fun removeImage(imageUri: String) {
-        _images.value = _images.value - imageUri
+        val currentImages = _images.value.toMutableList()
+        currentImages.remove(imageUri)
+        _images.value = currentImages
     }
 
-    fun onBadgeSelected(badge: TitleBadge?) {
-        _selectedBadge.value = badge
+    // Funzioni per gestire i tag
+    fun addRequiredTag(tag: Tags) {
+        val current = _requiredTags.value.toMutableList()
+        if (!current.contains(tag)) {
+            current.add(tag)
+            _requiredTags.value = current
+        }
+    }
+
+    fun removeRequiredTag(tag: Tags) {
+        val current = _requiredTags.value.toMutableList()
+        current.remove(tag)
+        _requiredTags.value = current
     }
 
     fun save(onDone: () -> Unit) {
@@ -103,12 +134,29 @@ class EditRequestViewModel(
             difficulty = difficulty.value,
             peopleRequired = peopleRequired.value,
             place = if (location.value.isBlank()) null else location.value.trim(),
-            //fotos = if (images.value.isEmpty()) null else images.value
+            fotos = images.value
         )
 
         viewModelScope.launch {
             try {
+                // Aggiorna la richiesta
                 repository.updateRequest(updated)
+
+                // Aggiorna i tag associati alla richiesta
+                // Prima rimuove tutti i tag esistenti, poi aggiunge quelli nuovi
+                tagsRepository.deleteTagsForMission(requestId)
+
+                val tagsToAdd = _requiredTags.value.map { tag ->
+                    com.example.myapplication.data.database.TagsMission(
+                        idTags = tag.id,
+                        idMissionId = requestId
+                    )
+                }
+
+                if (tagsToAdd.isNotEmpty()) {
+                    tagsRepository.insertTagsForMission(*tagsToAdd.toTypedArray())
+                }
+
                 _events.tryEmit("Richiesta aggiornata con successo")
                 onDone()
             } catch (e: Exception) {
