@@ -113,7 +113,7 @@ fun ChangeProfileScreen(
                 value = newPassword,
                 onValueChange = {
                     viewModel.onNewPasswordChange(it)
-                    passwordError = it.isNotBlank() && it.length < 6
+                    passwordError =  it.isNotBlank() && !isValidPhoneNumber(it)
                 },
                 passwordError = passwordError,
                 label = "Nuova password"

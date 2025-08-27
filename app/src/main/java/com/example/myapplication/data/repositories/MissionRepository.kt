@@ -1,6 +1,5 @@
 package com.example.myapplication.data.repositories
 
-
 import com.example.myapplication.data.database.GeneralMissionUser
 import com.example.myapplication.data.database.Mission
 import com.example.myapplication.data.database.MissionDao
@@ -17,8 +16,6 @@ class MissionRepository(private val missionDao: MissionDao) {
     suspend fun delete(mission: Mission) = missionDao.delete(mission)
 
     // General Missions
-
-
     fun getUserGeneralMissions(userId: Int): Flow<List<GeneralMissionUser>> =
         missionDao.getUserGeneralMissions(userId)
 
@@ -45,9 +42,12 @@ class MissionRepository(private val missionDao: MissionDao) {
     }
 
     suspend fun setGeneralMissionsUser(userId: Int) {
-        missionDao.setUserGeneralMissions(userId)
-    }
+        val generalMission = missionDao.getAllGeneralMissions()
+        generalMission.forEach { missionId ->
+            missionDao.setUserGeneralMissions(missionId, userId)
+        }
 
+    }
 
     suspend fun updateGeneralMissionUser(missionId: Int, userId: Int) {
         missionDao.updateGeneralMissionProgression(missionId, userId)
@@ -59,22 +59,20 @@ class MissionRepository(private val missionDao: MissionDao) {
     suspend fun updateWeeklyMissionUser(missionId: Int, userId: Int) {
         missionDao.updateWeeklyMissionProgression(missionId, userId)
         if(missionDao.isWeeklyCompleted(missionId, userId)) {
-            missionDao.setGeneralMissionClaimable(missionId, userId)
+            // Fixed: Use setWeeklyMissionClaimable instead of setGeneralMissionClaimable
+            missionDao.setWeeklyMissionClaimable(missionId, userId)
         }
     }
 
     suspend fun claimGeneralMission(missionId: Int, userId: Int) {
         missionDao.claimExp(missionId, userId)
-
         missionDao.shutGeneralMission(missionId, userId)
     }
 
     suspend fun claimWeeklyMission(missionId: Int, userId: Int) {
         missionDao.claimExp(missionId, userId)
-
         missionDao.shutWeeklyMission(missionId, userId)
     }
 
     suspend fun getMissionTitleById(missionId: Int): Int? = missionDao.getMissionBadgeId(missionId)
-
 }

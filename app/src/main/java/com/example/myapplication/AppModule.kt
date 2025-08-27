@@ -126,7 +126,7 @@ val appModule = module {
     viewModel { SettingsViewModel(get()) }
     viewModel { ParticipatingRequestsViewModel(get(), get()) }
     viewModel { MissionViewModel(get(), get(),
-        get(),get()) }
+        get()) }
 
     // ViewModel con parametri - usando parametersOf
     viewModel { (requestId: Int) ->

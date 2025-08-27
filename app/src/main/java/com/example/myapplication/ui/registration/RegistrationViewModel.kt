@@ -36,6 +36,9 @@ class RegistrationViewModel(
     var age by mutableIntStateOf(0) // non nullable, inizializzato a 0
         private set
 
+    var phoneNumber by mutableStateOf("")
+        private set
+
     fun onNameChange(newValue: String) { name = newValue }
     fun onSurnameChange(newValue: String) { surname = newValue }
     fun onEmailChange(newValue: String) { email = newValue }
@@ -43,11 +46,9 @@ class RegistrationViewModel(
     fun onAgeChange(newValue: String) {
         age = newValue.toIntOrNull() ?: 0 // se non valido, torna 0
     }
-
-
-    // Stato per errore età
-    var ageError by mutableStateOf(false)
-        private set
+    fun onPhoneNumberChange(newValue: String) {
+        phoneNumber = newValue // se non valido, torna 0
+    }
 
     fun registerUser(onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
@@ -63,7 +64,9 @@ class RegistrationViewModel(
                     surname = surname,
                     email = email,
                     password = hashedPassword,
-                    age = age
+                    age = age,
+                    phoneNumber = phoneNumber
+
                 )
                 val id = userDaoRepository.insertUserWithInfo(newUser).toInt()
                 titleBadgeRepository.insertUserBadgeCrossRef(id, 0)
@@ -73,7 +76,7 @@ class RegistrationViewModel(
                 onSuccess()
 
             } catch (e: SQLiteConstraintException) {
-                onError("Questa email è già registrata")
+                onError("Questa email è già registrata:")
             } catch (e: Exception) {
                 onError("Errore durante la registrazione: ${e.message}")
             }

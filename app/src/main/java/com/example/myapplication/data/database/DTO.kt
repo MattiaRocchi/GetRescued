@@ -14,3 +14,10 @@ data class UserWithInfo(
     val exp: Int,
     val profileFoto: String?
 )
+
+data class MissionUiState(
+    val isLoading: Boolean = true,
+    val generalMissions: List<Pair<Mission, GeneralMissionUser>> = emptyList(),
+    val weeklyMissions: List<Pair<Mission, WeeklyMissionUser>> = emptyList(),
+    val error: String? = null
+)

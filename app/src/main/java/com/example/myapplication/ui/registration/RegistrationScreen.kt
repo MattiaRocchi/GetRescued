@@ -8,22 +8,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,9 +23,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapplication.ui.GetRescuedRoute
@@ -42,7 +30,9 @@ import com.example.myapplication.ui.composables.AgeTextField
 import com.example.myapplication.ui.composables.EmailTextField
 import com.example.myapplication.ui.composables.NameTextField
 import com.example.myapplication.ui.composables.PasswordTextField
+import com.example.myapplication.ui.composables.PhoneTextField
 import com.example.myapplication.ui.composables.SurnameTextField
+import com.example.myapplication.ui.composables.isValidPhoneNumber
 import kotlinx.coroutines.launch
 
 
@@ -60,6 +50,7 @@ fun RegistrationScreen(
     var emailError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
     var ageError by remember { mutableStateOf(false) }
+    var phoneNumberError by remember { mutableStateOf(false) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -132,6 +123,14 @@ fun RegistrationScreen(
 
             Spacer(Modifier.height(16.dp))
 
+            PhoneTextField(
+                value = viewModel.phoneNumber.toString(),
+                onValueChange = {
+                    viewModel.onPhoneNumberChange(it)
+                    phoneNumberError = it.isNotBlank() && !isValidPhoneNumber(it)
+                },
+                phoneError = phoneNumberError
+            )
             Button(
                 onClick = {
                     viewModel.registerUser(
@@ -148,7 +147,8 @@ fun RegistrationScreen(
                         }
                     )
                 },
-                enabled = !nameError && !surnameError && !emailError && !passwordError && !ageError,
+                enabled = !nameError && !surnameError && !emailError && !passwordError && !ageError
+                            && !phoneNumberError,
 
                 modifier = Modifier.fillMaxWidth()
             ) {

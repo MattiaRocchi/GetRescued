@@ -180,11 +180,14 @@ interface MissionDao {
     suspend fun insert(mission: Mission)
 
     @Query("""
-    INSERT INTO GeneralMissionUser(id, idUser, progression, active)
-    SELECT id, :userId, 0, 1 FROM Mission WHERE type = 1
+        INSERT INTO GeneralMissionUser(id, idUser, progression, active, claimable) 
+        VALUES (:missionId, :userId, :progression, :active, :claimable)
 """)
-    suspend fun setUserGeneralMissions(userId: Int)
+    suspend fun setUserGeneralMissions(missionId: Int, userId: Int,
+                                       progression: Int = 0, active: Int = 1, claimable: Int = 0)
 
+    @Query("SELECT m.id FROM Mission m WHERE type = 1")
+    suspend fun getAllGeneralMissions(): List<Int>
 
     @Query("SELECT * FROM GeneralMissionUser WHERE idUser = :userId and active = 1")
     fun getUserGeneralMissions(userId: Int): Flow<List<GeneralMissionUser>>

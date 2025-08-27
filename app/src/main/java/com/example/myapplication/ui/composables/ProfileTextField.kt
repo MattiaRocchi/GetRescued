@@ -228,16 +228,21 @@ fun PhoneTextField(
     value: String,
     onValueChange: (String) -> Unit,
     phoneError: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = { onValueChange(it) },
-        label = { Text("Telefono (facoltativo)") },
+        label = { Text("Numero di Telefono") },
         isError = phoneError,
         modifier = modifier.fillMaxWidth(),
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+        supportingText = {
+            if (phoneError) {
+                Text("Inserisci un numero di telefono valido", color = MaterialTheme.colorScheme.error)
+            }
+        },
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -246,8 +251,11 @@ fun PhoneTextField(
             cursorColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
     )
-    if (phoneError) {
-        Spacer(modifier = Modifier.height(4.dp))
-        Text("Inserisci un numero di telefono valido", color = MaterialTheme.colorScheme.error)
-    }
+
+}
+
+
+fun isValidPhoneNumber(phone: String): Boolean {
+    val regex = Regex("^(?:\\+39)?3\\d{8,9}$")
+    return regex.matches(phone)
 }
