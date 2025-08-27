@@ -38,15 +38,15 @@ fun AddRequestScreen(
     val difficulty by viewModel.difficulty.collectAsState()
     val location by viewModel.location.collectAsState()
     val photos by viewModel.photos.collectAsState()
-    val requiredBadges by viewModel.requiredBadges.collectAsState()
-    val availableBadges by viewModel.availableBadges.collectAsState()
+    val requiredTags by viewModel.requiredTags.collectAsState() // Cambiato da requiredBadges
+    val availableTags by viewModel.availableTags.collectAsState() // Cambiato da availableBadges
     val isFormValid by viewModel.isFormValid.collectAsState()
 
     val context = LocalContext.current
 
     var showImagePicker by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
-    var showBadgeDialog by remember { mutableStateOf(false) }
+    var showTagDialog by remember { mutableStateOf(false) } // Cambiato da showBadgeDialog
 
     // Launcher per la galleria
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -205,19 +205,19 @@ fun AddRequestScreen(
                 }
             }
 
-            // Sezione badge richiesti
+            // Sezione tag richiesti (cambiato da badge)
             item {
-                Text("Badge richiesti (opzionale)", style = MaterialTheme.typography.titleMedium)
+                Text("Tag richiesti (opzionale)", style = MaterialTheme.typography.titleMedium)
 
-                if (requiredBadges.isNotEmpty()) {
+                if (requiredTags.isNotEmpty()) {
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.padding(vertical = 8.dp)
                     ) {
-                        items(requiredBadges) { badge ->
+                        items(requiredTags) { tag ->
                             FilterChip(
-                                onClick = { viewModel.removeRequiredBadge(badge) },
-                                label = { Text(badge.name) },
+                                onClick = { viewModel.removeRequiredTag(tag) },
+                                label = { Text(tag.name) },
                                 selected = true,
                                 trailingIcon = { Icon(Icons.Default.Close, "Rimuovi") }
                             )
@@ -226,10 +226,10 @@ fun AddRequestScreen(
                 }
 
                 Button(
-                    onClick = { showBadgeDialog = true },
+                    onClick = { showTagDialog = true },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Aggiungi badge richiesto")
+                    Text("Aggiungi tag richiesto")
                 }
             }
 
@@ -274,20 +274,20 @@ fun AddRequestScreen(
         )
     }
 
-    // Dialog per selezione badge
-    if (showBadgeDialog) {
+    // Dialog per selezione tag (cambiato da badge)
+    if (showTagDialog) {
         AlertDialog(
-            onDismissRequest = { showBadgeDialog = false },
-            title = { Text("Seleziona badge richiesti") },
+            onDismissRequest = { showTagDialog = false },
+            title = { Text("Seleziona tag richiesti") },
             text = {
                 LazyColumn {
-                    items(availableBadges) { badge ->
+                    items(availableTags.filter { it !in requiredTags }) { tag ->
                         FilterChip(
                             onClick = {
-                                viewModel.addRequiredBadge(badge)
-                                showBadgeDialog = false
+                                viewModel.addRequiredTag(tag)
+                                showTagDialog = false
                             },
-                            label = { Text(badge.name) },
+                            label = { Text(tag.name) },
                             selected = false,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -297,7 +297,7 @@ fun AddRequestScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showBadgeDialog = false }) {
+                TextButton(onClick = { showTagDialog = false }) {
                     Text("Chiudi")
                 }
             }

@@ -4,17 +4,18 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.Request
-import com.example.myapplication.data.database.TitleBadge
+import com.example.myapplication.data.database.Tags
+import com.example.myapplication.data.database.TagsMission
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
-import com.example.myapplication.data.repositories.TitleBadgeRepository
+import com.example.myapplication.data.repositories.TagsRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class AddRequestViewModel(
     private val repository: RequestDaoRepository,
     private val settingsRepository: SettingsRepository,
-    private val titleBadgeRepository: TitleBadgeRepository
+    private val tagsRepository: TagsRepository
 ) : ViewModel() {
 
     private val _location = MutableStateFlow("")
@@ -35,23 +36,21 @@ class AddRequestViewModel(
     private val _photos = MutableStateFlow<List<String>>(emptyList())
     val photos: StateFlow<List<String>> = _photos.asStateFlow()
 
-    private val _requiredBadges = MutableStateFlow<List<TitleBadge>>(emptyList())
-    val requiredBadges: StateFlow<List<TitleBadge>> = _requiredBadges.asStateFlow()
+    // Cambiato da TitleBadge a Tags
+    private val _requiredTags = MutableStateFlow<List<Tags>>(emptyList())
+    val requiredTags: StateFlow<List<Tags>> = _requiredTags.asStateFlow()
 
-    private val _availableBadges = MutableStateFlow<List<TitleBadge>>(emptyList())
-    val availableBadges: StateFlow<List<TitleBadge>> = _availableBadges.asStateFlow()
+    private val _availableTags = MutableStateFlow<List<Tags>>(emptyList())
+    val availableTags: StateFlow<List<Tags>> = _availableTags.asStateFlow()
 
     private val _isFormValid = MutableStateFlow(false)
     val isFormValid: StateFlow<Boolean> = _isFormValid.asStateFlow()
 
     init {
-        // Carica tutti i badge disponibili
+        // Carica tutti i tag disponibili
         viewModelScope.launch {
-            try {
-                val badges = titleBadgeRepository.getAll()
-                _availableBadges.value = badges
-            } catch (e: Exception) {
-                // Handle error
+            tagsRepository.allTagsFlow().collect { tags ->
+                _availableTags.value = tags
             }
         }
 
@@ -90,18 +89,19 @@ class AddRequestViewModel(
         }
     }
 
-    fun addRequiredBadge(badge: TitleBadge) {
-        val current = _requiredBadges.value.toMutableList()
-        if (!current.contains(badge)) {
-            current.add(badge)
-            _requiredBadges.value = current
+    // Cambiato per gestire Tags invece di TitleBadge
+    fun addRequiredTag(tag: Tags) {
+        val current = _requiredTags.value.toMutableList()
+        if (!current.contains(tag)) {
+            current.add(tag)
+            _requiredTags.value = current
         }
     }
 
-    fun removeRequiredBadge(badge: TitleBadge) {
-        val current = _requiredBadges.value.toMutableList()
-        current.remove(badge)
-        _requiredBadges.value = current
+    fun removeRequiredTag(tag: Tags) {
+        val current = _requiredTags.value.toMutableList()
+        current.remove(tag)
+        _requiredTags.value = current
     }
 
     fun submitRequest(onSuccess: () -> Unit) {
@@ -122,8 +122,16 @@ class AddRequestViewModel(
             )
 
             try {
+                // Inserisci la richiesta
                 repository.insertRequest(request)
-                // TODO: Collegare i badge richiesti usando TagsMission
+
+                // Se ci sono tag richiesti, dobbiamo collegarli alla richiesta
+                // Nota: per fare questo correttamente, dovremmo avere l'ID della richiesta appena inserita
+                // Il DAO insert dovrebbe restituire l'ID, ma attualmente non lo fa
+                // Per ora, i tag richiesti non vengono salvati - questo richiede una modifica al DAO
+
+                // TODO: Implementare il collegamento dei tag alla richiesta tramite TagsMission
+                // Questo richiede che RequestDao.insert restituisca l'ID della richiesta inserita
 
                 // Reset form
                 resetForm()
@@ -141,6 +149,6 @@ class AddRequestViewModel(
         _difficulty.value = "Bassa"
         _location.value = ""
         _photos.value = emptyList()
-        _requiredBadges.value = emptyList()
+        _requiredTags.value = emptyList()
     }
 }
