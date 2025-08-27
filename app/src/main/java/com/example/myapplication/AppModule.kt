@@ -79,8 +79,8 @@ val appModule = module {
         }
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val isEmpty = db.missionDao().getAll().isEmpty()
-                if (isEmpty) {
+                val count = db.missionDao().getMissionCount()
+                if (count <= 0) {
                     val general = loadMissionsFromRaw(ctx, true)
                     val weekly = loadMissionsFromRaw(ctx, false)
                     val allMissions = general + weekly

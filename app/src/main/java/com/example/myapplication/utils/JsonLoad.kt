@@ -35,6 +35,14 @@ fun loadTagsFromRaw(context: Context): List<Tags> {
         emptyList()
     }
 }
+data class MissionJson(
+    val name: String,
+    val description: String,
+    val exp: Int? = 0,
+    val titleBadge: Int? = null,
+    val Requirement: Int,
+    val Tag: String
+)
 
 fun loadMissionsFromRaw(context: Context, isGeneral: Boolean): List<Mission> {
     return try {
@@ -44,12 +52,21 @@ fun loadMissionsFromRaw(context: Context, isGeneral: Boolean): List<Mission> {
             context.resources.openRawResource(com.example.myapplication.R.raw.mission_week)
         }
         val reader = InputStreamReader(inputStream)
-        val type = object : com.google.gson.reflect.TypeToken<List<Mission>>() {}.type
-        val missions = com.google.gson.Gson().fromJson<List<Mission>>(reader, type)
+        val type = object : TypeToken<List<MissionJson>>() {}.type
+        val missionJsons = Gson().fromJson<List<MissionJson>>(reader, type)
 
-        // Forza il campo "type" in base alla sorgente
-        missions.map { mission ->
-            mission.copy(type = isGeneral)  // true = generale, false = settimanale
+        // Converti da MissionJson a Mission, impostando id = 0 per l'autogenerazione
+        missionJsons.mapIndexed { index, missionJson ->
+            Mission(
+                id = 0, // Questo farà sì che Room generi automaticamente l'ID
+                name = missionJson.name,
+                description = missionJson.description,
+                exp = missionJson.exp,
+                titleBadgeId = missionJson.titleBadge,
+                requirement = missionJson.Requirement,
+                tag = missionJson.Tag,
+                type = isGeneral
+            )
         }
     } catch (e: Exception) {
         e.printStackTrace()

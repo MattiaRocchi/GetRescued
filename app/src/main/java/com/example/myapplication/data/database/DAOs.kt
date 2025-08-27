@@ -230,7 +230,8 @@ interface MissionDao {
 
     @Query("SELECT * FROM Mission")
     fun getAll(): List<Mission>
-
+    @Query("SELECT COUNT(*) FROM Mission")
+    suspend fun getMissionCount(): Int
     @Query("""Update GeneralMissionUser set progression = progression+1 
                 WHERE id = :missionId AND idUser = :userId AND active = 1 AND claimable = 0""")
     suspend fun updateGeneralMissionProgression(missionId: Int, userId: Int)

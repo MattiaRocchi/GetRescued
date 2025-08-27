@@ -5,7 +5,8 @@
     "description": "Completa 1 richieste",
     "exp": 50,
     "Requirement": 1,
-    "Tag": ""
+    "Tag": "",
+    "type": 0
   },
   {
 
@@ -13,7 +14,8 @@
     "description": "Completa 3 richieste",
     "exp": 150,
     "Requirement": 3,
-    "Tag": ""
+    "Tag": "",
+    "type": 0
   },
   {
 
@@ -21,7 +23,8 @@
     "description": "Completa 5 richieste",
     "exp": 300,
     "Requirement": 5,
-    "Tag": ""
+    "Tag": "",
+    "type": 0
   },
   {
 
@@ -29,7 +32,8 @@
     "description": "Completa 10 richieste",
     "exp": 600,
     "Requirement": 10,
-    "Tag": ""
+    "Tag": "",
+    "type": 0
   },
   {
 
@@ -37,7 +41,8 @@
     "description": "Completa 15 richieste",
     "exp": 1000,
     "Requirement": 15,
-    "Tag": ""
+    "Tag": "",
+    "type": 0
   },
   {
 
@@ -45,7 +50,8 @@
     "description": "Completa 1 richieste con tag Idraulico",
     "exp": 100,
     "Requirement": 1,
-    "Tag": "Idraulico"
+    "Tag": "Idraulico",
+    "type": 0
   },
   {
 
@@ -53,7 +59,8 @@
     "description": "Completa 3 richieste con tag Idraulico",
     "exp": 250,
     "Requirement": 3,
-    "Tag": "Idraulico"
+    "Tag": "Idraulico",
+    "type": 0
   },
   {
 
@@ -61,7 +68,8 @@
     "description": "Completa 1 richieste con tag Elettricista",
     "exp": 100,
     "Requirement": 1,
-    "Tag": "Elettricista"
+    "Tag": "Elettricista",
+    "type": 0
   },
   {
 
@@ -69,7 +77,8 @@
     "description": "Completa 3 richieste con tag Elettricista",
     "exp": 250,
     "Requirement": 3,
-    "Tag": "Elettricista"
+    "Tag": "Elettricista",
+    "type": 0
   },
   {
 
@@ -77,7 +86,8 @@
     "description": "Completa 1 richieste con tag Pompiere",
     "exp": 100,
     "Requirement": 1,
-    "Tag": "Pompiere"
+    "Tag": "Pompiere",
+    "type": 0
   },
   {
 
@@ -85,7 +95,8 @@
     "description": "Completa 3 richieste con tag Pompiere",
     "exp": 250,
     "Requirement": 3,
-    "Tag": "Pompiere"
+    "Tag": "Pompiere",
+    "type": 0
   },
   {
 
@@ -93,7 +104,8 @@
     "description": "Completa 1 richieste con tag Animali",
     "exp": 100,
     "Requirement": 1,
-    "Tag": "Animali"
+    "Tag": "Animali",
+    "type": 0
   },
   {
 
@@ -101,6 +113,7 @@
     "description": "Completa 3 richieste con tag Animali",
     "exp": 250,
     "Requirement": 3,
-    "Tag": "Animali"
+    "Tag": "Animali",
+    "type": 0
   }
 ]
