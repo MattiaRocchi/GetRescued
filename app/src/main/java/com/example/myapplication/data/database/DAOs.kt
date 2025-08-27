@@ -175,11 +175,121 @@ interface MissionDao {
     @Insert
     suspend fun insert(mission: Mission)
 
+    @Query("""
+    INSERT INTO GeneralMissionUser(id, idUser, progression, active)
+    SELECT id, :userId, 0, 1 FROM Mission WHERE type = 1
+""")
+    suspend fun setUserGeneralMissions(userId: Int)
+
+
+    @Query("SELECT * FROM GeneralMissionUser WHERE idUser = :userId and active = 1")
+    fun getUserGeneralMissions(userId: Int): Flow<List<GeneralMissionUser>>
+
+    @Query("SELECT * FROM WeeklyMissionUser WHERE idUser = :userId and active = 1")
+    fun getUserWeeklyMissions(userId: Int): Flow<List<WeeklyMissionUser>>
+
+    @Query("SELECT m.* FROM GeneralMissionUser gm, Mission m WHERE idUser = :userId and m.id = gm.id and gm.active = 1")
+    suspend fun userMissionsGeneral(userId: Int): List<Mission>
+
+    @Query("SELECT m.* FROM WeeklyMissionUser wm, Mission m WHERE idUser = :userId and m.id = wm.id and wm.active = 1")
+    suspend fun userMissionsWeekly(userId: Int): List<Mission>
+
+
+
+
+    @Query("""SELECT m.*
+                    FROM Mission m, GeneralMissionUser gm
+                    WHERE gm.idUser = :userId AND gm.active = 0 AND m.type = 1""")
+    suspend fun getUserGeneralMissionsCompleted(userId: Int): List<Mission>
+
+    @Query("""SELECT m.*
+                    FROM Mission m, WeeklyMissionUser wm
+                    WHERE wm.idUser = :userId AND wm.active = 0 AND m.type = 0""")
+    suspend fun getUserWeeklyMissionsCompleted(userId: Int): List<Mission>
+
+    @Query("""
+
+    INSERT INTO WeeklyMissionUser(id, idUser, progression, active)
+    SELECT m.id, :userId, 0, 1
+    FROM Mission m
+    JOIN TagsMission tm ON m.id = tm.idMissionId
+    JOIN TagsUser tu ON tm.idTags = tu.idTags
+    WHERE tu.idUser = :userId AND m.type = 0
+    ORDER BY RANDOM() 
+    LIMIT 3
+""")
+    suspend fun setUserWeeklyMissions(userId: Int)
+
+    @Query("    Delete FROM WeeklyMissionUser WHERE idUser = :userId ")
+    suspend fun deleteUserWeeklyMissions(userId: Int)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(mission: List<Mission>)
+
     @Query("SELECT * FROM Mission WHERE id = :id")
     suspend fun getById(id: Int): Mission?
 
     @Query("SELECT * FROM Mission")
-    fun getAll(): Flow<List<Mission>>
+    fun getAll(): List<Mission>
+
+    @Query("""Update GeneralMissionUser set progression = progression+1 
+                WHERE id = :missionId AND idUser = :userId AND active = 1 AND claimable = 0""")
+    suspend fun updateGeneralMissionProgression(missionId: Int, userId: Int)
+
+    @Query("""Update WeeklyMissionUser set progression = progression+1 
+                  WHERE id = :missionId AND idUser = :userId AND active = 1 AND claimable = 0""")
+    suspend fun updateWeeklyMissionProgression(missionId: Int, userId: Int)
+
+    @Query("""Update GeneralMissionUser set active = 0 and claimable = 0 
+        WHERE id = :missionId AND idUser = :userId""")
+    suspend fun shutGeneralMission(missionId: Int, userId: Int)
+
+    @Query("""Update WeeklyMissionUser set active = 0 and claimable = 0
+                WHERE id = :missionId AND idUser = :userId""")
+    suspend fun shutWeeklyMission(missionId: Int, userId: Int)
+
+    @Query("""Update GeneralMissionUser set claimable = 1 
+                WHERE id = :missionId AND idUser = :userId""")
+    suspend fun setGeneralMissionClaimable(missionId: Int, userId: Int)
+
+    @Query("""Update WeeklyMissionUser set claimable = 1 
+                WHERE id = :missionId AND idUser = :userId""")
+    suspend fun setWeeklyMissionClaimable(missionId: Int, userId: Int)
+    @Query("""
+        SELECT CASE 
+            WHEN wm.progression >= m.requirement THEN 1 
+            ELSE 0 
+        END 
+        FROM WeeklyMissionUser wm
+        INNER JOIN Mission m ON wm.id = m.id
+        WHERE wm.idUser = :userId AND wm.id = :missionId
+    """)
+    suspend fun isWeeklyCompleted(missionId: Int, userId: Int ): Boolean
+
+    @Query("""
+        SELECT CASE 
+            WHEN gm.progression >= m.requirement THEN 1 
+            ELSE 0 
+        END 
+        FROM GeneralMissionUser gm
+        INNER JOIN Mission m ON gm.id = m.id
+        WHERE gm.idUser = :userId AND gm.id = :missionId
+    """)
+    suspend fun isGeneralCompleted(missionId: Int, userId: Int): Boolean
+
+    @Query("SELECT exp FROM Mission WHERE id = :missionId")
+    suspend fun getMissionExp(missionId: Int): Int
+
+    @Query("UPDATE UserInfo SET exp = exp + :exp WHERE id = :userId")
+    suspend fun addUserExp(userId: Int, exp: Int)
+
+    @Transaction
+    suspend fun claimExp(missionId: Int, userId: Int) {
+        val exp = getMissionExp(missionId)
+        addUserExp(userId, exp)
+    }
+
+    @Query("SELECT m.titleBadge FROM Mission m WHERE id = :missionId")
+    suspend fun getMissionBadgeId(missionId: Int): Int?
 
     @Update
     suspend fun update(mission: Mission)
@@ -235,4 +345,6 @@ interface TagDao {
             insertUserTags(*list.toTypedArray())
         }
     }
+
+
 }

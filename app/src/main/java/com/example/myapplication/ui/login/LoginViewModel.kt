@@ -10,7 +10,7 @@ import com.example.myapplication.data.repositories.UserDaoRepository
 import com.example.myapplication.utils.PasswordHasher
 import kotlinx.coroutines.launch
 
-class LoginViewModel(
+class  LoginViewModel(
     private val userDaoRepository: UserDaoRepository,
     private val settingsRepository: SettingsRepository
 

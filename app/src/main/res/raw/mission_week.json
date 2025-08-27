@@ -1,0 +1,106 @@
+[
+  {
+
+    "name": "Missione 1",
+    "description": "Completa 1 richieste",
+    "exp": 50,
+    "Requirement": 1,
+    "Tag": ""
+  },
+  {
+
+    "name": "Missione 2",
+    "description": "Completa 3 richieste",
+    "exp": 150,
+    "Requirement": 3,
+    "Tag": ""
+  },
+  {
+
+    "name": "Missione 3",
+    "description": "Completa 5 richieste",
+    "exp": 300,
+    "Requirement": 5,
+    "Tag": ""
+  },
+  {
+
+    "name": "Missione 4",
+    "description": "Completa 10 richieste",
+    "exp": 600,
+    "Requirement": 10,
+    "Tag": ""
+  },
+  {
+
+    "name": "Missione 5",
+    "description": "Completa 15 richieste",
+    "exp": 1000,
+    "Requirement": 15,
+    "Tag": ""
+  },
+  {
+
+    "name": "Missione Idraulico",
+    "description": "Completa 1 richieste con tag Idraulico",
+    "exp": 100,
+    "Requirement": 1,
+    "Tag": "Idraulico"
+  },
+  {
+
+    "name": "Missione Idraulico",
+    "description": "Completa 3 richieste con tag Idraulico",
+    "exp": 250,
+    "Requirement": 3,
+    "Tag": "Idraulico"
+  },
+  {
+
+    "name": "Missione Elettricista",
+    "description": "Completa 1 richieste con tag Elettricista",
+    "exp": 100,
+    "Requirement": 1,
+    "Tag": "Elettricista"
+  },
+  {
+
+    "name": "Missione Elettricista",
+    "description": "Completa 3 richieste con tag Elettricista",
+    "exp": 250,
+    "Requirement": 3,
+    "Tag": "Elettricista"
+  },
+  {
+
+    "name": "Missione Pompiere",
+    "description": "Completa 1 richieste con tag Pompiere",
+    "exp": 100,
+    "Requirement": 1,
+    "Tag": "Pompiere"
+  },
+  {
+
+    "name": "Missione Pompiere",
+    "description": "Completa 3 richieste con tag Pompiere",
+    "exp": 250,
+    "Requirement": 3,
+    "Tag": "Pompiere"
+  },
+  {
+
+    "name": "Missione Animali",
+    "description": "Completa 1 richieste con tag Animali",
+    "exp": 100,
+    "Requirement": 1,
+    "Tag": "Animali"
+  },
+  {
+
+    "name": "Missione Animali",
+    "description": "Completa 3 richieste con tag Animali",
+    "exp": 250,
+    "Requirement": 3,
+    "Tag": "Animali"
+  }
+]

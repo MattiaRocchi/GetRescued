@@ -10,33 +10,34 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Surface
+
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.data.database.GeneralMissionUser
 import com.example.myapplication.data.database.Mission
-import com.example.myapplication.data.database.generalMissionUser
-import com.example.myapplication.data.database.settimanalMissionUser
+import com.example.myapplication.data.database.WeeklyMissionUser
 import com.example.myapplication.ui.theme.UnpressableButton
 
 
 @Composable
 fun MissionCardWeek(
     mission: Mission,
-    settimanalMissionUser: settimanalMissionUser? = null,
+    weeklyMissionUser: WeeklyMissionUser? = null,
     onClaimClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     // Determina quale tipo di missione stiamo usando
-    val missionUser = settimanalMissionUser
+    val missionUser = weeklyMissionUser
     val progression = missionUser?.progression ?: 0
     val isActive = missionUser?.active ?: true
 
@@ -153,8 +154,8 @@ fun MissionCardWeek(
 @Composable
 fun MissionCardGeneral(
     mission: Mission,
-    generalMissionUser: generalMissionUser? = null,
-    settimanalMissionUser: settimanalMissionUser? = null,
+    generalMissionUser: GeneralMissionUser? = null,
+    weeklyMissionUser: WeeklyMissionUser? = null,
     onClaimClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {

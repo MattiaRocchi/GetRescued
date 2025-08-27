@@ -96,24 +96,31 @@ data class Mission(
     @ColumnInfo(name= "name") val name: String,
     @ColumnInfo(name= "description") val description: String,
     @ColumnInfo(name= "exp") val exp: Int? = 0,
-    @ColumnInfo(name= "titleBadge") val titleBadgeId: Int? = null
+    @ColumnInfo(name= "titleBadge") val titleBadgeId: Int? = null,
+    @ColumnInfo(name= "Requirement") val requirement: Int,
+    @ColumnInfo(name= "Tag") val tag: String,
+    @ColumnInfo(name= "type") val type: Boolean=true //generale (true) o settimanale (false)
 )
 @Entity(primaryKeys = ["id", "idUser"])
-data class generalMissionUser(
+data class GeneralMissionUser(
     val id: Int, //Id della missione di riferimento
     val idUser: Int,
     @ColumnInfo(name= "progression") var progression: Int=0, //valore di indice di completamento
     @ColumnInfo(name= "active") var active: Boolean=true, //se questa missione è attiva o meno,
     // di defaultinizialmente messa a true
+    //Se la missione è claimable, ovvero se l'utente ha completato la missione e può
+    // richiedere la ricompensa
+    @ColumnInfo(name = "claimable") var claimable: Boolean = false
 
 )
 @Entity(primaryKeys = ["id", "idUser"])
-data class settimanalMissionUser(
+data class WeeklyMissionUser(
     val id: Int, //Id della missione di riferimento
     val idUser: Int,
     @ColumnInfo(name= "progression") var progression: Int=0, //valore di indice di completamento
     @ColumnInfo(name= "active") var active: Boolean=true, //se questa missione è attiva o meno,
     // di default inizialmente messa a true
+    @ColumnInfo(name = "claimable") var claimable: Boolean = false
 )
 
 @Entity

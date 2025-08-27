@@ -1,11 +1,11 @@
 package com.example.myapplication.data.database
 
-import android.content.Context
+
 import androidx.room.Database
-import androidx.room.Room
+
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.sqlite.db.SupportSQLiteDatabase
+
 import com.example.myapplication.data.utils.Converters
 
 
@@ -13,11 +13,11 @@ import com.example.myapplication.data.utils.Converters
     entities = [
         User::class, Request::class, UserInfo::class,
         Mission::class, TitleBadge::class,
-        generalMissionUser::class, settimanalMissionUser::class,
+        GeneralMissionUser::class, WeeklyMissionUser::class,
         Tags::class, TagsMission::class, TagsUser::class,
         UserBadgeCrossRef::class, UserPart::class,
     ],
-    version = 7,
+    version = 8,
     exportSchema = true
 
 )

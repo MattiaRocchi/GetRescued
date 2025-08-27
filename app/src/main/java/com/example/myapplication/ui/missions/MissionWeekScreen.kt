@@ -3,8 +3,8 @@ package com.example.myapplication.ui.missions
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import com.example.myapplication.data.database.GeneralMissionUser
 import com.example.myapplication.data.database.Mission
-import com.example.myapplication.data.database.generalMissionUser
 import com.example.myapplication.ui.composables.MissionCardGeneral
 
 @Composable
@@ -16,10 +16,12 @@ fun MissionWeekScreen(
         id = 1,
         name = "Accetta 3 richieste:",
         description = "Completa 3 richieste",
-        exp = 150
+        exp = 150,
+        requirement = 3,
+        tag = ""
     )
 
-    val sampleGeneralMissionUser = generalMissionUser(
+    val sampleGeneralMissionUser = GeneralMissionUser(
         id = 1,
         idUser = 1,
         progression = 1,

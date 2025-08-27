@@ -22,8 +22,9 @@ import com.example.myapplication.ui.inforequest.InfoRequestViewModel
 import com.example.myapplication.ui.missions.MissionViewModel
 import com.example.myapplication.ui.participationrequests.ParticipatingRequestsViewModel
 import com.example.myapplication.ui.profile.ProfileViewModel
-import com.example.myapplication.ui.profile.loadTagsFromRaw
-import com.example.myapplication.ui.profile.loadTitleBadgesFromRaw
+import com.example.myapplication.utils.loadMissionsFromRaw
+import com.example.myapplication.utils.loadTagsFromRaw
+import com.example.myapplication.utils.loadTitleBadgesFromRaw
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
@@ -54,12 +55,38 @@ val appModule = module {
         // Nota: questo è lanciato in background e non blocca la creazione del singleton.
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                val isEmpty = db.tagDao().getAllTags().firstOrNull().isNullOrEmpty() // o una count sync se preferisci
+                if (isEmpty) {
+                    val tags = loadTagsFromRaw(ctx)
+                    if (tags.isNotEmpty()) db.tagDao().insertAll(tags)
+                }
+            } catch (t: Throwable) { t.printStackTrace() }
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
                 // Se hai una query count() sul DAO sarebbe preferibile usarla
                 val isEmpty = db.titleBadgeDao().getAll().isEmpty()
                 if (isEmpty) {
                     val titles = loadTitleBadgesFromRaw(ctx)
                     if (titles.isNotEmpty()) {
                         db.titleBadgeDao().insertAll(titles)
+                    }
+                }
+            } catch (t: Throwable) {
+                t.printStackTrace()
+            }
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val isEmpty = db.missionDao().getAll().isEmpty()
+                if (isEmpty) {
+                    val general = loadMissionsFromRaw(ctx, true)
+                    val weekly = loadMissionsFromRaw(ctx, false)
+                    val allMissions = general + weekly
+
+                    if (allMissions.isNotEmpty()) {
+                        db.missionDao().insertAll(allMissions)
                     }
                 }
             } catch (t: Throwable) {
@@ -87,7 +114,7 @@ val appModule = module {
 
 
     // ViewModels
-    viewModel { RegistrationViewModel(get(), get()) }
+    viewModel { RegistrationViewModel(get(), get(), get()) }
     viewModel { LoginViewModel(get(), get()) }
     viewModel { AddRequestViewModel(get(), get(), get()) } // get() → RequestDaoRepository
     viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository

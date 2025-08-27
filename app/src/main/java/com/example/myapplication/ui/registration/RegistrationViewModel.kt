@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.User
+import com.example.myapplication.data.repositories.MissionRepository
 import com.example.myapplication.data.repositories.TitleBadgeRepository
 
 import com.example.myapplication.data.repositories.UserDaoRepository
@@ -16,7 +17,8 @@ import kotlinx.coroutines.launch
 
 class RegistrationViewModel(
     private val userDaoRepository: UserDaoRepository,
-    private val titleBadgeRepository: TitleBadgeRepository
+    private val titleBadgeRepository: TitleBadgeRepository,
+    private val missionRepository: MissionRepository
 ) : ViewModel() {
 
     var name by mutableStateOf("")
@@ -66,6 +68,7 @@ class RegistrationViewModel(
                 val id = userDaoRepository.insertUserWithInfo(newUser).toInt()
                 titleBadgeRepository.insertUserBadgeCrossRef(id, 0)
                 titleBadgeRepository.updateActiveTitle(id, 0)
+                missionRepository.setGeneralMissionsUser(id)
 
                 onSuccess()
 

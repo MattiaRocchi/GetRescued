@@ -1,0 +1,209 @@
+[
+  {
+
+    "name": "Apprendista",
+    "description": "Completa 2 richieste",
+    "exp": 100,
+    "titleBadge": 1,
+    "Requirement": 2,
+    "Tag": ""
+  },
+  {
+
+    "name": "Diligente",
+    "description": "Completa 5 richieste",
+    "exp": 300,
+    "titleBadge": 2,
+    "Requirement": 5,
+    "Tag": ""
+  },
+  {
+
+    "name": "Altruista",
+    "description": "Completa 10 richieste",
+    "exp": 600,
+    "titleBadge": 3,
+    "Requirement": 10,
+    "Tag": ""
+  },
+  {
+
+    "name": "Caritatevole",
+    "description": "Completa 30 richieste",
+    "exp": 1200,
+    "titleBadge": 4,
+    "Requirement": 30,
+    "Tag": ""
+  },
+  {
+
+    "name": "Esperto Soccorritore",
+    "description": "Completa 50 richieste",
+    "exp": 3000,
+    "titleBadge": 5,
+    "Requirement": 50,
+    "Tag": ""
+  },
+  {
+
+    "name": "Filantropo",
+    "description": "Completa 100 richieste",
+    "exp": 10000,
+    "titleBadge": 6,
+    "Requirement": 100,
+    "Tag": ""
+  },
+  {
+
+    "name": "Idraulico Novello",
+    "description": "Completa 2 richieste con tag Idraulico",
+    "exp": 200,
+    "titleBadge": 7,
+    "Requirement": 2,
+    "Tag": "Idraulico"
+  },
+  {
+
+    "name": "Idraulico Amatoriale",
+    "description": "Completa 5 richieste con tag Idraulico",
+    "exp": 500,
+    "titleBadge": 8,
+    "Requirement": 5,
+    "Tag": "Idraulico"
+  },
+  {
+
+    "name": "Idraulico Diligente",
+    "description": "Completa 10 richieste con tag Idraulico",
+    "exp": 1000,
+    "titleBadge": 9,
+    "Requirement": 10,
+    "Tag": "Idraulico"
+  },
+  {
+
+    "name": "Idraulico Esperto",
+    "description": "Completa 20 richieste con tag Idraulico",
+    "exp": 3000,
+    "titleBadge": 10,
+    "Requirement": 20,
+    "Tag": "Idraulico"
+  },
+  {
+
+    "name": "Maestro Idraulico",
+    "description": "Completa 50 richieste con tag Idraulico",
+    "exp": 10000,
+    "titleBadge": 11,
+    "Requirement": 50,
+    "Tag": "Idraulico"
+  },
+  {
+
+    "name": "MedioMan!",
+    "description": "Completa 10 richieste con il tag Casalinghe",
+    "exp": 7000,
+    "titleBadge": 12,
+    "Requirement": 10,
+    "Tag": "Casalinghe"
+  },
+  {
+
+    "name": "Pompiere Novello",
+    "description": "Completa 2 richieste con tag Pompiere",
+    "exp": 200,
+    "titleBadge": 13,
+    "Requirement": 2,
+    "Tag": "Pompiere"
+  },
+  {
+
+    "name": "Pompiere Amatoriale",
+    "description": "Completa 5 richieste con tag Pompiere",
+    "exp": 500,
+    "titleBadge": 14,
+    "Requirement": 5,
+    "Tag": "Pompiere"
+  },
+  {
+
+    "name": "Pompiere Diligente",
+    "description": "Completa 10 richieste con tag Pompiere",
+    "exp": 1000,
+    "titleBadge": 15,
+    "Requirement": 10,
+    "Tag": "Pompiere"
+  },
+  {
+
+    "name": "Pompiere Esperto",
+    "description": "Completa 20 richieste con tag Pompiere",
+    "exp": 3000,
+    "titleBadge": 16,
+    "Requirement": 20,
+    "Tag": "Pompiere"
+  },
+  {
+
+    "name": "Pompiere Eroe",
+    "description": "Completa 50 richieste con tag Pompiere",
+    "exp": 10000,
+    "titleBadge": 17,
+    "Requirement": 50,
+    "Tag": "Pompiere"
+  },
+  {
+
+    "name": "Elettricista Novello",
+    "description": "Completa 2 richieste con tag Elettricista",
+    "exp": 200,
+    "titleBadge": 18,
+    "Requirement": 2,
+    "Tag": "Elettricista"
+  },
+  {
+
+    "name": "Elettricista Amatoriale",
+    "description": "Completa 5 richieste con tag Elettricista",
+    "exp": 500,
+    "titleBadge": 19,
+    "Requirement": 5,
+    "Tag": "Elettricista"
+  },
+  {
+
+    "name": "Elettricista Diligente",
+    "description": "Completa 10 richieste con tag Elettricista",
+    "exp": 1000,
+    "titleBadge": 20,
+    "Requirement": 10,
+    "Tag": "Elettricista"
+  },
+  {
+
+    "name": "Elettricista Esperto",
+    "description": "Completa 20 richieste con tag Elettricista",
+    "exp": 3000,
+    "titleBadge": 21,
+    "Requirement": 20,
+    "Tag": "Elettricista"
+  },
+  {
+
+    "name": "Elettricista Idraulico",
+    "description": "Completa 50 richieste con tag Elettricista",
+    "exp": 10000,
+    "titleBadge": 22,
+    "Requirement": 50,
+    "Tag": "Elettricista"
+  },
+  {
+
+    "name": "Amante delle palle di pelo",
+    "description": "Completa 10 richieste con tag Animali",
+    "exp": 2000,
+    "titleBadge": 23,
+    "Requirement": 5,
+    "Tag": "Animali"
+  }
+]

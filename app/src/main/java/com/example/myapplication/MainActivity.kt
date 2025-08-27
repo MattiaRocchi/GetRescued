@@ -22,16 +22,20 @@ import com.example.myapplication.utils.MusicService
 import org.koin.android.ext.android.get
 import kotlinx.coroutines.flow.first
 import androidx.lifecycle.lifecycleScope
+import com.example.myapplication.utils.WeeklyMissionsScheduler
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
+    private lateinit var weeklyMissionsScheduler: WeeklyMissionsScheduler
     private var isMusicServiceRunning = false
     private lateinit var settingsRepository: SettingsRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
+        weeklyMissionsScheduler = WeeklyMissionsScheduler(this)
         // Inizializza il repository una sola volta
         settingsRepository = get<SettingsRepository>()
 
@@ -48,14 +52,19 @@ class MainActivity : ComponentActivity() {
                     GetRescuedRoute.Login
                 }
 
-                // 🎵 Gestione musica reattiva ai cambiamenti di stato
+                // 🎵 Gestione musica e schedulazione reattiva ai cambiamenti di stato
                 LaunchedEffect(validUserId, musicEnabled) {
-                    if (validUserId != null && musicEnabled) {
-                        startMusicIfNotRunning()
+                    val isLoggedIn = validUserId != null
+
+                    if (isLoggedIn) {
+                        if (musicEnabled) startMusicIfNotRunning() else stopMusicService()
+                        weeklyMissionsScheduler.scheduleWeeklyMissionReset()
                     } else {
                         stopMusicService()
+                        weeklyMissionsScheduler.cancelWeeklyMissionReset()
                     }
                 }
+
 
                 Scaffold(
                     topBar = {

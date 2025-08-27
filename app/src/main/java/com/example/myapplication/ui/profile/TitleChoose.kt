@@ -331,30 +331,3 @@ fun rarityToColor(rarity: String): Color {
 
 
 
-fun loadTitleBadgesFromRaw(context: Context): List<TitleBadge> {
-    return try {
-        val inputStream = context.resources.openRawResource(
-            com.example.myapplication.R.raw.titles
-        )
-        val reader = InputStreamReader(inputStream)
-        val type = object : TypeToken<List<TitleBadge>>() {}.type
-        Gson().fromJson<List<TitleBadge>>(reader, type)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        emptyList()
-    }
-}
-
-fun loadTagsFromRaw(context: Context): List<Tags> {
-    return try {
-        val inputStream = context.resources.openRawResource(
-            com.example.myapplication.R.raw.tags
-        )
-        val reader = InputStreamReader(inputStream)
-        val type = object : TypeToken<List<Tags>>() {}.type
-        Gson().fromJson<List<Tags>>(reader, type)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        emptyList()
-    }
-}
