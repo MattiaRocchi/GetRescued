@@ -212,7 +212,6 @@ fun InfoRequestScreen(
                         // Pulsanti di azione con DEBUG
                         when {
                             state.isCreator -> {
-                                println("DEBUG InfoRequest UI - Mostrando: Sei il creatore")
                                 Card(
                                     colors = CardDefaults.cardColors(
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -230,7 +229,6 @@ fun InfoRequestScreen(
                             }
 
                             state.isParticipating -> {
-                                println("DEBUG InfoRequest UI - Mostrando: Stai partecipando")
                                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     Card(
                                         colors = CardDefaults.cardColors(
@@ -238,7 +236,7 @@ fun InfoRequestScreen(
                                         )
                                     ) {
                                         Text(
-                                            "✅ Stai già partecipando a questa richiesta",
+                                            "✅ Sei stato approvato per questa richiesta!",
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(16.dp),
@@ -259,8 +257,24 @@ fun InfoRequestScreen(
                                 }
                             }
 
+                            state.isPending -> {
+                                Card(
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                                    )
+                                ) {
+                                    Text(
+                                        "⏳ Richiesta di partecipazione inviata, attendi l'approvazione del creatore",
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            }
+
                             state.isFull -> {
-                                println("DEBUG InfoRequest UI - Mostrando: Posti esauriti")
                                 Card(
                                     colors = CardDefaults.cardColors(
                                         containerColor = MaterialTheme.colorScheme.errorContainer
@@ -278,18 +292,14 @@ fun InfoRequestScreen(
                             }
 
                             else -> {
-                                println("DEBUG InfoRequest UI - Mostrando: Pulsante partecipa")
                                 Button(
-                                    onClick = {
-                                        println("DEBUG InfoRequest UI - Bottone partecipa cliccato!")
-                                        viewModel.participate()
-                                    },
+                                    onClick = { viewModel.participate() },
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = MaterialTheme.colorScheme.primary
                                     )
                                 ) {
-                                    Text("🤝 Partecipa alla richiesta")
+                                    Text("🤝 Richiedi di partecipare")
                                 }
                             }
                         }

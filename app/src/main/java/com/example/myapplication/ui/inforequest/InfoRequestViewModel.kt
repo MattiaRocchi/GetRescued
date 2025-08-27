@@ -2,6 +2,7 @@ package com.example.myapplication.ui.inforequest
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.data.database.PendingRequest
 import com.example.myapplication.data.database.Request
 import com.example.myapplication.data.database.UserWithInfo
 import com.example.myapplication.data.repositories.RequestDaoRepository
@@ -26,6 +27,7 @@ class InfoRequestViewModel(
             val creator: UserWithInfo? = null,
             val isCreator: Boolean = false,
             val isParticipating: Boolean = false,
+            val isPending: Boolean = false,
             val isFull: Boolean = false
         ) : UiState()
     }
@@ -44,22 +46,27 @@ class InfoRequestViewModel(
                 if (req == null) {
                     UiState.NotFound
                 } else {
-                    // DEBUG: log per capire i valori
-                    println("DEBUG InfoRequest - UID: $uid, Request sender: ${req.sender}")
-
-                    // Consideriamo l'utente valido solo se uid > 0 (non -1)
                     val isValidUser = uid > 0
                     val isCreator = isValidUser && uid == req.sender
                     val isParticipating = isValidUser && uid in req.rescuers
                     val isFull = req.rescuers.size >= req.peopleRequired
 
-                    println("DEBUG InfoRequest - isValidUser: $isValidUser, isCreator: $isCreator, isParticipating: $isParticipating, isFull: $isFull")
+                    // Controlla se l'utente ha una richiesta pending
+                    val isPending = if (isValidUser && !isCreator && !isParticipating) {
+                        try {
+                            val pendingRequests = requestRepository.getPendingRequestsForRequest(req.id)
+                            pendingRequests.any { it.userId == uid }
+                        } catch (e: Exception) {
+                            false
+                        }
+                    } else false
 
                     UiState.Ready(
                         request = req,
                         creator = null,
                         isCreator = isCreator,
                         isParticipating = isParticipating,
+                        isPending = isPending,
                         isFull = isFull
                     )
                 }
@@ -103,37 +110,35 @@ class InfoRequestViewModel(
             }
 
             val uid = userIdFlow.first()
-            println("DEBUG participate() - UID: $uid")
-
-            if (uid <= 0) { // Cambiato da -1 a <= 0 per maggiore sicurezza
+            if (uid <= 0) {
                 _events.emit("Devi effettuare il login per partecipare")
                 return@launch
             }
 
             val req = current.request
-            println("DEBUG participate() - Request sender: ${req.sender}, rescuers: ${req.rescuers}")
-
             if (uid == req.sender) {
                 _events.emit("Sei il creatore della richiesta")
                 return@launch
             }
             if (uid in req.rescuers) {
-                _events.emit("Hai già partecipato")
-                return@launch
-            }
-            if (req.rescuers.size >= req.peopleRequired) {
-                _events.emit("Posti esauriti")
+                _events.emit("Sei già stato approvato per questa richiesta")
                 return@launch
             }
 
             try {
-                val updated = req.copy(rescuers = req.rescuers + uid)
-                println("DEBUG participate() - Updating request with new rescuers: ${updated.rescuers}")
-                requestRepository.updateRequest(updated)
-                _events.emit("✅ Partecipazione registrata con successo!")
+                // Crea una richiesta di partecipazione pending invece di approvare direttamente
+                val pendingRequest = PendingRequest(requestId = req.id, userId = uid)
+
+                // Inserisci la richiesta pending nel database
+                requestRepository.insertPendingRequest(pendingRequest)
+
+                _events.emit("✅ Richiesta di partecipazione inviata! Attendi l'approvazione del creatore.")
             } catch (t: Throwable) {
-                println("DEBUG participate() - Error: ${t.message}")
-                _events.emit("❌ Errore durante la partecipazione: ${t.message ?: "sconosciuto"}")
+                if (t.message?.contains("UNIQUE constraint failed") == true) {
+                    _events.emit("⚠️ Hai già inviato una richiesta di partecipazione per questa richiesta")
+                } else {
+                    _events.emit("❌ Errore durante l'invio della richiesta: ${t.message ?: "sconosciuto"}")
+                }
             }
         }
     }

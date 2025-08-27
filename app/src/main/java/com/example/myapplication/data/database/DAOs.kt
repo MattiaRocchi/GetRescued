@@ -115,11 +115,6 @@ interface RequestDao {
     @Query("SELECT * FROM Request WHERE sender = :userId ORDER BY date DESC")
     fun getRequestsByUser(userId: Int): Flow<List<Request>>
 
-    /*
-    val requests: LiveData<List<Request>> = requestDao
-    .getAvailableRequestsForUser(currentUserId)
-    .asLiveData()
-     */
     @Query("""
         SELECT DISTINCT r.* FROM Request r
         INNER JOIN TagsMission tm ON r.id = tm.idMissionId
@@ -128,19 +123,28 @@ interface RequestDao {
     """)
     fun getAvailableRequestsForUser(userId: Int): Flow<List<Request>>
 
-
     @Update
     suspend fun update(request: Request)
-
     @Delete
     suspend fun delete(request: Request)
-
     @Query("""
     SELECT r.* 
     FROM UserPart u, Request r 
     WHERE r.id = u.idMissionId AND u.idUser = :userID
 """)
     fun getUserRequests(userID: Int): Flow<List<Request>>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertPendingRequest(pendingRequest: PendingRequest)
+
+    @Delete
+    suspend fun deletePendingRequest(pendingRequest: PendingRequest)
+
+    @Query("SELECT * FROM PendingRequest WHERE requestId = :requestId")
+    suspend fun getPendingRequestsForRequest(requestId: Int): List<PendingRequest>
+
+    @Query("DELETE FROM PendingRequest WHERE requestId = :requestId AND userId = :userId")
+    suspend fun deletePendingRequest(requestId: Int, userId: Int)
 
 }
 

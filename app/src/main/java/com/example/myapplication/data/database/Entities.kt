@@ -34,6 +34,14 @@ data class Request(
     @ColumnInfo(name= "completed") var completed: Boolean=false,
 )
 
+
+@Entity(primaryKeys = ["requestId", "userId"])
+data class PendingRequest(
+    val requestId: Int,
+    val userId: Int,
+    @ColumnInfo(name = "requested_at") val requestedAt: Long = System.currentTimeMillis()
+)
+
 @Entity(primaryKeys = ["idUser", "idMissionId"])
 data class UserPart(
     //tag necessari per poter dare

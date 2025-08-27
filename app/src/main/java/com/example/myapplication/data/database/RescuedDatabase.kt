@@ -16,8 +16,9 @@ import com.example.myapplication.data.utils.Converters
         GeneralMissionUser::class, WeeklyMissionUser::class,
         Tags::class, TagsMission::class, TagsUser::class,
         UserBadgeCrossRef::class, UserPart::class,
+        PendingRequest::class
     ],
-    version = 8,
+    version = 9,
     exportSchema = true
 
 )

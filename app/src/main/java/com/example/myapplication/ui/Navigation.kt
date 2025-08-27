@@ -1,5 +1,4 @@
 package com.example.myapplication.ui
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -19,6 +18,8 @@ import com.example.myapplication.ui.inforequest.InfoRequestScreen
 import com.example.myapplication.ui.inforequest.InfoRequestViewModel
 import com.example.myapplication.ui.login.LoginScreen
 import com.example.myapplication.ui.login.LoginViewModel
+import com.example.myapplication.ui.managerequest.ManageRequest
+import com.example.myapplication.ui.managerequest.ManageRequestViewModel
 import com.example.myapplication.ui.missions.MissionGeneralScreen
 import com.example.myapplication.ui.missions.MissionViewModel
 import com.example.myapplication.ui.missions.MissionWeekScreen
@@ -63,6 +64,9 @@ sealed interface GetRescuedRoute {
     data class AddRequest(val requestId: Int) : GetRescuedRoute
 
     @Serializable
+    data class ManageRequestDetails(val requestId: Int) : GetRescuedRoute
+
+    @Serializable
     object ManageRequests : GetRescuedRoute
 
     @Serializable
@@ -100,96 +104,65 @@ fun GetRescuedNavGraph(
                 // MOLTO SEMPLIFICATO - Koin gestisce tutto
                 val viewModel: AddRequestViewModel = koinViewModel()
                 AddRequestScreen(viewModel, onCreated = { navController.popBackStack() })
-            }
-            composable<GetRescuedRoute.Profile> {
-                val viewModel: ProfileViewModel = koinViewModel()
-                ProfileScreen(navController, viewModel)
-            }
-            composable<GetRescuedRoute.ChangeProfile> {
-                val viewModel: ChangeProfileViewModel = koinViewModel()
-                ChangeProfileScreen(navController, viewModel)
-            }
-            composable<GetRescuedRoute.Requests> {
-                val viewModel: RequestsViewModel = koinViewModel()
-                RequestsScreen(navController, viewModel)
-            }
-            composable<GetRescuedRoute.MissionWeek> {
-                val viewModel: MissionViewModel = koinViewModel()
-                MissionWeekScreen(navController, viewModel)
-            }
-            composable<GetRescuedRoute.MissionGeneral> {
-                val viewModel: MissionViewModel = koinViewModel()
-                MissionGeneralScreen(navController, viewModel)
-            }
-            composable<GetRescuedRoute.Registration> {
-                val viewModel: RegistrationViewModel = koinViewModel()
-                RegistrationScreen(navController, viewModel)
-            }
-            composable<GetRescuedRoute.Login> {
-                val viewModel: LoginViewModel = koinViewModel()
-                LoginScreen(navController, viewModel)
-            }
-
-            composable<GetRescuedRoute.Settings> {
-                val viewModel: SettingsViewModel = koinViewModel()
-                SettingsScreen(navController, viewModel)
-            }
-
-            composable<GetRescuedRoute.BrowseRequests> {
-                BrowseRequestsScreen(navController = navController)
-            }
-
-            composable<GetRescuedRoute.InfoRequest> { backStackEntry ->
-                val args = backStackEntry.toRoute<GetRescuedRoute.InfoRequest>()
-                val viewModel: InfoRequestViewModel = koinViewModel { parametersOf(args.requestId) }
-                InfoRequestScreen(navController = navController, viewModel = viewModel)
-            }
-
-            composable<GetRescuedRoute.ManageRequests> {
-                ManageRequestsScreen(navController = navController)
-            }
-            composable<GetRescuedRoute.EditRequest> { backStackEntry ->
-                val args = backStackEntry.toRoute<GetRescuedRoute.EditRequest>()
-                val viewModel: EditRequestViewModel = koinViewModel { parametersOf(args.requestId) }
-                EditRequestScreen(
-                    navController = navController,
-                    viewModel = viewModel
-                )
-            }
-
         }
-}
-
-
-
-/*
-@Composable
-fun GetRescuedNavGraph(navController: NavHostController
-
-
-) {
-
-
-    NavHost(
-        navController = navController,
-        startDestination = GetRescuedRoute.registration
-    ) {
-        composable<GetRescuedRoute.addRequest> { backStackEntry ->
-            val args = backStackEntry.toRoute<GetRescuedRoute.addRequest>()
-            val requestId = args.requestId
-            AddRequestScreen(
-                navController,
-                viewModel = TODO(),
-                userId = TODO()
+        composable<GetRescuedRoute.Profile> {
+            val viewModel: ProfileViewModel = koinViewModel()
+            ProfileScreen(navController, viewModel)
+        }
+        composable<GetRescuedRoute.ChangeProfile> {
+            val viewModel: ChangeProfileViewModel = koinViewModel()
+            ChangeProfileScreen(navController, viewModel)
+        }
+        composable<GetRescuedRoute.Requests> {
+            val viewModel: RequestsViewModel = koinViewModel()
+            RequestsScreen(navController, viewModel)
+        }
+        composable<GetRescuedRoute.MissionWeek> {
+            val viewModel: MissionViewModel = koinViewModel()
+            MissionWeekScreen(navController, viewModel)
+        }
+        composable<GetRescuedRoute.MissionGeneral> {
+            val viewModel: MissionViewModel = koinViewModel()
+            MissionGeneralScreen(navController, viewModel)
+        }
+        composable<GetRescuedRoute.Registration> {
+            val viewModel: RegistrationViewModel = koinViewModel()
+            RegistrationScreen(navController, viewModel)
+        }
+        composable<GetRescuedRoute.Login> {
+            val viewModel: LoginViewModel = koinViewModel()
+            LoginScreen(navController, viewModel)
+        }
+        composable<GetRescuedRoute.Settings> {
+            val viewModel: SettingsViewModel = koinViewModel()
+            SettingsScreen(navController, viewModel)
+        }
+        composable<GetRescuedRoute.BrowseRequests> {
+            BrowseRequestsScreen(navController = navController)
+        }
+        composable<GetRescuedRoute.InfoRequest> { backStackEntry ->
+            val args = backStackEntry.toRoute<GetRescuedRoute.InfoRequest>()
+            val viewModel: InfoRequestViewModel = koinViewModel { parametersOf(args.requestId) }
+            InfoRequestScreen(navController = navController, viewModel = viewModel)
+        }
+        composable<GetRescuedRoute.ManageRequests> {
+            ManageRequestsScreen(navController = navController)
+        }
+        composable<GetRescuedRoute.EditRequest> { backStackEntry ->
+            val args = backStackEntry.toRoute<GetRescuedRoute.EditRequest>()
+            val viewModel: EditRequestViewModel = koinViewModel { parametersOf(args.requestId) }
+            EditRequestScreen(
+                navController = navController,
+                viewModel = viewModel
             )
         }
-        composable<GetRescuedRoute.profile> {
-            ProfileScreen(navController)
-        }
-        composable<GetRescuedRoute.registration> {
-            RegistrationScreen(navController)
+        composable<GetRescuedRoute.ManageRequestDetails> { backStackEntry ->
+            val args = backStackEntry.toRoute<GetRescuedRoute.ManageRequestDetails>()
+            val viewModel: ManageRequestViewModel = koinViewModel { parametersOf(args.requestId) }
+            ManageRequest(
+                navController = navController,
+                viewModel = viewModel
+            )
         }
     }
-}*/
-
-
+}

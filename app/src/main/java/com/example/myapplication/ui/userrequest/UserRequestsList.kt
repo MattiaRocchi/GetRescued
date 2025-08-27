@@ -51,7 +51,7 @@ fun UserRequestsList(
             items(requests) { request ->
                 DynamicRequestCard(
                     request = request,
-                    onClick = { navController.navigate(GetRescuedRoute.EditRequest(request.id)) },
+                    onClick = { navController.navigate(GetRescuedRoute.ManageRequestDetails(request.id)) },
                     currentUserId = currentUserId
                 )
             }
