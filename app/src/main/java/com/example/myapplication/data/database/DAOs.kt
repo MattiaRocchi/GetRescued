@@ -184,7 +184,7 @@ interface MissionDao {
         VALUES (:missionId, :userId, :progression, :active, :claimable)
 """)
     suspend fun setUserGeneralMissions(missionId: Int, userId: Int,
-                                       progression: Int = 0, active: Int = 1, claimable: Int = 0)
+                                       progression: Int = 0, active: Int = 1, claimable: Int = 1)
 
     @Query("SELECT m.id FROM Mission m WHERE type = 1")
     suspend fun getAllGeneralMissions(): List<Int>
@@ -215,17 +215,22 @@ interface MissionDao {
     suspend fun getUserWeeklyMissionsCompleted(userId: Int): List<Mission>
 
     @Query("""
-
-    INSERT INTO WeeklyMissionUser(id, idUser, progression, active)
-    SELECT m.id, :userId, 0, 1
+    SELECT m.id
     FROM Mission m
-    JOIN TagsMission tm ON m.id = tm.idMissionId
-    JOIN TagsUser tu ON tm.idTags = tu.idTags
-    WHERE tu.idUser = :userId AND m.type = 0
-    ORDER BY RANDOM() 
+    LEFT JOIN TagsMission tm ON m.id = tm.idMissionId
+    LEFT JOIN TagsUser tu ON tm.idTags = tu.idTags AND tu.idUser = :userId
+    WHERE m.type = 0
+      AND (tm.idTags IS NULL OR tu.idUser = :userId)
+    ORDER BY RANDOM()
     LIMIT 3
 """)
-    suspend fun setUserWeeklyMissions(userId: Int)
+    suspend fun getRandomWeeklyMissions(userId: Int): List<Int>
+    @Query("""
+    INSERT INTO WeeklyMissionUser(id, idUser, progression, active, claimable)
+    VALUES (:missionId, :userId, 0, 1, 0)
+""")
+    suspend fun insertWeeklyMissionForUser(missionId: Int, userId: Int)
+
 
     @Query("    Delete FROM WeeklyMissionUser WHERE idUser = :userId ")
     suspend fun deleteUserWeeklyMissions(userId: Int)
@@ -298,6 +303,9 @@ interface MissionDao {
 
     @Query("SELECT m.titleBadge FROM Mission m WHERE id = :missionId")
     suspend fun getMissionBadgeId(missionId: Int): Int?
+
+
+
 
     @Update
     suspend fun update(mission: Mission)

@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.data.database.GeneralMissionUser
@@ -50,16 +51,22 @@ fun MissionCardWeekly(
     val requirement = mission.requirement
     val isCompleted = progression >= requirement
     val isClaimable = missionUser?.claimable ?: false
+    val isFinished = !isActive && !isClaimable // Missione completata e già riscattata
 
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = if (isFinished)
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+            else
+                MaterialTheme.colorScheme.secondaryContainer
         ),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isFinished) 1.dp else 3.dp
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -76,20 +83,40 @@ fun MissionCardWeekly(
                     Icon(
                         imageVector = Icons.Default.Timer,
                         contentDescription = "Weekly Mission",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = if (isFinished)
+                            MaterialTheme.colorScheme.outline
+                        else
+                            MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "SETTIMANALE",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = if (isFinished)
+                            MaterialTheme.colorScheme.outline
+                        else
+                            MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp
                     )
                 }
 
-                if (isCompleted) {
+                if (isFinished) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xFF4CAF50),
+                        modifier = Modifier.padding(4.dp)
+                    ) {
+                        Text(
+                            text = "COMPLETATA",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                        )
+                    }
+                } else if (isCompleted) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = "Completed",
@@ -106,79 +133,85 @@ fun MissionCardWeekly(
                 text = mission.name,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
+                color = if (isFinished)
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                else
+                    MaterialTheme.colorScheme.onSecondaryContainer,
+                textDecoration = if (isFinished) TextDecoration.LineThrough else TextDecoration.None
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            if (!isFinished) {
+                Spacer(modifier = Modifier.height(12.dp))
 
-            // Progress section
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.75f)
-                            .height(6.dp)
-                            .clip(RoundedCornerShape(3.dp))
-                            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-                    ) {
-                        val progressPercentage = if (requirement > 0) progression.toFloat() / requirement else 0f
+                // Progress section - only shown for active/claimable missions
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth(progressPercentage.coerceIn(0f, 1f))
-                                .fillMaxHeight()
+                                .fillMaxWidth(0.75f)
+                                .height(6.dp)
                                 .clip(RoundedCornerShape(3.dp))
-                                .background(
-                                    if (isCompleted) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary
-                                )
+                                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                        ) {
+                            val progressPercentage = if (requirement > 0) progression.toFloat() / requirement else 0f
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(progressPercentage.coerceIn(0f, 1f))
+                                    .fillMaxHeight()
+                                    .clip(RoundedCornerShape(3.dp))
+                                    .background(
+                                        if (isCompleted) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary
+                                    )
+                            )
+                        }
+
+                        Text(
+                            text = "$progression/$requirement",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
+                            modifier = Modifier.padding(top = 2.dp)
                         )
                     }
 
-                    Text(
-                        text = "$progression/$requirement",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
-                        modifier = Modifier.padding(top = 2.dp)
-                    )
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // EXP Badge
-                    Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = MaterialTheme.colorScheme.tertiary
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = "${mission.exp ?: 0} EXP",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onTertiary,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                    }
+                        // EXP Badge
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.tertiary
+                        ) {
+                            Text(
+                                text = "${mission.exp ?: 0} EXP",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onTertiary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
 
-                    // Claim Button
-                    Button(
-                        onClick = onClaimClick,
-                        enabled = isClaimable && isActive,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isClaimable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                            contentColor = if (isClaimable) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.height(32.dp)
-                    ) {
-                        Text(
-                            text = "Claim",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold
-                        )
+                        // Claim Button
+                        Button(
+                            onClick = onClaimClick,
+                            enabled = isClaimable && isActive,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (isClaimable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                contentColor = if (isClaimable) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            ),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.height(32.dp)
+                        ) {
+                            Text(
+                                text = "Claim",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }
@@ -199,16 +232,22 @@ fun MissionCardGeneral(
     val requirement = mission.requirement
     val isCompleted = progression >= requirement
     val isClaimable = missionUser?.claimable ?: false
+    val isFinished = !isActive && !isClaimable // Missione completata e già riscattata
 
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = if (isFinished)
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+            else
+                MaterialTheme.colorScheme.primaryContainer
         ),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isFinished) 1.dp else 3.dp
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -225,20 +264,40 @@ fun MissionCardGeneral(
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = "General Mission",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = if (isFinished)
+                            MaterialTheme.colorScheme.outline
+                        else
+                            MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "GENERALE",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = if (isFinished)
+                            MaterialTheme.colorScheme.outline
+                        else
+                            MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp
                     )
                 }
 
-                if (isCompleted) {
+                if (isFinished) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xFF4CAF50),
+                        modifier = Modifier.padding(4.dp)
+                    ) {
+                        Text(
+                            text = "COMPLETATA",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                        )
+                    }
+                } else if (isCompleted) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = "Completed",
@@ -255,79 +314,85 @@ fun MissionCardGeneral(
                 text = mission.name,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = if (isFinished)
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                else
+                    MaterialTheme.colorScheme.onPrimaryContainer,
+                textDecoration = if (isFinished) TextDecoration.LineThrough else TextDecoration.None
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            if (!isFinished) {
+                Spacer(modifier = Modifier.height(12.dp))
 
-            // Progress section
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.75f)
-                            .height(6.dp)
-                            .clip(RoundedCornerShape(3.dp))
-                            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-                    ) {
-                        val progressPercentage = if (requirement > 0) progression.toFloat() / requirement else 0f
+                // Progress section - only shown for active/claimable missions
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth(progressPercentage.coerceIn(0f, 1f))
-                                .fillMaxHeight()
+                                .fillMaxWidth(0.75f)
+                                .height(6.dp)
                                 .clip(RoundedCornerShape(3.dp))
-                                .background(
-                                    if (isCompleted) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary
-                                )
+                                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                        ) {
+                            val progressPercentage = if (requirement > 0) progression.toFloat() / requirement else 0f
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(progressPercentage.coerceIn(0f, 1f))
+                                    .fillMaxHeight()
+                                    .clip(RoundedCornerShape(3.dp))
+                                    .background(
+                                        if (isCompleted) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary
+                                    )
+                            )
+                        }
+
+                        Text(
+                            text = "$progression/$requirement",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                            modifier = Modifier.padding(top = 2.dp)
                         )
                     }
 
-                    Text(
-                        text = "$progression/$requirement",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                        modifier = Modifier.padding(top = 2.dp)
-                    )
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // EXP Badge
-                    Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = MaterialTheme.colorScheme.tertiary
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = "${mission.exp ?: 0} EXP",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onTertiary,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                    }
+                        // EXP Badge
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.tertiary
+                        ) {
+                            Text(
+                                text = "${mission.exp ?: 0} EXP",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onTertiary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
 
-                    // Claim Button
-                    Button(
-                        onClick = onClaimClick,
-                        enabled = isClaimable && isActive,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isClaimable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                            contentColor = if (isClaimable) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.height(32.dp)
-                    ) {
-                        Text(
-                            text = "Claim",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold
-                        )
+                        // Claim Button
+                        Button(
+                            onClick = onClaimClick,
+                            enabled = isClaimable && isActive,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (isClaimable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                contentColor = if (isClaimable) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            ),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.height(32.dp)
+                        ) {
+                            Text(
+                                text = "Claim",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }

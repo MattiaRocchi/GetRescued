@@ -80,10 +80,37 @@ class MissionViewModel(
                         }
                     }
 
+                    // Ordina le missioni: prima quelle attive/claimable, poi quelle completate
+                    val sortedGeneralMissions = generalMissionsWithData.sortedWith(
+                        compareBy<Pair<Mission, GeneralMissionUser>> { (_, missionUser) ->
+                            // Le missioni completate (active=false && claimable=false) vanno in fondo
+                            if (!missionUser.active && !missionUser.claimable) 1 else 0
+                        }.thenBy { (_, missionUser) ->
+                            // Tra quelle attive, prima quelle claimable
+                            if (missionUser.claimable) 0 else 1
+                        }.thenBy { (mission, _) ->
+                            // Infine ordine alfabetico per nome
+                            mission.name
+                        }
+                    )
+
+                    val sortedWeeklyMissions = weeklyMissionsWithData.sortedWith(
+                        compareBy<Pair<Mission, WeeklyMissionUser>> { (_, missionUser) ->
+                            // Le missioni completate (active=false && claimable=false) vanno in fondo
+                            if (!missionUser.active && !missionUser.claimable) 1 else 0
+                        }.thenBy { (_, missionUser) ->
+                            // Tra quelle attive, prima quelle claimable
+                            if (missionUser.claimable) 0 else 1
+                        }.thenBy { (mission, _) ->
+                            // Infine ordine alfabetico per nome
+                            mission.name
+                        }
+                    )
+
                     MissionUiState(
                         isLoading = false,
-                        generalMissions = generalMissionsWithData,
-                        weeklyMissions = weeklyMissionsWithData,
+                        generalMissions = sortedGeneralMissions,
+                        weeklyMissions = sortedWeeklyMissions,
                         error = null
                     )
                 }.collect { newState ->

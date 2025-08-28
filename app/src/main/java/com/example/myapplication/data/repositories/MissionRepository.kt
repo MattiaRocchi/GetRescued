@@ -38,7 +38,10 @@ class MissionRepository(private val missionDao: MissionDao) {
     // Reset & assign new missions
     suspend fun setWeeklyMissionsUser(userId: Int) {
         missionDao.deleteUserWeeklyMissions(userId)
-        missionDao.setUserWeeklyMissions(userId)
+        val missions = missionDao.getRandomWeeklyMissions(userId)
+        missions.forEach { missionId ->
+            missionDao.insertWeeklyMissionForUser(missionId, userId)
+        }
     }
 
     suspend fun setGeneralMissionsUser(userId: Int) {

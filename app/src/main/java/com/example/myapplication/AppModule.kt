@@ -115,7 +115,7 @@ val appModule = module {
 
 
     // ViewModels
-    viewModel { RegistrationViewModel(get(), get(), get()) }
+    viewModel { RegistrationViewModel(get(), get(), get(), get()) }
     viewModel { LoginViewModel(get(), get()) }
     viewModel { AddRequestViewModel(get(), get(), get()) } // get() → RequestDaoRepository
     viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository

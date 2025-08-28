@@ -48,8 +48,7 @@ fun ProfileScreen(
     // Dati dal ViewModel
     val user by viewModel.user.collectAsState()
     val activeTitle by viewModel.userActiveTitle.collectAsState()
-    val titles by viewModel.userTitles.collectAsState()
-    val allTitles by viewModel.allTitles.collectAsState()
+    val userTitles by viewModel.userTitles.collectAsState()
     val allTags by viewModel.allTags.collectAsState()
     val selectedIds = viewModel.getSelectedTagIds()
 
@@ -322,7 +321,7 @@ fun ProfileScreen(
 
     if (showTitleDialog) {
         TitlePickerDialog(
-            titles = allTitles,
+            titles = userTitles,
             activeTitleId = user?.activeTitle,
             onDismiss = { showTitleDialog = false },
             onSelect = { title ->

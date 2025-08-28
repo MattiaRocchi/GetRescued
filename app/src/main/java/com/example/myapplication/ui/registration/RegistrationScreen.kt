@@ -16,6 +16,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +34,7 @@ import com.example.myapplication.ui.composables.PasswordTextField
 import com.example.myapplication.ui.composables.PhoneTextField
 import com.example.myapplication.ui.composables.SurnameTextField
 import com.example.myapplication.ui.composables.isValidPhoneNumber
+import com.example.myapplication.ui.profile.TagPickerDialog
 import kotlinx.coroutines.launch
 
 
@@ -44,6 +46,9 @@ fun RegistrationScreen(
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    val allTags by viewModel.allTags.collectAsState() // puoi caricarli via ViewModel
+    var showTagsDialog by remember { mutableStateOf(false) }
 
     var nameError by remember { mutableStateOf(false) }
     var surnameError by remember { mutableStateOf(false) }
@@ -132,6 +137,14 @@ fun RegistrationScreen(
                 phoneError = phoneNumberError
             )
             Button(
+                onClick = { showTagsDialog = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Scegli i tuoi interessi (tag)")
+            }
+
+
+            Button(
                 onClick = {
                     viewModel.registerUser(
                         onSuccess = {
@@ -159,6 +172,18 @@ fun RegistrationScreen(
 
             TextButton(onClick = { navController.navigate(GetRescuedRoute.Login) }) {
                 Text("Hai già un account? Accedi")
+            }
+
+            if (showTagsDialog) {
+                TagPickerDialog(
+                    tags = allTags,
+                    selectedTagIds = viewModel.selectedTags,
+                    onDismiss = { showTagsDialog = false },
+                    onConfirm = { selected ->
+                        viewModel.onTagsSelected(selected)
+                        showTagsDialog = false
+                    }
+                )
             }
         }
     }

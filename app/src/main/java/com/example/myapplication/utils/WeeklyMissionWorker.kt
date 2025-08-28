@@ -11,6 +11,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import com.example.myapplication.data.repositories.SettingsRepository
 import  com.example.myapplication.data.database.MissionDao
+import com.example.myapplication.data.repositories.MissionRepository
 import kotlinx.coroutines.flow.first
 
 
@@ -20,7 +21,7 @@ class WeeklyMissionsWorker(
 ) : CoroutineWorker(context, params), KoinComponent {
 
     // Inietta le dipendenze con Koin
-    private val missionDao: MissionDao by inject()
+    private val missionRepository: MissionRepository by inject()
     private val settingsRepository: SettingsRepository by inject()
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
@@ -30,7 +31,7 @@ class WeeklyMissionsWorker(
 
             if (userId != null) {
                 // Esegui la funzione per resettare le missioni settimanali
-                setWeeklyMissionsUser(userId)
+                missionRepository.setWeeklyMissionsUser(userId)
 
                 // Log per debug (opzionale)
                 android.util.Log.d("WeeklyMissionsWorker", "Missioni settimanali aggiornate per utente $userId")
@@ -46,8 +47,5 @@ class WeeklyMissionsWorker(
         }
     }
 
-    private suspend fun setWeeklyMissionsUser(id: Int) {
-        missionDao.deleteUserWeeklyMissions(id)
-        missionDao.setUserWeeklyMissions(id) // ✅ Corretto: era setUserGeneralMissions
-    }
+
 }

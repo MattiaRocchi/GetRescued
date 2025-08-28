@@ -37,9 +37,6 @@ class ProfileViewModel(
     private val _userActiveTitle = MutableStateFlow<TitleBadge?>(null)
     val userActiveTitle: StateFlow<TitleBadge?> = _userActiveTitle
 
-    private val _allTitles = MutableStateFlow<List<TitleBadge>>(emptyList())
-    val allTitles: StateFlow<List<TitleBadge>> = _allTitles
-
     // Tags
     private val _allTags = MutableStateFlow<List<Tags>>(emptyList())
     val allTags: StateFlow<List<Tags>> = _allTags
@@ -56,7 +53,7 @@ class ProfileViewModel(
                     _user.value = userDaoRepository.getUserWithInfo(id)
                     _userTitles.value = titleBadgeRepository.getUserTitles(id)
                     _userActiveTitle.value = titleBadgeRepository.getActiveTitleByUserId(id)
-                    _allTitles.value = titleBadgeRepository.getAll()
+
 
                     try {
                         _allTags.value = tagsRepository.getAll()          // <-- List<Tags>
@@ -76,7 +73,6 @@ class ProfileViewModel(
                     _user.value = null
                     _userTitles.value = emptyList()
                     _userActiveTitle.value = null
-                    _allTitles.value = emptyList()
                     _allTags.value = emptyList()
                     _userTags.value = emptyList()
                 }
