@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -84,8 +85,8 @@ fun MissionWeekScreen(
                 onClick = {},
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isWeeklyActive) MaterialTheme.colorScheme.tertiaryContainer else UnpressableButton,
-                    contentColor = if (isWeeklyActive) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.primary,
+                    containerColor = if (isWeeklyActive) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.tertiary,
+                    contentColor = if (isWeeklyActive) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onTertiary,
                     disabledContainerColor = UnpressableButtonDark,
                     disabledContentColor = MaterialTheme.colorScheme.onPrimary
                 )
@@ -100,8 +101,8 @@ fun MissionWeekScreen(
                 onClick = { navController.navigate(GetRescuedRoute.MissionGeneral) },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (!isWeeklyActive) MaterialTheme.colorScheme.tertiaryContainer else UnpressableButton,
-                    contentColor = if (!isWeeklyActive) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.primary,
+                    containerColor = if (!isWeeklyActive) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.tertiary,
+                    contentColor = if (!isWeeklyActive) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onTertiary,
                     disabledContainerColor = UnpressableButtonDark,
                     disabledContentColor = MaterialTheme.colorScheme.onPrimary
                 )

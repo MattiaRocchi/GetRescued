@@ -171,8 +171,8 @@ fun MissionCardWeekly(
                             containerColor = if (isClaimable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                             contentColor = if (isClaimable) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         ),
-                        shape = RoundedCornerShape(6.dp),
-                        modifier = Modifier.height(28.dp)
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.height(32.dp)
                     ) {
                         Text(
                             text = "Claim",
@@ -320,8 +320,8 @@ fun MissionCardGeneral(
                             containerColor = if (isClaimable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                             contentColor = if (isClaimable) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         ),
-                        shape = RoundedCornerShape(6.dp),
-                        modifier = Modifier.height(28.dp)
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.height(32.dp)
                     ) {
                         Text(
                             text = "Claim",

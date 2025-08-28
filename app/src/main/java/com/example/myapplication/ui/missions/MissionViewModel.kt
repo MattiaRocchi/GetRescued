@@ -25,7 +25,7 @@ class MissionViewModel(
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
-    // UserId dallo store
+    // UserId dallo store - stesso pattern del ProfileViewModel
     private val userId = settingsRepository.userIdFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), -1)
 
@@ -33,28 +33,36 @@ class MissionViewModel(
     val uiState: StateFlow<MissionUiState> = _uiState.asStateFlow()
 
     init {
-        loadMissions()
-    }
-
-    private fun loadMissions() {
+        // Stesso pattern del ProfileViewModel: osserva i cambiamenti di userId
         viewModelScope.launch {
-            try {
-                val currentUserId = userId.first()
-                if (currentUserId == -1) {
-                    _uiState.value = _uiState.value.copy(
+            userId.collect { id ->
+                if (id != -1) {
+                    loadMissionsForUser(id)
+                } else {
+                    // Reset se non loggato
+                    _uiState.value = MissionUiState(
                         isLoading = false,
+                        generalMissions = emptyList(),
+                        weeklyMissions = emptyList(),
                         error = "Utente non trovato"
                     )
-                    return@launch
                 }
+            }
+        }
+    }
 
-                // Combine flows for reactive updates
+    private fun loadMissionsForUser(currentUserId: Int) {
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+
+                // Combine flows per aggiornamenti reattivi
                 combine(
                     missionRepository.getUserGeneralMissions(currentUserId),
                     missionRepository.getUserWeeklyMissions(currentUserId)
                 ) { generalMissionUsers, weeklyMissionUsers ->
 
-                    // Load corresponding missions for general
+                    // Load missioni generali con dati
                     val generalMissionsWithData = mutableListOf<Pair<Mission, GeneralMissionUser>>()
                     for (missionUser in generalMissionUsers) {
                         val mission = missionRepository.getById(missionUser.id)
@@ -63,7 +71,7 @@ class MissionViewModel(
                         }
                     }
 
-                    // Load corresponding missions for weekly
+                    // Load missioni settimanali con dati
                     val weeklyMissionsWithData = mutableListOf<Pair<Mission, WeeklyMissionUser>>()
                     for (missionUser in weeklyMissionUsers) {
                         val mission = missionRepository.getById(missionUser.id)
@@ -75,13 +83,10 @@ class MissionViewModel(
                     MissionUiState(
                         isLoading = false,
                         generalMissions = generalMissionsWithData,
-                        weeklyMissions = weeklyMissionsWithData
+                        weeklyMissions = weeklyMissionsWithData,
+                        error = null
                     )
-                }.stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(5000),
-                    initialValue = MissionUiState()
-                ).collect { newState ->
+                }.collect { newState ->
                     _uiState.value = newState
                 }
 
@@ -97,7 +102,7 @@ class MissionViewModel(
     fun claimGeneralMissionReward(missionId: Int) {
         viewModelScope.launch {
             try {
-                val currentUserId = userId.first()
+                val currentUserId = userId.value
                 if (currentUserId == -1) return@launch
 
                 missionRepository.claimGeneralMission(missionId, currentUserId)
@@ -108,8 +113,7 @@ class MissionViewModel(
                     titleBadgeRepository.insertUserBadgeCrossRef(currentUserId, newTitle)
                 }
 
-                // Reload missions to reflect changes
-                loadMissions()
+                // Le missioni si ricaricano automaticamente tramite il Flow in loadMissionsForUser
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     error = "Errore nel reclamare la ricompensa: ${e.message}"
@@ -121,7 +125,7 @@ class MissionViewModel(
     fun claimWeeklyMissionReward(missionId: Int) {
         viewModelScope.launch {
             try {
-                val currentUserId = userId.first()
+                val currentUserId = userId.value
                 if (currentUserId == -1) return@launch
 
                 missionRepository.claimWeeklyMission(missionId, currentUserId)
@@ -132,8 +136,7 @@ class MissionViewModel(
                     titleBadgeRepository.insertUserBadgeCrossRef(currentUserId, newTitle)
                 }
 
-                // Reload missions to reflect changes
-                loadMissions()
+                // Le missioni si ricaricano automaticamente tramite il Flow in loadMissionsForUser
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     error = "Errore nel reclamare la ricompensa: ${e.message}"
