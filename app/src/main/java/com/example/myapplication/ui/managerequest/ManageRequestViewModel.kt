@@ -26,7 +26,12 @@ class ManageRequestViewModel(
             val request: Request,
             val pendingParticipants: List<UserWithInfo> = emptyList(),
             val approvedParticipants: List<UserWithInfo> = emptyList()
-        ) : UiState()
+        ) : UiState() {
+            // Funzioni di utilità per determinare le azioni disponibili
+            val canDelete: Boolean get() = request.canBeDeleted()
+            val canMarkCompleted: Boolean get() = request.isScheduledForToday()
+            val isExpired: Boolean get() = request.isScheduledInPast()
+        }
     }
 
     private val _events = MutableSharedFlow<String>(extraBufferCapacity = 1)
@@ -125,10 +130,10 @@ class ManageRequestViewModel(
                 // Rimuovi dalla tabella pending requests
                 requestRepository.deletePendingRequest(request.id, userId)
 
-                _events.tryEmit("✅ Partecipante approvato con successo!")
+                _events.tryEmit("Partecipante approvato con successo!")
 
             } catch (e: Exception) {
-                _events.tryEmit("❌ Errore nell'approvazione: ${e.message}")
+                _events.tryEmit("Errore nell'approvazione: ${e.message}")
             }
         }
     }
@@ -142,10 +147,10 @@ class ManageRequestViewModel(
                 // Rimuovi dalla tabella pending requests
                 requestRepository.deletePendingRequest(current.request.id, userId)
 
-                _events.tryEmit("❌ Richiesta di partecipazione rifiutata")
+                _events.tryEmit("Richiesta di partecipazione rifiutata")
 
             } catch (e: Exception) {
-                _events.tryEmit("❌ Errore nel rifiuto: ${e.message}")
+                _events.tryEmit("Errore nel rifiuto: ${e.message}")
             }
         }
     }
@@ -167,10 +172,55 @@ class ManageRequestViewModel(
                 val updatedRequest = request.copy(rescuers = request.rescuers - userId)
                 requestRepository.updateRequest(updatedRequest)
 
-                _events.tryEmit("🚪 Partecipante rimosso dalla richiesta")
+                _events.tryEmit("Partecipante rimosso dalla richiesta")
 
             } catch (e: Exception) {
-                _events.tryEmit("❌ Errore nella rimozione: ${e.message}")
+                _events.tryEmit("Errore nella rimozione: ${e.message}")
+            }
+        }
+    }
+
+    fun deleteRequest(onDeleted: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val current = _uiState.value
+            if (current !is UiState.Ready) return@launch
+
+            val request = current.request
+
+            if (!request.canBeDeleted()) {
+                _events.tryEmit("Impossibile eliminare: la richiesta è troppo vicina alla data di svolgimento")
+                return@launch
+            }
+
+            try {
+                requestRepository.deleteRequest(request)
+                _events.tryEmit("Richiesta eliminata con successo")
+                onDeleted()
+            } catch (e: Exception) {
+                _events.tryEmit("Errore nell'eliminazione: ${e.message}")
+            }
+        }
+    }
+
+    fun markAsCompleted(onCompleted: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val current = _uiState.value
+            if (current !is UiState.Ready) return@launch
+
+            val request = current.request
+
+            if (!request.isScheduledForToday() && !request.isScheduledInPast()) {
+                _events.tryEmit("Puoi contrassegnare come completata solo durante o dopo la data di svolgimento")
+                return@launch
+            }
+
+            try {
+                val updatedRequest = request.copy(completed = true)
+                requestRepository.updateRequest(updatedRequest)
+                _events.tryEmit("Richiesta contrassegnata come completata")
+                onCompleted()
+            } catch (e: Exception) {
+                _events.tryEmit("Errore nel completamento: ${e.message}")
             }
         }
     }

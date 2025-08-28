@@ -1,14 +1,16 @@
 package com.example.myapplication.data.database
 
 
-
-
+import android.graphics.Color
+import androidx.compose.runtime.Composable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-
-
+import com.example.myapplication.ui.theme.LocalTitleColors
+import com.example.myapplication.ui.theme.TitleColors
+import java.time.LocalDate
+import java.time.ZoneId
 
 
 
@@ -26,8 +28,32 @@ data class Request(
     @ColumnInfo(name= "fotos") var fotos: List<String>, //quale tipo sarebbe meglio usare per questo?
     @ColumnInfo(name= "description") var description: String,
     @ColumnInfo(name = "date") val date: Long = System.currentTimeMillis(),
+    @ColumnInfo(name = "scheduledDate") val scheduledDate: Long,
     @ColumnInfo(name= "completed") var completed: Boolean=false,
-)
+){
+    // Utility functions per gestire le date
+    fun isScheduledForToday(): Boolean {
+        val today = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val scheduled = LocalDate.ofEpochDay(scheduledDate / (24 * 60 * 60 * 1000))
+            .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val tomorrow = today + (24 * 60 * 60 * 1000)
+        return scheduled >= today && scheduled < tomorrow
+    }
+
+    fun isScheduledInPast(): Boolean {
+        val today = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val scheduled = LocalDate.ofEpochDay(scheduledDate / (24 * 60 * 60 * 1000))
+            .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        return scheduled < today
+    }
+
+    fun canBeDeleted(): Boolean {
+        val tomorrow = LocalDate.now().plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val scheduled = LocalDate.ofEpochDay(scheduledDate / (24 * 60 * 60 * 1000))
+            .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        return scheduled >= tomorrow
+    }
+}
 
 
 @Entity(primaryKeys = ["requestId", "userId"])
@@ -57,6 +83,11 @@ data class TagsMission(
     // una mano nel soccorrimento
     val idTags: Int,
     val idMissionId: Int,
+)
+@Entity(primaryKeys = ["idTags", "idRequest"])
+data class TagsRequest(
+    val idTags: Int,
+    val idRequest: Int
 )
 @Entity(primaryKeys = ["idTags", "idUser"])
 data class TagsUser(
@@ -113,7 +144,7 @@ data class GeneralMissionUser(
     @ColumnInfo(name= "active") var active: Boolean=true, //se questa missione è attiva o meno,
     // di defaultinizialmente messa a true
     //Se la missione è claimable, ovvero se l'utente ha completato la missione e può
-    // richiedere la ricompensa
+    //richiedere la ricompensa
     @ColumnInfo(name = "claimable") var claimable: Boolean = false
 
 )

@@ -32,7 +32,9 @@ import coil.request.ImageRequest
 import com.example.myapplication.ui.composables.CameraCapture
 import com.example.myapplication.ui.composables.ImagePickerDialog
 import openAddressInMaps
-
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditRequestScreen(
@@ -46,8 +48,9 @@ fun EditRequestScreen(
     val peopleRequired by viewModel.peopleRequired.collectAsState()
     val location by viewModel.location.collectAsState()
     val images by viewModel.images.collectAsState()
-    val requiredTags by viewModel.requiredTags.collectAsState() // Cambiato da selectedBadge
-    val availableTags by viewModel.availableTags.collectAsState() // Cambiato da availableBadges
+    val scheduledDate by viewModel.scheduledDate.collectAsState()
+    val requiredTags by viewModel.requiredTags.collectAsState()
+    val availableTags by viewModel.availableTags.collectAsState()
 
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -56,6 +59,14 @@ fun EditRequestScreen(
     var showImagePicker by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
     var showTagDialog by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    // State per il DatePicker
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = java.time.ZoneId.systemDefault().let { zoneId ->
+            scheduledDate.atStartOfDay(zoneId).toInstant().toEpochMilli()
+        }
+    )
 
     // Launcher per selezione immagini dalla galleria
     val imagePickerLauncher = rememberLauncherForActivityResult(
@@ -129,6 +140,7 @@ fun EditRequestScreen(
                         value = title,
                         onValueChange = viewModel::onTitleChange,
                         label = { Text("Titolo") },
+                        leadingIcon = { Icon(Icons.Default.Title, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
@@ -140,6 +152,7 @@ fun EditRequestScreen(
                         value = description,
                         onValueChange = viewModel::onDescriptionChange,
                         label = { Text("Descrizione") },
+                        leadingIcon = { Icon(Icons.Default.Description, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 3,
                         maxLines = 5
@@ -152,6 +165,7 @@ fun EditRequestScreen(
                         value = peopleRequired.toString(),
                         onValueChange = { it.toIntOrNull()?.let(viewModel::onPeopleRequiredChange) },
                         label = { Text("Numero persone richieste") },
+                        leadingIcon = { Icon(Icons.Default.Group, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
@@ -166,6 +180,7 @@ fun EditRequestScreen(
                             onValueChange = {},
                             readOnly = true,
                             label = { Text("Difficoltà") },
+                            leadingIcon = { Icon(Icons.Default.TrendingUp, contentDescription = null) },
                             trailingIcon = {
                                 IconButton(onClick = { expanded = true }) {
                                     Icon(Icons.Default.ArrowDropDown, contentDescription = "Seleziona")
@@ -187,6 +202,29 @@ fun EditRequestScreen(
                                 )
                             }
                         }
+                    }
+                }
+
+                // Data di svolgimento
+                item {
+                    OutlinedTextField(
+                        value = scheduledDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Data di svolgimento") },
+                        leadingIcon = { Icon(Icons.Default.DateRange, contentDescription = null) },
+                        trailingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
+                        modifier = Modifier.fillMaxWidth().clickable { showDatePicker = true },
+                        isError = scheduledDate.isBefore(LocalDate.now())
+                    )
+
+                    if (scheduledDate.isBefore(LocalDate.now())) {
+                        Text(
+                            "La data deve essere odierna o futura",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                        )
                     }
                 }
 
@@ -215,7 +253,7 @@ fun EditRequestScreen(
                     }
                 }
 
-                // Sezione Tag richiesti (cambiato da Badge)
+                // Sezione Tag richiesti
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -265,7 +303,7 @@ fun EditRequestScreen(
                     }
                 }
 
-                // Sezione immagini
+                // Sezione immagini (resto del codice rimane uguale)
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -359,6 +397,66 @@ fun EditRequestScreen(
                         Icon(Icons.Default.Save, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
                         Text("Salva modifiche")
+                    }
+                }
+            }
+        }
+    }
+
+    // DatePicker Dialog
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val selectedDate = java.time.Instant.ofEpochMilli(millis)
+                                .atZone(java.time.ZoneId.systemDefault())
+                                .toLocalDate()
+
+                            if (selectedDate.isBefore(LocalDate.now())) {
+                                // Non fare nulla se la data è passata
+                                return@TextButton
+                            }
+
+                            viewModel.onScheduledDateChange(selectedDate)
+                        }
+                        showDatePicker = false
+                    }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Annulla")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+
+            // Mostra avviso se la data selezionata è nel passato
+            datePickerState.selectedDateMillis?.let { millis ->
+                val selectedDate = java.time.Instant.ofEpochMilli(millis)
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .toLocalDate()
+
+                if (selectedDate.isBefore(LocalDate.now())) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Text(
+                            "⚠️ Seleziona una data odierna o futura",
+                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }

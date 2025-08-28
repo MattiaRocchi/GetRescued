@@ -119,6 +119,52 @@ interface RequestDao {
     """)
     fun getAvailableRequestsForUser(userId: Int): Flow<List<Request>>
 
+    // Query per aggiornare automaticamente le richieste scadute
+    @Query("""
+        UPDATE Request 
+        SET completed = 1 
+        WHERE completed = 0 
+        AND scheduledDate < :currentDateMillis
+    """)
+    suspend fun markExpiredRequestsAsCompleted(currentDateMillis: Long)
+
+    // Query per ottenere le richieste che scadono oggi
+    @Query("""
+        SELECT * FROM Request 
+        WHERE completed = 0 
+        AND scheduledDate >= :todayStartMillis 
+        AND scheduledDate < :todayEndMillis
+    """)
+    fun getRequestsScheduledForToday(todayStartMillis: Long, todayEndMillis: Long): Flow<List<Request>>
+
+    // Query per ottenere le richieste future (non scadute)
+    @Query("""
+        SELECT * FROM Request 
+        WHERE completed = 0 
+        AND scheduledDate >= :currentDateMillis
+        ORDER BY scheduledDate ASC
+    """)
+    fun getActiveRequests(currentDateMillis: Long): Flow<List<Request>>
+
+    @Query("""
+        SELECT * FROM Request r
+        WHERE r.completed = 0 
+        AND r.sender != :userId
+        AND r.id IN (
+            SELECT tr.idRequest FROM TagsRequest tr
+            WHERE tr.idTags IN (
+                SELECT tu.idTags FROM TagsUser tu WHERE tu.idUser = :userId
+            )
+        )
+    """)
+    fun getAvailableRequestsForUserWithTags(userId: Int): Flow<List<Request>>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertTagsForRequest(vararg tr: TagsRequest)
+
+    @Query("DELETE FROM TagsRequest WHERE idRequest = :requestId")
+    suspend fun deleteTagsForRequest(requestId: Int)
+
     @Update
     suspend fun update(request: Request)
     @Delete
@@ -357,6 +403,43 @@ interface TagDao {
             insertUserTags(*list.toTypedArray())
         }
     }
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertTagsForRequest(vararg tr: TagsRequest)
+
+    @Query("DELETE FROM TagsRequest WHERE idRequest = :requestId")
+    suspend fun deleteTagsForRequest(requestId: Int)
+
+    @Transaction
+    suspend fun replaceRequestTags(requestId: Int, tagIds: List<Int>) {
+        deleteTagsForRequest(requestId)
+        if (tagIds.isNotEmpty()) {
+            val list = tagIds.map { TagsRequest(idTags = it, idRequest = requestId) }
+            insertTagsForRequest(*list.toTypedArray())
+        }
+    }
+
+    // Controlla se l'utente ha tutti i tag richiesti per una richiesta
+    @Query("""
+        SELECT CASE 
+            WHEN COUNT(DISTINCT tr.idTags) = 
+                 COUNT(DISTINCT CASE WHEN tu.idUser = :userId THEN tr.idTags END)
+            THEN 1 ELSE 0 END
+        FROM TagsRequest tr
+        LEFT JOIN TagsUser tu ON tr.idTags = tu.idTags AND tu.idUser = :userId
+        WHERE tr.idRequest = :requestId
+    """)
+    suspend fun userHasRequiredTags(userId: Int, requestId: Int): Boolean
+
+    // Request tags - NUOVO
+    @Transaction
+    @Query("""
+        SELECT t.* FROM Tags t
+        INNER JOIN TagsRequest tr ON t.id = tr.idTags
+        WHERE tr.idRequest = :requestId
+        ORDER BY t.name
+    """)
+    suspend fun getTagsForRequest(requestId: Int): List<Tags>
 
 
 }
