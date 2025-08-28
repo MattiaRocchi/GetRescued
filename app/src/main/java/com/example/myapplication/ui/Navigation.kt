@@ -5,8 +5,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.example.myapplication.ui.SettingsScreen.SettingsScreen
-import com.example.myapplication.ui.SettingsScreen.SettingsViewModel
+import com.example.myapplication.ui.settingsScreen.SettingsScreen
+import com.example.myapplication.ui.settingsScreen.SettingsViewModel
 import com.example.myapplication.ui.addrequest.AddRequestScreen
 import com.example.myapplication.ui.addrequest.AddRequestViewModel
 import com.example.myapplication.ui.slide.ManageRequestsScreen

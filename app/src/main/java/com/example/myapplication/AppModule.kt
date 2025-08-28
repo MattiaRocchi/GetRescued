@@ -10,7 +10,7 @@ import com.example.myapplication.data.repositories.TitleBadgeRepository
 import com.example.myapplication.data.repositories.UserDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.data.repositories.TagsRepository
-import com.example.myapplication.ui.SettingsScreen.SettingsViewModel
+import com.example.myapplication.ui.settingsScreen.SettingsViewModel
 import com.example.myapplication.ui.addrequest.AddRequestViewModel
 import com.example.myapplication.ui.changeProfile.ChangeProfileViewModel
 import com.example.myapplication.ui.userrequest.UserRequestListViewModel

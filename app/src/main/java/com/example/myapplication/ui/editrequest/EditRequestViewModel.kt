@@ -17,7 +17,8 @@ class EditRequestViewModel(
 
     val requestFlow: StateFlow<Request?> =
         repository.getRequestByIdFlow(requestId)
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+            .stateIn(viewModelScope,
+                SharingStarted.WhileSubscribed(5_000), null)
 
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> = _title

@@ -31,7 +31,7 @@ fun GetRescuedTopBar(
     TopAppBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Get", style = MaterialTheme.typography.titleLarge)
+                Text("GetRescued", style = MaterialTheme.typography.titleLarge)
                 Image(
                     painter = painterResource(id = R.drawable.ic_red_cross),
                     contentDescription = "Logo Croce Rossa",

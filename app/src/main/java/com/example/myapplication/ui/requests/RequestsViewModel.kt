@@ -7,7 +7,7 @@ import com.example.myapplication.data.repositories.RequestDaoRepository
 import kotlinx.coroutines.flow.*
 
 class RequestsViewModel(
-    private val repository: RequestDaoRepository
+    repository: RequestDaoRepository
 ) : ViewModel() {
 
     // Tutte le richieste (utile per debug o altre funzionalità)

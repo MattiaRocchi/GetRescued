@@ -2,20 +2,11 @@ package com.example.myapplication.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-/*
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-*/
 //light color
  val EasyTask = Color(0xFF4C7744)
 val MediumTask = Color(0xFF9E8C3C)
 val DifficulTask = Color(0xFF8C3C3C)
-val ColossalTask = Color(0xFF9C76D9)
+
 val BackGround = Color(0xFFFFFFFF)
 val Primary = Color(0xFFAAAAAA)
 val OnPrimary = Color(0xFFFFFFFF)
@@ -30,12 +21,6 @@ val Tertiary = Color(0xFFFF6F00)
 val OnTertiary = Color(0xFFFFFFFF)
 val TertiaryContainer = Color(0xFFFFE0B2)
 val OnTertiaryContainer = Color(0xFF993900)
-val UnpressableButton = Color(0xFFBDBDBD)
-//dark color
-val EasyTaskDark = Color(0xFF558B2F)
-val MediumTaskDark = Color(0xFFFFC107)
-val DifficulTaskDark = Color(0xFFD84315)
-val ColossalTaskDark = Color(0xFF7E57C2)
 
 val BackGroundDark = Color(0xFF121212)
 val PrimaryDark = Color(0xFFB0BEC5)

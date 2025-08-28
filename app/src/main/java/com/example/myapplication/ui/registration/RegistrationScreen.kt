@@ -129,7 +129,7 @@ fun RegistrationScreen(
             Spacer(Modifier.height(16.dp))
 
             PhoneTextField(
-                value = viewModel.phoneNumber.toString(),
+                value = viewModel.phoneNumber,
                 onValueChange = {
                     viewModel.onPhoneNumberChange(it)
                     phoneNumberError = it.isNotBlank() && !isValidPhoneNumber(it)
