@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-
+import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Button
@@ -29,7 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -40,11 +40,10 @@ import com.example.myapplication.data.database.WeeklyMissionUser
 
 @Composable
 fun MissionCardWeekly(
-    modifier: Modifier = Modifier,
     mission: Mission,
     weeklyMissionUser: WeeklyMissionUser? = null,
-    onClaimClick: () -> Unit = {}
-
+    onClaimClick: () -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     val missionUser = weeklyMissionUser
     val progression = missionUser?.progression ?: 0
@@ -129,37 +128,17 @@ fun MissionCardWeekly(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-
-            // Mission title and description
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = mission.name,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = if (isFinished)
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    else
-                        MaterialTheme.colorScheme.onSecondaryContainer,
-                    textDecoration = if (isFinished) TextDecoration.LineThrough else TextDecoration.None,
-                    maxLines = 1
-                )
-
-                if (mission.description.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = mission.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (isFinished)
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                        else
-                            MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
-                        maxLines = 2,
-                        lineHeight = 16.sp
-                    )
-                }
-            }
+            // Mission title
+            Text(
+                text = mission.name,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = if (isFinished)
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                else
+                    MaterialTheme.colorScheme.onSecondaryContainer,
+                textDecoration = if (isFinished) TextDecoration.LineThrough else TextDecoration.None
+            )
 
             if (!isFinished) {
                 Spacer(modifier = Modifier.height(12.dp))
@@ -242,11 +221,10 @@ fun MissionCardWeekly(
 
 @Composable
 fun MissionCardGeneral(
-    modifier: Modifier = Modifier,
     mission: Mission,
     generalMissionUser: GeneralMissionUser? = null,
-    onClaimClick: () -> Unit = {}
-
+    onClaimClick: () -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     val missionUser = generalMissionUser
     val progression = missionUser?.progression ?: 0
@@ -331,36 +309,17 @@ fun MissionCardGeneral(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Mission title and description
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = mission.name,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = if (isFinished)
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    else
-                        MaterialTheme.colorScheme.onSecondaryContainer,
-                    textDecoration = if (isFinished) TextDecoration.LineThrough else TextDecoration.None,
-                    maxLines = 1
-                )
-
-                if (mission.description.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = mission.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (isFinished)
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                        else
-                            MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
-                        maxLines = 2,
-                        lineHeight = 16.sp
-                    )
-                }
-            }
+            // Mission title
+            Text(
+                text = mission.name,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = if (isFinished)
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                else
+                    MaterialTheme.colorScheme.onPrimaryContainer,
+                textDecoration = if (isFinished) TextDecoration.LineThrough else TextDecoration.None
+            )
 
             if (!isFinished) {
                 Spacer(modifier = Modifier.height(12.dp))

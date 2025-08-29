@@ -1,6 +1,7 @@
 
 package com.example.myapplication.data.database
 
+import android.nfc.Tag
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -56,14 +57,17 @@ interface UserDao {
         val oldInfo = getUserInfo(idOld)
 
         // Costruisce nuova UserInfo per il nuovo utente
-        val newInfo = oldInfo?.// copia i dati ma cambia l'id con quello nuovo
-        copy(id = newUserId.toInt())
-            ?: UserInfo(
+        val newInfo = if (oldInfo == null) {
+            UserInfo(
                 id = newUserId.toInt(),
                 activeTitle = 0,
                 exp = 0,
                 profileFoto = null
             )
+        } else {
+            // copia i dati ma cambia l'id con quello nuovo
+            oldInfo.copy(id = newUserId.toInt())
+        }
 
         // Elimina la vecchia UserInfo se esiste
         if (oldInfo != null) {

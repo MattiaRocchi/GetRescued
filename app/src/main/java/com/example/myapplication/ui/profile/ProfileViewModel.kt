@@ -12,6 +12,7 @@ import com.example.myapplication.data.repositories.UserDaoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -41,7 +42,7 @@ class ProfileViewModel(
     val allTags: StateFlow<List<Tags>> = _allTags
 
     private val _userTags = MutableStateFlow<List<Tags>>(emptyList())
-    //val userTags: StateFlow<List<Tags>> = _userTags
+    val userTags: StateFlow<List<Tags>> = _userTags
 
     init {
         // 🔹 ogni volta che cambia userId → ricarico tutto (inclusi tags)

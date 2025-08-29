@@ -193,11 +193,10 @@ fun AgeTextField(
 
 @Composable
 fun HabitationTextField(
-    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     habitationError: Boolean = false,
-
+    modifier: Modifier = Modifier
 ) {
     OutlinedTextField(
         value = value,
@@ -221,14 +220,15 @@ fun HabitationTextField(
     }
 }
 
+// -----------------------------
 // Phone number
+// -----------------------------
 @Composable
 fun PhoneTextField(
-    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    phoneError: Boolean = false
-
+    phoneError: Boolean = false,
+    modifier: Modifier = Modifier,
 ) {
     OutlinedTextField(
         value = value,

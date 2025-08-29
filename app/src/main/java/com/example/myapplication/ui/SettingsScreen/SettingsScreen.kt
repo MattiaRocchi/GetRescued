@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.settingsScreen
+package com.example.myapplication.ui.SettingsScreen
 
 //TODO Se i permessi risultano permanentemente negati non li richiede più
 

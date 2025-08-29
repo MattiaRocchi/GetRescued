@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.settingsScreen
+package com.example.myapplication.ui.SettingsScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

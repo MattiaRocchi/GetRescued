@@ -17,11 +17,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
-
+import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -46,7 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapplication.ui.GetRescuedRoute
-
+import com.example.myapplication.ui.theme.UnpressableButton
 import com.example.myapplication.ui.theme.UnpressableButtonDark
 
 @Composable
@@ -179,7 +178,7 @@ private fun GeneralMissionsHeader() {
                 )
             }
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.TrendingUp,
+                imageVector = Icons.Default.TrendingUp,
                 contentDescription = "Progress",
                 tint = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.size(16.dp)

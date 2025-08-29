@@ -3,18 +3,18 @@ package com.example.myapplication.ui.changeProfile
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
-
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import com.example.myapplication.ui.composables.*
-
+import androidx.compose.foundation.layout.imePadding
 
 @Composable
 fun ChangeProfileScreen(
@@ -90,11 +90,11 @@ fun ChangeProfileScreen(
 
             Spacer(Modifier.height(8.dp))
 
-
-            HabitationTextField(
+            ProfileTextField(
                 value = habitation ?: "",
-                onValueChange = { viewModel.onHabitationChange(it) })
-
+                onValueChange = { viewModel.onHabitationChange(it) },
+                label = "Residenza (facoltativo)"
+            )
 
             Spacer(Modifier.height(8.dp))
 

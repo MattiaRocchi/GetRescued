@@ -15,7 +15,7 @@ fun loadTitleBadgesFromRaw(context: Context): List<TitleBadge> {
         )
         val reader = InputStreamReader(inputStream)
         val type = object : TypeToken<List<TitleBadge>>() {}.type
-        Gson().fromJson(reader, type)
+        Gson().fromJson<List<TitleBadge>>(reader, type)
     } catch (e: Exception) {
         e.printStackTrace()
         emptyList()
@@ -29,7 +29,7 @@ fun loadTagsFromRaw(context: Context): List<Tags> {
         )
         val reader = InputStreamReader(inputStream)
         val type = object : TypeToken<List<Tags>>() {}.type
-        Gson().fromJson(reader, type)
+        Gson().fromJson<List<Tags>>(reader, type)
     } catch (e: Exception) {
         e.printStackTrace()
         emptyList()
@@ -40,8 +40,8 @@ data class MissionJson(
     val description: String,
     val exp: Int? = 0,
     val titleBadge: Int? = null,
-    val requirement: Int,
-    val tag: String
+    val Requirement: Int,
+    val Tag: String
 )
 
 fun loadMissionsFromRaw(context: Context, isGeneral: Boolean): List<Mission> {
@@ -63,8 +63,8 @@ fun loadMissionsFromRaw(context: Context, isGeneral: Boolean): List<Mission> {
                 description = missionJson.description,
                 exp = missionJson.exp,
                 titleBadgeId = missionJson.titleBadge,
-                requirement = missionJson.requirement,
-                tag = missionJson.tag,
+                requirement = missionJson.Requirement,
+                tag = missionJson.Tag,
                 type = isGeneral
             )
         }
