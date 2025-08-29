@@ -5,12 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.Request
 import com.example.myapplication.data.database.Tags
-import com.example.myapplication.data.database.TagsMission
+import com.example.myapplication.data.database.TagsRequest
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.data.repositories.TagsRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
+import kotlin.math.absoluteValue
 
 class AddRequestViewModel(
     private val repository: RequestDaoRepository,
@@ -36,7 +39,11 @@ class AddRequestViewModel(
     private val _photos = MutableStateFlow<List<String>>(emptyList())
     val photos: StateFlow<List<String>> = _photos.asStateFlow()
 
-    // Cambiato da TitleBadge a Tags
+    // Campo per la data di svolgimento
+    private val _scheduledDate = MutableStateFlow(LocalDate.now())
+    val scheduledDate: StateFlow<LocalDate> = _scheduledDate.asStateFlow()
+
+    // Corretto: usa Tags invece di TitleBadge
     private val _requiredTags = MutableStateFlow<List<Tags>>(emptyList())
     val requiredTags: StateFlow<List<Tags>> = _requiredTags.asStateFlow()
 
@@ -60,9 +67,14 @@ class AddRequestViewModel(
                 _title,
                 _description,
                 _location,
-                _peopleRequired
-            ) { title, desc, loc, people ->
-                title.isNotBlank() && desc.isNotBlank() && loc.isNotBlank() && people > 0
+                _peopleRequired,
+                _scheduledDate
+            ) { title, desc, loc, people, date ->
+                title.isNotBlank() &&
+                        desc.isNotBlank() &&
+                        loc.isNotBlank() &&
+                        people > 0 &&
+                        !date.isBefore(LocalDate.now()) // La data deve essere oggi o futura
             }.collect { isValid ->
                 _isFormValid.value = isValid
             }
@@ -74,6 +86,12 @@ class AddRequestViewModel(
     fun onLocationChange(v: String) { _location.value = v }
     fun onPeopleRequiredChange(v: Int) { _peopleRequired.value = maxOf(1, v) }
     fun onDifficultyChange(v: String) { _difficulty.value = v }
+    fun onScheduledDateChange(date: LocalDate) {
+        // Assicuriamoci che la data non sia nel passato
+        if (!date.isBefore(LocalDate.now())) {
+            _scheduledDate.value = date
+        }
+    }
 
     fun addPhoto(photoUri: Uri) {
         val currentPhotos = _photos.value.toMutableList()
@@ -89,7 +107,7 @@ class AddRequestViewModel(
         }
     }
 
-    // Cambiato per gestire Tags invece di TitleBadge
+    // Gestisce Tags invece di TitleBadge
     fun addRequiredTag(tag: Tags) {
         val current = _requiredTags.value.toMutableList()
         if (!current.contains(tag)) {
@@ -110,6 +128,12 @@ class AddRequestViewModel(
         viewModelScope.launch {
             val userId = settingsRepository.userIdFlow.firstOrNull() ?: return@launch
 
+            // Converti LocalDate in timestamp (inizio giornata)
+            val scheduledDateMillis = scheduledDate.value
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()
+
             val request = Request(
                 title = title.value,
                 sender = userId,
@@ -118,26 +142,31 @@ class AddRequestViewModel(
                 peopleRequired = peopleRequired.value,
                 fotos = photos.value,
                 description = description.value,
-                place = location.value
+                place = location.value,
+                scheduledDate = scheduledDateMillis
             )
 
             try {
-                // Inserisci la richiesta
-                repository.insertRequest(request)
+                // CORREZIONE: Inserisci la richiesta e ottieni l'ID generato
+                val insertedId = repository.insertRequest(request)
 
-                // Se ci sono tag richiesti, dobbiamo collegarli alla richiesta
-                // Nota: per fare questo correttamente, dovremmo avere l'ID della richiesta appena inserita
-                // Il DAO insert dovrebbe restituire l'ID, ma attualmente non lo fa
-                // Per ora, i tag richiesti non vengono salvati - questo richiede una modifica al DAO
-
-                // TODO: Implementare il collegamento dei tag alla richiesta tramite TagsMission
-                // Questo richiede che RequestDao.insert restituisca l'ID della richiesta inserita
+                // CORREZIONE: Se ci sono tag richiesti, collegali alla richiesta usando l'ID corretto
+                if (_requiredTags.value.isNotEmpty()) {
+                    val tagsToAdd = _requiredTags.value.map { tag ->
+                        TagsRequest(
+                            idTags = tag.id,
+                            idRequest = insertedId.toInt() // Usa l'ID restituito dall'inserimento
+                        )
+                    }
+                    repository.insertTagsForRequest(*tagsToAdd.toTypedArray())
+                }
 
                 // Reset form
                 resetForm()
                 onSuccess()
             } catch (e: Exception) {
-                // Handle error
+                // Handle error - potresti voler esporre questo errore all'UI
+                println("Errore durante la creazione della richiesta: ${e.message}")
             }
         }
     }
@@ -150,5 +179,6 @@ class AddRequestViewModel(
         _location.value = ""
         _photos.value = emptyList()
         _requiredTags.value = emptyList()
+        _scheduledDate.value = LocalDate.now()
     }
 }

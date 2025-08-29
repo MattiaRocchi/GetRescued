@@ -7,16 +7,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.myapplication.ui.theme.LocalTitleColors
-import com.example.myapplication.ui.theme.TitleColors
+import java.time.LocalDate
 
-
-
-object TitleTheme {
-    val colors: TitleColors
-        @Composable
-        get() = LocalTitleColors.current
-}
 
 @Entity
 data class Request(
@@ -31,8 +23,66 @@ data class Request(
     @ColumnInfo(name= "fotos") var fotos: List<String>, //quale tipo sarebbe meglio usare per questo?
     @ColumnInfo(name= "description") var description: String,
     @ColumnInfo(name = "date") val date: Long = System.currentTimeMillis(),
+    @ColumnInfo(name = "scheduledDate") val scheduledDate: Long,
     @ColumnInfo(name= "completed") var completed: Boolean=false,
-)
+){
+    // Utility functions per gestire le date e stati
+    fun isScheduledForToday(): Boolean {
+        val today = LocalDate.now()
+        val scheduled = java.time.Instant.ofEpochMilli(scheduledDate)
+            .atZone(java.time.ZoneId.systemDefault())
+            .toLocalDate()
+        return scheduled == today
+    }
+
+    fun isScheduledForTomorrow(): Boolean {
+        val tomorrow = LocalDate.now().plusDays(1)
+        val scheduled = java.time.Instant.ofEpochMilli(scheduledDate)
+            .atZone(java.time.ZoneId.systemDefault())
+            .toLocalDate()
+        return scheduled == tomorrow
+    }
+
+    fun isScheduledInPast(): Boolean {
+        val today = LocalDate.now()
+        val scheduled = java.time.Instant.ofEpochMilli(scheduledDate)
+            .atZone(java.time.ZoneId.systemDefault())
+            .toLocalDate()
+        return scheduled.isBefore(today)
+    }
+
+    fun canBeDeleted(): Boolean {
+        // Può essere eliminata solo se è programmata per dopo domani
+        val tomorrow = LocalDate.now().plusDays(1)
+        val scheduled = java.time.Instant.ofEpochMilli(scheduledDate)
+            .atZone(java.time.ZoneId.systemDefault())
+            .toLocalDate()
+        return scheduled.isAfter(tomorrow)
+    }
+
+    fun canBeModified(): Boolean {
+        // Può essere modificata solo se è programmata per dopo domani
+        return canBeDeleted()
+    }
+
+    fun getRequestState(): String {
+        return when {
+            isScheduledInPast() -> "Scaduta"
+            isScheduledForToday() -> "In corso"
+            isScheduledForTomorrow() -> "In preparazione"
+            else -> "Programmata"
+        }
+    }
+
+    fun getAvailableActions(): List<String> {
+        return when {
+            isScheduledInPast() -> listOf("complete")
+            isScheduledForToday() -> listOf("complete")
+            isScheduledForTomorrow() -> emptyList()
+            else -> listOf("edit", "delete", "manage_participants")
+        }
+    }
+}
 
 
 @Entity(primaryKeys = ["requestId", "userId"])
@@ -55,12 +105,18 @@ data class Tags(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name= "name") val name: String,
 )
+
 @Entity(primaryKeys = ["idTags", "idMissionId"])
 data class TagsMission(
     //tag necessari per poter dare
     // una mano nel soccorrimento
     val idTags: Int,
     val idMissionId: Int,
+)
+@Entity(primaryKeys = ["idTags", "idRequest"])
+data class TagsRequest(
+    val idTags: Int,
+    val idRequest: Int
 )
 @Entity(primaryKeys = ["idTags", "idUser"])
 data class TagsUser(
@@ -117,7 +173,7 @@ data class GeneralMissionUser(
     @ColumnInfo(name= "active") var active: Boolean=true, //se questa missione è attiva o meno,
     // di defaultinizialmente messa a true
     //Se la missione è claimable, ovvero se l'utente ha completato la missione e può
-    // richiedere la ricompensa
+    //richiedere la ricompensa
     @ColumnInfo(name = "claimable") var claimable: Boolean = false
 
 )

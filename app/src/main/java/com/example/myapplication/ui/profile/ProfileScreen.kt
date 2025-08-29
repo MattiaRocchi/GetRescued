@@ -285,13 +285,13 @@ fun ProfileScreen(
             Button(
                 onClick = {
                     viewModel.logout {
-
-                        val musicIntent = Intent(context,
-                            MusicService::class.java)
+                        val musicIntent = Intent(context, MusicService::class.java)
                         context.stopService(musicIntent)
 
                         navController.navigate(GetRescuedRoute.Login) {
+                            // Pulisci tutto il back stack come suggerito dalle slide
                             popUpTo(0) { inclusive = true }
+                            launchSingleTop = true
                         }
                     }
                 },

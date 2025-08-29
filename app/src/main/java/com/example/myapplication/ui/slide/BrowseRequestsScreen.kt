@@ -16,12 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.data.database.Request
+import com.example.myapplication.data.database.Tags
 import com.example.myapplication.data.repositories.SettingsRepository
+import com.example.myapplication.data.repositories.TagsRepository
 import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.ui.composables.DynamicRequestCard
+import com.example.myapplication.ui.composables.RequestFilter
 import com.example.myapplication.ui.participationrequests.ParticipatingRequestsViewModel
 import com.example.myapplication.ui.requests.RequestsViewModel
-import com.example.myapplication.ui.theme.*
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -37,92 +39,64 @@ fun BrowseRequestsScreen(
     val allVM: RequestsViewModel = koinViewModel()
     val participatingVM: ParticipatingRequestsViewModel = koinViewModel()
     val settingsRepository: SettingsRepository = koinInject()
+    val tagsRepository: TagsRepository = koinInject()
 
     // Ottieni l'ID utente corrente
     val currentUserId by settingsRepository.userIdFlow.collectAsState(initial = -1)
 
+    // Stati per i filtri
     var searchQuery by remember { mutableStateOf("") }
     var showFilters by remember { mutableStateOf(false) }
     var selectedDifficulty by remember { mutableStateOf<String?>(null) }
+    var selectedTags by remember { mutableStateOf<List<Tags>>(emptyList()) }
     var sortByDate by remember { mutableStateOf(true) } // true = più recenti, false = più vecchi
+    var hideMyRequests by remember { mutableStateOf(false) } // NUOVO filtro
 
-    Column(Modifier.fillMaxSize()) {
-        // Barra di ricerca
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            elevation = CardDefaults.cardElevation(4.dp)
-        ) {
-            Column(Modifier.padding(16.dp)) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    label = { Text("Cerca richieste...") },
-                    leadingIcon = { Icon(Icons.Default.Search, "Cerca") },
-                    trailingIcon = {
-                        IconButton(onClick = { showFilters = !showFilters }) {
-                            Icon(Icons.Default.FilterList, "Filtri")
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
+    // Carica tutti i tag disponibili
+    val availableTags by tagsRepository.allTagsFlow().collectAsState(initial = emptyList())
 
-                if (showFilters) {
-                    Spacer(Modifier.height(12.dp))
+    // Mappa per associare request ID ai loro tags
+    var requestTagsMap by remember { mutableStateOf<Map<Int, List<Tags>>>(emptyMap()) }
 
-                    // Filtro difficoltà
-                    Text("Difficoltà:", style = MaterialTheme.typography.labelMedium)
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    ) {
-                        FilterChip(
-                            onClick = { selectedDifficulty = if (selectedDifficulty == "Bassa") null else "Bassa" },
-                            label = { Text("Bassa") },
-                            selected = selectedDifficulty == "Bassa",
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = EasyTask
-                            )
-                        )
-                        FilterChip(
-                            onClick = { selectedDifficulty = if (selectedDifficulty == "Media") null else "Media" },
-                            label = { Text("Media") },
-                            selected = selectedDifficulty == "Media",
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MediumTask
-                            )
-                        )
-                        FilterChip(
-                            onClick = { selectedDifficulty = if (selectedDifficulty == "Alta") null else "Alta" },
-                            label = { Text("Alta") },
-                            selected = selectedDifficulty == "Alta",
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = DifficulTask
-                            )
-                        )
-                    }
+    // Carica i tags per le richieste quando cambiano
+    val allRequests by allVM.availableRequests.collectAsState()
+    val participatingRequests by participatingVM.participation.collectAsState()
 
-                    // Ordinamento per data
-                    Text("Ordinamento:", style = MaterialTheme.typography.labelMedium)
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    ) {
-                        FilterChip(
-                            onClick = { sortByDate = true },
-                            label = { Text("Più recenti") },
-                            selected = sortByDate
-                        )
-                        FilterChip(
-                            onClick = { sortByDate = false },
-                            label = { Text("Più vecchi") },
-                            selected = !sortByDate
-                        )
-                    }
-                }
+    LaunchedEffect(allRequests, participatingRequests) {
+        val allRequestIds = (allRequests + participatingRequests).map { it.id }.distinct()
+        val newTagsMap = mutableMapOf<Int, List<Tags>>()
+
+        allRequestIds.forEach { requestId ->
+            try {
+                val tags = tagsRepository.getTagsForRequest(requestId)
+                newTagsMap[requestId] = tags
+            } catch (e: Exception) {
+                // Se c'è un errore nel caricamento dei tags, usa lista vuota
+                newTagsMap[requestId] = emptyList()
             }
         }
+
+        requestTagsMap = newTagsMap
+    }
+
+    Column(Modifier.fillMaxSize()) {
+        // Filtro completo con tutti i parametri
+        RequestFilter(
+            searchQuery = searchQuery,
+            onSearchQueryChange = { searchQuery = it },
+            selectedDifficulty = selectedDifficulty,
+            onDifficultyChange = { selectedDifficulty = it },
+            selectedTags = selectedTags,
+            onTagsChange = { selectedTags = it },
+            availableTags = availableTags,
+            sortByDate = sortByDate,
+            onSortByDateChange = { sortByDate = it },
+            hideMyRequests = hideMyRequests,
+            onHideMyRequestsChange = { hideMyRequests = it },
+            showFilters = showFilters,
+            onToggleFilters = { showFilters = !showFilters },
+            modifier = Modifier.padding(16.dp)
+        )
 
         TabRow(selectedTabIndex = pagerState.currentPage) {
             Tab(
@@ -140,18 +114,24 @@ fun BrowseRequestsScreen(
         HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
             when (page) {
                 0 -> FilteredRequestsList(
-                    requests = allVM.availableRequests.collectAsState().value,
+                    requests = allRequests,
+                    requestTagsMap = requestTagsMap,
                     searchQuery = searchQuery,
                     selectedDifficulty = selectedDifficulty,
+                    selectedTags = selectedTags,
                     sortByDate = sortByDate,
+                    hideMyRequests = hideMyRequests,
                     navController = navController,
                     currentUserId = currentUserId
                 )
                 1 -> FilteredRequestsList(
-                    requests = participatingVM.participation.collectAsState().value,
+                    requests = participatingRequests,
+                    requestTagsMap = requestTagsMap,
                     searchQuery = searchQuery,
                     selectedDifficulty = selectedDifficulty,
+                    selectedTags = selectedTags,
                     sortByDate = sortByDate,
+                    hideMyRequests = hideMyRequests,
                     navController = navController,
                     currentUserId = currentUserId
                 )
@@ -163,13 +143,25 @@ fun BrowseRequestsScreen(
 @Composable
 private fun FilteredRequestsList(
     requests: List<Request>,
+    requestTagsMap: Map<Int, List<Tags>>,
     searchQuery: String,
     selectedDifficulty: String?,
+    selectedTags: List<Tags>,
     sortByDate: Boolean,
+    hideMyRequests: Boolean,
     navController: NavController,
     currentUserId: Int
 ) {
-    val filteredRequests = remember(requests, searchQuery, selectedDifficulty, sortByDate) {
+    val filteredRequests = remember(
+        requests,
+        requestTagsMap,
+        searchQuery,
+        selectedDifficulty,
+        selectedTags,
+        sortByDate,
+        hideMyRequests,
+        currentUserId
+    ) {
         requests
             .filter { request ->
                 // Filtro per testo di ricerca
@@ -178,9 +170,20 @@ private fun FilteredRequestsList(
                         request.description.contains(searchQuery, ignoreCase = true)
 
                 // Filtro per difficoltà
-                val matchesDifficulty = selectedDifficulty == null || request.difficulty == selectedDifficulty
+                val matchesDifficulty =
+                    selectedDifficulty == null || request.difficulty == selectedDifficulty
 
-                matchesSearch && matchesDifficulty
+                // NUOVO: Filtro per tag richiesti
+                val requestTags = requestTagsMap[request.id] ?: emptyList()
+                val matchesTags = selectedTags.isEmpty() ||
+                        selectedTags.all { selectedTag ->
+                            requestTags.any { requestTag -> requestTag.id == selectedTag.id }
+                        }
+
+                // NUOVO: Filtro per nascondere le proprie richieste
+                val matchesOwnership = !hideMyRequests || (currentUserId != request.sender)
+
+                matchesSearch && matchesDifficulty && matchesTags && matchesOwnership
             }
             .sortedBy { if (sortByDate) -it.date else it.date }
     }
@@ -203,8 +206,10 @@ private fun FilteredRequestsList(
             }
         } else {
             items(filteredRequests) { request ->
+                val requestTags = requestTagsMap[request.id] ?: emptyList()
                 DynamicRequestCard(
                     request = request,
+                    tags = requestTags,
                     onClick = { navController.navigate(GetRescuedRoute.InfoRequest(request.id)) },
                     currentUserId = currentUserId
                 )

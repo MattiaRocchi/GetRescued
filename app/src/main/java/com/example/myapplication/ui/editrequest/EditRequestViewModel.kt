@@ -8,10 +8,12 @@ import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.TagsRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
 
 class EditRequestViewModel(
     private val repository: RequestDaoRepository,
-    private val tagsRepository: TagsRepository, // Cambiato da TitleBadgeRepository
+    private val tagsRepository: TagsRepository,
     private val requestId: Int
 ) : ViewModel() {
 
@@ -37,7 +39,10 @@ class EditRequestViewModel(
     private val _images = MutableStateFlow<List<String>>(emptyList())
     val images: StateFlow<List<String>> = _images
 
-    // Cambiato da TitleBadge a Tags
+    // Nuovo campo per la data di svolgimento
+    private val _scheduledDate = MutableStateFlow(LocalDate.now())
+    val scheduledDate: StateFlow<LocalDate> = _scheduledDate
+
     private val _requiredTags = MutableStateFlow<List<Tags>>(emptyList())
     val requiredTags: StateFlow<List<Tags>> = _requiredTags
 
@@ -64,6 +69,12 @@ class EditRequestViewModel(
                 _peopleRequired.value = r.peopleRequired
                 _location.value = r.place ?: ""
                 _images.value = r.fotos
+
+                // Converti il timestamp in LocalDate
+                val scheduledLocalDate = java.time.Instant.ofEpochMilli(r.scheduledDate)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+                _scheduledDate.value = scheduledLocalDate
             }
         }
 
@@ -80,6 +91,12 @@ class EditRequestViewModel(
     fun onDifficultyChange(v: String) { _difficulty.value = v }
     fun onPeopleRequiredChange(v: Int) { _peopleRequired.value = v }
     fun onLocationChange(v: String) { _location.value = v }
+    fun onScheduledDateChange(date: LocalDate) {
+        // Assicuriamoci che la data non sia nel passato
+        if (!date.isBefore(LocalDate.now())) {
+            _scheduledDate.value = date
+        }
+    }
 
     fun addImage(imageUri: String) {
         val currentImages = _images.value.toMutableList()
@@ -128,13 +145,25 @@ class EditRequestViewModel(
             return
         }
 
+        if (_scheduledDate.value.isBefore(LocalDate.now())) {
+            _events.tryEmit("La data di svolgimento deve essere odierna o futura")
+            return
+        }
+
+        // Converti LocalDate in timestamp
+        val scheduledDateMillis = _scheduledDate.value
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+
         val updated = current.copy(
             title = title.value.trim(),
             description = description.value.trim(),
             difficulty = difficulty.value,
             peopleRequired = peopleRequired.value,
             place = if (location.value.isBlank()) null else location.value.trim(),
-            fotos = images.value
+            fotos = images.value,
+            scheduledDate = scheduledDateMillis
         )
 
         viewModelScope.launch {
@@ -143,7 +172,6 @@ class EditRequestViewModel(
                 repository.updateRequest(updated)
 
                 // Aggiorna i tag associati alla richiesta
-                // Prima rimuove tutti i tag esistenti, poi aggiunge quelli nuovi
                 tagsRepository.deleteTagsForMission(requestId)
 
                 val tagsToAdd = _requiredTags.value.map { tag ->

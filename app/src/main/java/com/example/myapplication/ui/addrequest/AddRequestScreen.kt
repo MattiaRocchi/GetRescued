@@ -11,8 +11,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,7 +25,11 @@ import coil.compose.AsyncImage
 import com.example.myapplication.ui.composables.CameraCapture
 import com.example.myapplication.ui.composables.ImagePickerDialog
 import openAddressInMaps
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddRequestScreen(
     viewModel: AddRequestViewModel,
@@ -38,15 +41,24 @@ fun AddRequestScreen(
     val difficulty by viewModel.difficulty.collectAsState()
     val location by viewModel.location.collectAsState()
     val photos by viewModel.photos.collectAsState()
-    val requiredTags by viewModel.requiredTags.collectAsState() // Cambiato da requiredBadges
-    val availableTags by viewModel.availableTags.collectAsState() // Cambiato da availableBadges
+    val scheduledDate by viewModel.scheduledDate.collectAsState()
+    val requiredTags by viewModel.requiredTags.collectAsState()
+    val availableTags by viewModel.availableTags.collectAsState()
     val isFormValid by viewModel.isFormValid.collectAsState()
 
     val context = LocalContext.current
 
     var showImagePicker by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
-    var showTagDialog by remember { mutableStateOf(false) } // Cambiato da showBadgeDialog
+    var showTagDialog by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    // State per il DatePicker
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = java.time.ZoneId.systemDefault().let { zoneId ->
+            scheduledDate.atStartOfDay(zoneId).toInstant().toEpochMilli()
+        }
+    )
 
     // Launcher per la galleria
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -87,7 +99,8 @@ fun AddRequestScreen(
                     onValueChange = viewModel::onTitleChange,
                     label = { Text("Titolo *") },
                     modifier = Modifier.fillMaxWidth(),
-                    isError = title.isBlank()
+                    isError = title.isBlank(),
+                    leadingIcon = { Icon(Icons.Default.Title, contentDescription = null) }
                 )
             }
 
@@ -98,7 +111,8 @@ fun AddRequestScreen(
                     label = { Text("Descrizione *") },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3,
-                    isError = description.isBlank()
+                    isError = description.isBlank(),
+                    leadingIcon = { Icon(Icons.Default.Description, contentDescription = null) }
                 )
             }
 
@@ -108,7 +122,8 @@ fun AddRequestScreen(
                     onValueChange = { it.toIntOrNull()?.let(viewModel::onPeopleRequiredChange) },
                     label = { Text("Numero persone richieste *") },
                     modifier = Modifier.fillMaxWidth(),
-                    isError = peopleRequired <= 0
+                    isError = peopleRequired <= 0,
+                    leadingIcon = { Icon(Icons.Default.Group, contentDescription = null) }
                 )
             }
 
@@ -120,7 +135,9 @@ fun AddRequestScreen(
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Difficoltà *") },
-                        modifier = Modifier.fillMaxWidth().clickable { expanded = true }
+                        modifier = Modifier.fillMaxWidth().clickable { expanded = true },
+                        leadingIcon = { Icon(Icons.Default.TrendingUp, contentDescription = null) },
+                        trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) }
                     )
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         listOf("Bassa", "Media", "Alta").forEach { diff ->
@@ -136,13 +153,37 @@ fun AddRequestScreen(
                 }
             }
 
+            // Campo data di svolgimento
+            item {
+                OutlinedTextField(
+                    value = scheduledDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Data di svolgimento *") },
+                    modifier = Modifier.fillMaxWidth().clickable { showDatePicker = true },
+                    leadingIcon = { Icon(Icons.Default.DateRange, contentDescription = null) },
+                    trailingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
+                    isError = scheduledDate.isBefore(LocalDate.now())
+                )
+
+                if (scheduledDate.isBefore(LocalDate.now())) {
+                    Text(
+                        "La data deve essere odierna o futura",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
+            }
+
             item {
                 OutlinedTextField(
                     value = location,
                     onValueChange = viewModel::onLocationChange,
                     label = { Text("Posizione (es: Piazza Duomo, Milano) *") },
                     modifier = Modifier.fillMaxWidth(),
-                    isError = location.isBlank()
+                    isError = location.isBlank(),
+                    leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) }
                 )
 
                 if (location.isNotBlank()) {
@@ -150,6 +191,8 @@ fun AddRequestScreen(
                         onClick = { openAddressInMaps(context, location) },
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                     ) {
+                        Icon(Icons.Default.Map, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
                         Text("Visualizza posizione in Maps")
                     }
                 }
@@ -205,7 +248,7 @@ fun AddRequestScreen(
                 }
             }
 
-            // Sezione tag richiesti (cambiato da badge)
+            // Sezione tag richiesti
             item {
                 Text("Tag richiesti (opzionale)", style = MaterialTheme.typography.titleMedium)
 
@@ -229,6 +272,8 @@ fun AddRequestScreen(
                     onClick = { showTagDialog = true },
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    Icon(Icons.Default.Add, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
                     Text("Aggiungi tag richiesto")
                 }
             }
@@ -240,18 +285,55 @@ fun AddRequestScreen(
                     enabled = isFormValid,
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    Icon(Icons.Default.Send, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
                     Text("Crea Richiesta")
                 }
 
                 if (!isFormValid) {
                     Text(
-                        "Compila tutti i campi obbligatori (*)",
+                        "Compila tutti i campi obbligatori (*) e assicurati che la data sia valida",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
             }
+        }
+    }
+
+    // DatePicker Dialog
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val selectedDate = java.time.Instant.ofEpochMilli(millis)
+                                .atZone(java.time.ZoneId.systemDefault())
+                                .toLocalDate()
+
+                            if (selectedDate.isBefore(LocalDate.now())) {
+                                // Non fare nulla se la data è passata
+                                return@TextButton
+                            }
+
+                            viewModel.onScheduledDateChange(selectedDate)
+                        }
+                        showDatePicker = false
+                    }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Annulla")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
         }
     }
 
@@ -274,7 +356,7 @@ fun AddRequestScreen(
         )
     }
 
-    // Dialog per selezione tag (cambiato da badge)
+    // Dialog per selezione tag
     if (showTagDialog) {
         AlertDialog(
             onDismissRequest = { showTagDialog = false },

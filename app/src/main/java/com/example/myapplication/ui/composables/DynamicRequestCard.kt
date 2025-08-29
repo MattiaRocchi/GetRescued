@@ -4,9 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Label
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.data.database.Request
+import com.example.myapplication.data.database.Tags
 import com.example.myapplication.ui.theme.DifficulTask
 import com.example.myapplication.ui.theme.EasyTask
 import com.example.myapplication.ui.theme.MediumTask
@@ -22,13 +26,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * Card condivisa per visualizzare una richiesta con colori dinamici
+ * Card condivisa per visualizzare una richiesta con colori dinamici e supporto tags
  */
 @Composable
 fun DynamicRequestCard(
     request: Request,
+    tags: List<Tags> = emptyList(),
     onClick: () -> Unit,
-    currentUserId: Int = -1 // Aggiungiamo il parametro per l'ID utente corrente
+    currentUserId: Int = -1
 ) {
     val backgroundColor = when (request.difficulty) {
         "Bassa" -> EasyTask
@@ -101,11 +106,104 @@ fun DynamicRequestCard(
                 )
 
                 request.place?.let { place ->
-                    Text(
-                        text = "📍 $place",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.LocationOn,
+                            contentDescription = "Posizione",
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = place,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                // Data di svolgimento prevista
+                request.scheduledDate.let { scheduledDate ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Schedule,
+                            contentDescription = "Data prevista",
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "Prevista: ${SimpleDateFormat("dd/MM/yy", Locale.getDefault()).format(Date(scheduledDate))}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                // Tag richiesti - MIGLIORATO
+                if (tags.isNotEmpty()) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Label,
+                                contentDescription = "Tag richiesti",
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "Tag richiesti:",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            items(tags.take(5)) { tag -> // Mostra fino a 5 tag
+                                AssistChip(
+                                    onClick = { },
+                                    label = {
+                                        Text(
+                                            text = tag.name,
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
+                                    },
+                                    modifier = Modifier.height(24.dp),
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Tag,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(12.dp)
+                                        )
+                                    }
+                                )
+                            }
+                            if (tags.size > 5) {
+                                item {
+                                    AssistChip(
+                                        onClick = { },
+                                        label = {
+                                            Text(
+                                                text = "+${tags.size - 5}",
+                                                style = MaterialTheme.typography.labelSmall
+                                            )
+                                        },
+                                        modifier = Modifier.height(24.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
                 Row(
@@ -117,23 +215,44 @@ fun DynamicRequestCard(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "👥 ${request.rescuers.size}/${request.peopleRequired}",
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.Medium
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Group,
+                                contentDescription = "Persone",
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Text(
+                                text = "${request.rescuers.size}/${request.peopleRequired}",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
 
                         if (isCompleted) {
                             Surface(
                                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                                 shape = RoundedCornerShape(8.dp)
                             ) {
-                                Text(
-                                    text = "✓ Completo",
+                                Row(
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.CheckCircle,
+                                        contentDescription = "Completo",
+                                        modifier = Modifier.size(12.dp),
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                    Text(
+                                        text = "Completo",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
                             }
                         }
                     }
@@ -141,8 +260,8 @@ fun DynamicRequestCard(
                     // Data di creazione
                     Text(
                         text = remember(request.date) {
-                            java.text.SimpleDateFormat("dd/MM/yy", java.util.Locale.getDefault())
-                                .format(java.util.Date(request.date))
+                            SimpleDateFormat("dd/MM/yy", Locale.getDefault())
+                                .format(Date(request.date))
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -155,13 +274,24 @@ fun DynamicRequestCard(
                         color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f),
                         shape = RoundedCornerShape(6.dp)
                     ) {
-                        Text(
-                            text = "👤 Creata da te",
+                        Row(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.Medium
-                        )
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Person,
+                                contentDescription = "Creata da te",
+                                modifier = Modifier.size(12.dp),
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Creata da te",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
             }
@@ -170,63 +300,7 @@ fun DynamicRequestCard(
 }
 
 /**
- * Chip per mostrare la difficoltà con colori dinamici
- */
-@Composable
-fun DifficultyChip(
-    difficulty: String,
-    backgroundColor: Color,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        color = backgroundColor.copy(alpha = 0.2f),
-        shape = RoundedCornerShape(12.dp),
-        modifier = modifier
-    ) {
-        Text(
-            text = difficulty,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Medium
-        )
-    }
-}
-
-/**
- * Chip per mostrare che la richiesta è completa
- */
-@Composable
-fun CompletedChip() {
-    Surface(
-        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Text(
-            text = "✓ Completo",
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.primary
-        )
-    }
-}
-
-/**
- * Testo formattato per la data
- */
-@Composable
-fun DateText(date: Long) {
-    Text(
-        text = remember(date) {
-            SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-                .format(Date(date))
-        },
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-}
-
-/**
- * Filtro per le richieste
+ * Filtro completo per le richieste con tutti i parametri richiesti
  */
 @Composable
 fun RequestFilter(
@@ -234,8 +308,13 @@ fun RequestFilter(
     onSearchQueryChange: (String) -> Unit,
     selectedDifficulty: String?,
     onDifficultyChange: (String?) -> Unit,
+    selectedTags: List<Tags>,
+    onTagsChange: (List<Tags>) -> Unit,
+    availableTags: List<Tags>,
     sortByDate: Boolean,
     onSortByDateChange: (Boolean) -> Unit,
+    hideMyRequests: Boolean,
+    onHideMyRequestsChange: (Boolean) -> Unit,
     showFilters: Boolean,
     onToggleFilters: () -> Unit,
     modifier: Modifier = Modifier
@@ -251,14 +330,14 @@ fun RequestFilter(
                 label = { Text("Cerca richieste...") },
                 leadingIcon = {
                     Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Default.Search,
+                        imageVector = Icons.Default.Search,
                         contentDescription = "Cerca"
                     )
                 },
                 trailingIcon = {
                     IconButton(onClick = onToggleFilters) {
                         Icon(
-                            imageVector = androidx.compose.material.icons.Icons.Default.FilterList,
+                            imageVector = Icons.Default.FilterList,
                             contentDescription = "Filtri"
                         )
                     }
@@ -300,6 +379,53 @@ fun RequestFilter(
                         )
                     )
                 }
+
+                Spacer(Modifier.height(8.dp))
+
+                // Filtro tag
+                Text("Tag richiesti:", style = MaterialTheme.typography.labelMedium)
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(vertical = 4.dp)
+                ) {
+                    items(availableTags) { tag ->
+                        FilterChip(
+                            onClick = {
+                                val newTags = if (tag in selectedTags) {
+                                    selectedTags - tag
+                                } else {
+                                    selectedTags + tag
+                                }
+                                onTagsChange(newTags)
+                            },
+                            label = { Text(tag.name) },
+                            selected = tag in selectedTags,
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Tag,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(12.dp)
+                                )
+                            }
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                // Filtro per nascondere le proprie richieste
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Checkbox(
+                        checked = hideMyRequests,
+                        onCheckedChange = onHideMyRequestsChange
+                    )
+                    Text("Nascondi le mie richieste", style = MaterialTheme.typography.bodyMedium)
+                }
+
+                Spacer(Modifier.height(8.dp))
 
                 // Ordinamento per data
                 Text("Ordinamento:", style = MaterialTheme.typography.labelMedium)
