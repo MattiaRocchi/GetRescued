@@ -26,12 +26,12 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * Card condivisa per visualizzare una richiesta con colori dinamici
+ * Card condivisa per visualizzare una richiesta con colori dinamici e supporto tags
  */
 @Composable
 fun DynamicRequestCard(
     request: Request,
-    tags: List<Tags> = emptyList(), // NUOVO PARAMETRO
+    tags: List<Tags> = emptyList(),
     onClick: () -> Unit,
     currentUserId: Int = -1
 ) {
@@ -124,7 +124,7 @@ fun DynamicRequestCard(
                     }
                 }
 
-                // NUOVO: Data di svolgimento prevista
+                // Data di svolgimento prevista
                 request.scheduledDate.let { scheduledDate ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -144,23 +144,32 @@ fun DynamicRequestCard(
                     }
                 }
 
-                // NUOVO: Tag richiesti
+                // Tag richiesti - MIGLIORATO
                 if (tags.isNotEmpty()) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Label,
-                            contentDescription = "Tag richiesti",
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        LazyRow(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            modifier = Modifier.weight(1f)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            items(tags.take(3)) { tag -> // Mostra solo i primi 3 per risparmiare spazio
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Label,
+                                contentDescription = "Tag richiesti",
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "Tag richiesti:",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            items(tags.take(5)) { tag -> // Mostra fino a 5 tag
                                 AssistChip(
                                     onClick = { },
                                     label = {
@@ -169,16 +178,23 @@ fun DynamicRequestCard(
                                             style = MaterialTheme.typography.labelSmall
                                         )
                                     },
-                                    modifier = Modifier.height(24.dp)
+                                    modifier = Modifier.height(24.dp),
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Tag,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(12.dp)
+                                        )
+                                    }
                                 )
                             }
-                            if (tags.size > 3) {
+                            if (tags.size > 5) {
                                 item {
                                     AssistChip(
                                         onClick = { },
                                         label = {
                                             Text(
-                                                text = "+${tags.size - 3}",
+                                                text = "+${tags.size - 5}",
                                                 style = MaterialTheme.typography.labelSmall
                                             )
                                         },
@@ -284,7 +300,7 @@ fun DynamicRequestCard(
 }
 
 /**
- * Filtro aggiornato per le richieste con supporto tag
+ * Filtro completo per le richieste con tutti i parametri richiesti
  */
 @Composable
 fun RequestFilter(
@@ -297,8 +313,8 @@ fun RequestFilter(
     availableTags: List<Tags>,
     sortByDate: Boolean,
     onSortByDateChange: (Boolean) -> Unit,
-    hideMyRequests: Boolean, // NUOVO
-    onHideMyRequestsChange: (Boolean) -> Unit, // NUOVO
+    hideMyRequests: Boolean,
+    onHideMyRequestsChange: (Boolean) -> Unit,
     showFilters: Boolean,
     onToggleFilters: () -> Unit,
     modifier: Modifier = Modifier
@@ -366,7 +382,7 @@ fun RequestFilter(
 
                 Spacer(Modifier.height(8.dp))
 
-                // NUOVO: Filtro tag
+                // Filtro tag
                 Text("Tag richiesti:", style = MaterialTheme.typography.labelMedium)
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -383,14 +399,21 @@ fun RequestFilter(
                                 onTagsChange(newTags)
                             },
                             label = { Text(tag.name) },
-                            selected = tag in selectedTags
+                            selected = tag in selectedTags,
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Tag,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(12.dp)
+                                )
+                            }
                         )
                     }
                 }
 
                 Spacer(Modifier.height(8.dp))
 
-                // NUOVO: Filtro per nascondere le proprie richieste
+                // Filtro per nascondere le proprie richieste
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)

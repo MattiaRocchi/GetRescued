@@ -98,7 +98,10 @@ interface UserDao {
 @Dao
 interface RequestDao {
     @Insert
-    suspend fun insert(request: Request)
+    suspend fun insert(request: Request): Long
+
+    @Insert
+    suspend fun insertAndGetId(request: Request): Long
 
     @Query("SELECT * FROM Request WHERE id in (:requestId) LIMIT 1")
     suspend fun getRequestById(requestId: Int): List<Request>
@@ -140,6 +143,13 @@ interface RequestDao {
         AND scheduledDate < :todayEndMillis
     """)
     fun getRequestsScheduledForToday(todayStartMillis: Long, todayEndMillis: Long): Flow<List<Request>>
+
+    @Query("""
+    SELECT * FROM Request 
+    WHERE completed = 0 
+    AND scheduledDate < :currentDateMillis
+""")
+    suspend fun getExpiredRequests(currentDateMillis: Long): List<Request>
 
     // Query per ottenere le richieste future (non scadute)
     @Query("""

@@ -8,8 +8,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.automirrored.filled.Label
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +23,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import openAddressInMaps
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +33,7 @@ fun InfoRequestScreen(
     viewModel: InfoRequestViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val requestTags by viewModel.requestTags.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
@@ -83,9 +86,6 @@ fun InfoRequestScreen(
                             "${creator.name} ${creator.surname}"
                         }
                     }
-
-                    // DEBUG: Log dello stato
-                    println("DEBUG InfoRequest UI - isCreator: ${state.isCreator}, isParticipating: ${state.isParticipating}, isFull: ${state.isFull}")
 
                     Column(
                         modifier = Modifier
@@ -140,6 +140,12 @@ fun InfoRequestScreen(
                                     Text("🤝 Partecipanti: ${r.rescuers.size}", style = MaterialTheme.typography.bodyMedium)
                                 }
 
+                                // Data di svolgimento prevista
+                                Text(
+                                    text = "📅 Data prevista: ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(r.scheduledDate))}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+
                                 // Posizione con bottone Maps
                                 r.place?.let { place ->
                                     Row(
@@ -174,6 +180,50 @@ fun InfoRequestScreen(
                             }
                         }
 
+                        // NUOVO: Sezione tag richiesti
+                        if (requestTags.isNotEmpty()) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                elevation = CardDefaults.cardElevation(4.dp)
+                            ) {
+                                Column(Modifier.padding(16.dp)) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Filled.Label,
+                                            contentDescription = "Tag richiesti",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                        Text(
+                                            "Tag richiesti",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                    Spacer(Modifier.height(8.dp))
+                                    LazyRow(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        items(requestTags) { tag ->
+                                            AssistChip(
+                                                onClick = { },
+                                                label = { Text(tag.name) },
+                                                leadingIcon = {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Tag,
+                                                        contentDescription = null,
+                                                        modifier = Modifier.size(16.dp)
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         // Sezione foto (se presenti)
                         if (r.fotos.isNotEmpty()) {
                             Card(
@@ -189,7 +239,7 @@ fun InfoRequestScreen(
                                     Spacer(Modifier.height(8.dp))
                                     LazyRow(
                                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        modifier = Modifier.height(120.dp) // Altezza fissa per evitare problemi
+                                        modifier = Modifier.height(120.dp)
                                     ) {
                                         items(r.fotos) { photoUri ->
                                             AsyncImage(
@@ -209,7 +259,7 @@ fun InfoRequestScreen(
                         // Spazio prima dei pulsanti
                         Spacer(Modifier.height(24.dp))
 
-                        // Pulsanti di azione con DEBUG
+                        // Pulsanti di azione
                         when {
                             state.isCreator -> {
                                 Card(

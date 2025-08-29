@@ -35,27 +35,61 @@ data class Request(
     @ColumnInfo(name = "scheduledDate") val scheduledDate: Long,
     @ColumnInfo(name= "completed") var completed: Boolean=false,
 ){
-    // Utility functions per gestire le date
+    // Utility functions per gestire le date e stati
     fun isScheduledForToday(): Boolean {
-        val today = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-        val scheduled = LocalDate.ofEpochDay(scheduledDate / (24 * 60 * 60 * 1000))
-            .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-        val tomorrow = today + (24 * 60 * 60 * 1000)
-        return scheduled >= today && scheduled < tomorrow
+        val today = LocalDate.now()
+        val scheduled = java.time.Instant.ofEpochMilli(scheduledDate)
+            .atZone(java.time.ZoneId.systemDefault())
+            .toLocalDate()
+        return scheduled == today
+    }
+
+    fun isScheduledForTomorrow(): Boolean {
+        val tomorrow = LocalDate.now().plusDays(1)
+        val scheduled = java.time.Instant.ofEpochMilli(scheduledDate)
+            .atZone(java.time.ZoneId.systemDefault())
+            .toLocalDate()
+        return scheduled == tomorrow
     }
 
     fun isScheduledInPast(): Boolean {
-        val today = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-        val scheduled = LocalDate.ofEpochDay(scheduledDate / (24 * 60 * 60 * 1000))
-            .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-        return scheduled < today
+        val today = LocalDate.now()
+        val scheduled = java.time.Instant.ofEpochMilli(scheduledDate)
+            .atZone(java.time.ZoneId.systemDefault())
+            .toLocalDate()
+        return scheduled.isBefore(today)
     }
 
     fun canBeDeleted(): Boolean {
-        val tomorrow = LocalDate.now().plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-        val scheduled = LocalDate.ofEpochDay(scheduledDate / (24 * 60 * 60 * 1000))
-            .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-        return scheduled >= tomorrow
+        // Può essere eliminata solo se è programmata per dopo domani
+        val tomorrow = LocalDate.now().plusDays(1)
+        val scheduled = java.time.Instant.ofEpochMilli(scheduledDate)
+            .atZone(java.time.ZoneId.systemDefault())
+            .toLocalDate()
+        return scheduled.isAfter(tomorrow)
+    }
+
+    fun canBeModified(): Boolean {
+        // Può essere modificata solo se è programmata per dopo domani
+        return canBeDeleted()
+    }
+
+    fun getRequestState(): String {
+        return when {
+            isScheduledInPast() -> "Scaduta"
+            isScheduledForToday() -> "In corso"
+            isScheduledForTomorrow() -> "In preparazione"
+            else -> "Programmata"
+        }
+    }
+
+    fun getAvailableActions(): List<String> {
+        return when {
+            isScheduledInPast() -> listOf("complete")
+            isScheduledForToday() -> listOf("complete")
+            isScheduledForTomorrow() -> emptyList()
+            else -> listOf("edit", "delete", "manage_participants")
+        }
     }
 }
 

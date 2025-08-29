@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.PendingRequest
 import com.example.myapplication.data.database.Request
+import com.example.myapplication.data.database.Tags
 import com.example.myapplication.data.database.UserWithInfo
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
+import com.example.myapplication.data.repositories.TagsRepository
 import com.example.myapplication.data.repositories.UserDaoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -16,6 +18,7 @@ class InfoRequestViewModel(
     private val requestRepository: RequestDaoRepository,
     private val userDaoRepository: UserDaoRepository,
     private val settingsRepository: SettingsRepository,
+    private val tagsRepository: TagsRepository,
     private val requestId: Int // Ora iniettato da Koin con parametersOf
 ) : ViewModel() {
 
@@ -39,6 +42,10 @@ class InfoRequestViewModel(
     private val userIdFlow: Flow<Int> = settingsRepository.userIdFlow
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
+    // NUOVO: StateFlow per i tags della richiesta
+    private val _requestTags = MutableStateFlow<List<Tags>>(emptyList())
+    val requestTags: StateFlow<List<Tags>> = _requestTags.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -99,6 +106,17 @@ class InfoRequestViewModel(
                     }
                 }
         }
+
+        // NUOVO: Carica i tags della richiesta
+        viewModelScope.launch {
+            try {
+                val tags = tagsRepository.getTagsForRequest(requestId)
+                _requestTags.value = tags
+            } catch (e: Exception) {
+                _events.tryEmit("Errore nel caricamento dei tags")
+                _requestTags.value = emptyList()
+            }
+        }
     }
 
     fun participate() {
@@ -152,7 +170,7 @@ class InfoRequestViewModel(
             }
 
             val uid = userIdFlow.first()
-            if (uid <= 0) { // Cambiato da -1 a <= 0
+            if (uid <= 0) {
                 _events.emit("Devi effettuare il login")
                 return@launch
             }
