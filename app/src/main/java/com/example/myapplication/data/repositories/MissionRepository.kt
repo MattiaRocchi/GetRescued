@@ -78,4 +78,43 @@ class MissionRepository(private val missionDao: MissionDao) {
     }
 
     suspend fun getMissionTitleById(missionId: Int): Int? = missionDao.getMissionBadgeId(missionId)
+
+    suspend fun updateMissionsForCompletedRequest(userId: Int, requestTags: List<String>) {
+        try {
+            // Ottieni tutte le missioni generali attive dell'utente
+            val generalMissions = userMissionsGeneral(userId)
+            for (mission in generalMissions) {
+                // Controlla se il tag della missione corrisponde a uno dei tag della richiesta
+                if (requestTags.contains(mission.tag)) {
+                    updateGeneralMissionUser(mission.id, userId)
+                }
+            }
+
+            // Ottieni tutte le missioni settimanali attive dell'utente
+            val weeklyMissions = userMissionsWeekly(userId)
+            for (mission in weeklyMissions) {
+                // Controlla se il tag della missione corrisponde a uno dei tag della richiesta
+                if (requestTags.contains(mission.tag)) {
+                    updateWeeklyMissionUser(mission.id, userId)
+                }
+            }
+        } catch (e: Exception) {
+            // Log error but don't throw to avoid breaking the completion flow
+            println("Error updating missions for completed request: ${e.message}")
+        }
+    }
+
+    suspend fun addExperienceForCompletedRequest(userId: Int, difficulty: String) {
+        try {
+            val expToAdd = when (difficulty) {
+                "Bassa" -> 25
+                "Media" -> 35
+                "Alta" -> 50
+                else -> 25 // Default fallback
+            }
+            missionDao.addUserExp(userId, expToAdd)
+        } catch (e: Exception) {
+            println("Error adding experience: ${e.message}")
+        }
+    }
 }

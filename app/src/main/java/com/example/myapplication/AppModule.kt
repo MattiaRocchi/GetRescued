@@ -119,7 +119,6 @@ val appModule = module {
     viewModel { LoginViewModel(get(), get()) }
     viewModel { AddRequestViewModel(get(), get(), get()) } // get() → RequestDaoRepository
     viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository
-    viewModel { RequestsViewModel(get()) }
     viewModel { ProfileViewModel(get(), get(), get(), get()) }
     viewModel { UserRequestListViewModel(get(), get()) }
     viewModel { ChangeProfileViewModel(get(), get()) }
@@ -129,13 +128,13 @@ val appModule = module {
 
     //Neccessitano l'id
     viewModel { (requestId: Int) ->
-        InfoRequestViewModel(get(), get(),get(), requestId)
+        InfoRequestViewModel(get(), get(),get(),get(), requestId)
     }
     viewModel { (requestId: Int) ->
         EditRequestViewModel(get(), get(), requestId)
     }
     viewModel { (requestId: Int) ->
-        ManageRequestViewModel(get(), get(), get(), requestId)
+        ManageRequestViewModel(get(), get(), get(), get(), get(), requestId)
     }
 
 }

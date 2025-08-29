@@ -57,10 +57,10 @@ fun ManageRequest(
                     }
                 },
                 actions = {
-                    // Bottone per modificare la richiesta (solo se non è scaduta)
+                    // Bottone per modificare la richiesta (solo se può essere modificata)
                     if (uiState is ManageRequestViewModel.UiState.Ready) {
                         val state = uiState as ManageRequestViewModel.UiState.Ready
-                        if (!state.isExpired) {
+                        if (state.canEdit) {
                             IconButton(
                                 onClick = {
                                     navController.navigate(
@@ -153,25 +153,30 @@ fun ManageRequest(
                                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                         // Badge stato
                                         Surface(
-                                            color = when {
-                                                state.isExpired -> MaterialTheme.colorScheme.errorContainer
-                                                state.canMarkCompleted -> MaterialTheme.colorScheme.secondaryContainer
-                                                else -> MaterialTheme.colorScheme.primaryContainer
+                                            color = when (state.requestState) {
+                                                "Scaduta" -> MaterialTheme.colorScheme.errorContainer
+                                                "In corso" -> MaterialTheme.colorScheme.secondaryContainer
+                                                "In preparazione" -> MaterialTheme.colorScheme.tertiaryContainer
+                                                "Programmata" -> MaterialTheme.colorScheme.primaryContainer
+                                                else -> MaterialTheme.colorScheme.surfaceVariant
                                             },
                                             shape = RoundedCornerShape(12.dp)
                                         ) {
                                             Text(
-                                                text = when {
-                                                    state.isExpired -> "Scaduta"
-                                                    state.canMarkCompleted -> "In corso"
-                                                    else -> "Programmata"
-                                                },
+                                                text = state.requestState,
                                                 modifier = Modifier.padding(
                                                     horizontal = 8.dp,
                                                     vertical = 4.dp
                                                 ),
                                                 style = MaterialTheme.typography.labelMedium,
-                                                fontWeight = FontWeight.Medium
+                                                fontWeight = FontWeight.Medium,
+                                                color = when (state.requestState) {
+                                                    "Scaduta" -> MaterialTheme.colorScheme.onErrorContainer
+                                                    "In corso" -> MaterialTheme.colorScheme.onSecondaryContainer
+                                                    "In preparazione" -> MaterialTheme.colorScheme.onTertiaryContainer
+                                                    "Programmata" -> MaterialTheme.colorScheme.onPrimaryContainer
+                                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
+                                                }
                                             )
                                         }
 
@@ -283,6 +288,47 @@ fun ManageRequest(
 
                                 Text("📝 Descrizione:", style = MaterialTheme.typography.titleSmall)
                                 Text(r.description, style = MaterialTheme.typography.bodyMedium)
+
+                                if (state.requestTags.isNotEmpty()) {
+                                    HorizontalDivider()
+
+                                    Text(
+                                        "🏷️ Tag richiesti:",
+                                        style = MaterialTheme.typography.titleSmall
+                                    )
+
+                                    @OptIn(ExperimentalLayoutApi::class)
+                                    FlowRow(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        state.requestTags.forEach { tag ->
+                                            Surface(
+                                                color = MaterialTheme.colorScheme.primaryContainer,
+                                                shape = RoundedCornerShape(8.dp)
+                                            ) {
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.Tag,
+                                                        contentDescription = "Tag",
+                                                        modifier = Modifier.size(14.dp),
+                                                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                                    )
+                                                    Spacer(Modifier.width(4.dp))
+                                                    Text(
+                                                        text = tag.name,
+                                                        style = MaterialTheme.typography.labelMedium,
+                                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -303,75 +349,77 @@ fun ManageRequest(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    // Pulsante elimina (solo se può essere eliminata)
-                                    if (state.canDelete) {
-                                        OutlinedButton(
-                                            onClick = { showDeleteDialog = true },
-                                            colors = ButtonDefaults.outlinedButtonColors(
-                                                contentColor = MaterialTheme.colorScheme.error
-                                            ),
-                                            modifier = Modifier.weight(1f)
-                                        ) {
-                                            Icon(
-                                                Icons.Default.Delete,
-                                                contentDescription = "Elimina",
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                            Spacer(Modifier.width(4.dp))
-                                            Text("Elimina")
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        // Pulsante elimina (solo se può essere eliminata)
+                                        if (state.canDelete) {
+                                            OutlinedButton(
+                                                onClick = { showDeleteDialog = true },
+                                                colors = ButtonDefaults.outlinedButtonColors(
+                                                    contentColor = MaterialTheme.colorScheme.error
+                                                ),
+                                                modifier = Modifier.weight(1f)
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.Delete,
+                                                    contentDescription = "Elimina",
+                                                    modifier = Modifier.size(18.dp)
+                                                )
+                                                Spacer(Modifier.width(4.dp))
+                                                Text("Elimina")
+                                            }
                                         }
-                                    }
 
-                                    // Pulsante completa (solo se può essere completata)
-                                    if (state.canMarkCompleted || state.isExpired) {
-                                        Button(
-                                            onClick = { showCompleteDialog = true },
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = MaterialTheme.colorScheme.secondary
-                                            ),
-                                            modifier = Modifier.weight(1f)
-                                        ) {
-                                            Icon(
-                                                Icons.Default.CheckCircle,
-                                                contentDescription = "Completa",
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                            Spacer(Modifier.width(4.dp))
-                                            Text("Completa")
+                                        // Pulsante completa (solo se può essere completata)
+                                        if (state.canMarkCompleted) {
+                                            Button(
+                                                onClick = { showCompleteDialog = true },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = MaterialTheme.colorScheme.secondary
+                                                ),
+                                                modifier = Modifier.weight(1f)
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.CheckCircle,
+                                                    contentDescription = "Completa",
+                                                    modifier = Modifier.size(18.dp)
+                                                )
+                                                Spacer(Modifier.width(4.dp))
+                                                Text("Completa")
+                                            }
                                         }
                                     }
                                 }
 
-                                // Messaggi informativi
+                                //Messaggi informativi:
                                 Spacer(Modifier.height(8.dp))
-                                when {
-                                    state.isExpired -> {
+                                when (state.requestState) {
+                                    "Scaduta" -> {
                                         Text(
-                                            "⚠️ La richiesta è scaduta. Puoi solo contrassegnarla come completata.",
+                                            "⚠️ La richiesta è scaduta. Verrà completata automaticamente.",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.error
                                         )
                                     }
-
-                                    state.canMarkCompleted -> {
+                                    "In corso" -> {
                                         Text(
-                                            "📅 La richiesta è programmata per oggi. Puoi contrassegnarla come completata.",
+                                            "▶️ La richiesta è in corso oggi. Puoi contrassegnarla come completata.",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.secondary
                                         )
                                     }
-
-                                    state.canDelete -> {
+                                    "In preparazione" -> {
                                         Text(
-                                            "🗑️ Puoi eliminare la richiesta fino al giorno prima della data di svolgimento.",
+                                            "⏳ La richiesta è in preparazione per domani. Nessuna azione disponibile.",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
-
-                                    else -> {
+                                    "Programmata" -> {
                                         Text(
-                                            "⏳ La richiesta è troppo vicina alla data di svolgimento per essere eliminata.",
+                                            "📅 Puoi modificare, eliminare la richiesta o gestire i partecipanti.",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
