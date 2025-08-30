@@ -22,8 +22,6 @@ class MusicService : Service() {
         when (action) {
             ACTION_START, null -> {
                 if (mediaPlayer == null) {
-                    // assuming raw/background_music exists
-                    //TODO Inserire la backgroung music
                     mediaPlayer = MediaPlayer.create(this, com.example.myapplication.R.raw.background_music)
                     mediaPlayer?.isLooping = true
                     mediaPlayer?.setVolume(0.5f, 0.5f)
