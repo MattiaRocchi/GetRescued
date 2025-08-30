@@ -435,14 +435,16 @@ interface TagDao {
 
     // Controlla se l'utente ha tutti i tag richiesti per una richiesta
     @Query("""
-        SELECT CASE 
-            WHEN COUNT(DISTINCT tr.idTags) = 
-                 COUNT(DISTINCT CASE WHEN tu.idUser = :userId THEN tr.idTags END)
-            THEN 1 ELSE 0 END
-        FROM TagsRequest tr
-        LEFT JOIN TagsUser tu ON tr.idTags = tu.idTags AND tu.idUser = :userId
-        WHERE tr.idRequest = :requestId
-    """)
+    SELECT CASE 
+        WHEN EXISTS (
+            SELECT 1
+            FROM TagsRequest tr
+            JOIN TagsUser tu ON tr.idTags = tu.idTags
+            WHERE tr.idRequest = :requestId
+              AND tu.idUser = :userId
+        ) THEN 1 ELSE 0 
+    END
+""")
     suspend fun userHasRequiredTags(userId: Int, requestId: Int): Boolean
 
     // Request tags - NUOVO
