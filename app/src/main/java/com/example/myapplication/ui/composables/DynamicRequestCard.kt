@@ -120,12 +120,10 @@ fun DynamicRequestCard(
                             Icons.Default.LocationOn,
                             contentDescription = "Posizione",
                             modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = place,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -140,12 +138,10 @@ fun DynamicRequestCard(
                             Icons.Default.Schedule,
                             contentDescription = "Data prevista",
                             modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "Prevista: ${SimpleDateFormat("dd/MM/yy", Locale.getDefault()).format(Date(scheduledDate))}",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -163,12 +159,10 @@ fun DynamicRequestCard(
                                 imageVector = Icons.AutoMirrored.Filled.Label,
                                 contentDescription = "Tag richiesti",
                                 modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
                                 text = "Tag richiesti:",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -270,7 +264,6 @@ fun DynamicRequestCard(
                                 .format(Date(request.date))
                         },
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 

@@ -57,11 +57,11 @@ fun EmailTextField(
         isError = emailError,
         modifier = modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            focusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            cursorColor = MaterialTheme.colorScheme.onSecondaryContainer
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            unfocusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            cursorColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
     )
     if (emailError) {
@@ -87,11 +87,11 @@ fun PasswordTextField(
         isError = passwordError,
         modifier = modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            focusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            cursorColor = MaterialTheme.colorScheme.onSecondaryContainer
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            unfocusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            cursorColor = MaterialTheme.colorScheme.onPrimaryContainer
         ),
         visualTransformation = if (passwordVisible) VisualTransformation.None else
             PasswordVisualTransformation(),
@@ -181,32 +181,6 @@ fun AgeTextField(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         modifier = modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            focusedTextColor = MaterialTheme.colorScheme.onTertiaryContainer,
-            unfocusedTextColor = MaterialTheme.colorScheme.onTertiaryContainer,
-            cursorColor = MaterialTheme.colorScheme.onTertiaryContainer
-        )
-    )
-    if (ageError) Text("Inserisci un'età valida", color = MaterialTheme.colorScheme.error)
-}
-
-@Composable
-fun HabitationTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    habitationError: Boolean = false,
-    modifier: Modifier = Modifier
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = { onValueChange(it) },
-        label = { Text("Residenza (facoltativo)") },
-        isError = habitationError,
-        modifier = modifier.fillMaxWidth(),
-        singleLine = false,
-        maxLines = 2,
-        colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -214,12 +188,8 @@ fun HabitationTextField(
             cursorColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
     )
-    if (habitationError) {
-        Spacer(modifier = Modifier.height(4.dp))
-        Text("Inserisci un indirizzo valido", color = MaterialTheme.colorScheme.error)
-    }
+    if (ageError) Text("Inserisci un'età valida", color = MaterialTheme.colorScheme.error)
 }
-
 // -----------------------------
 // Phone number
 // -----------------------------
@@ -256,6 +226,6 @@ fun PhoneTextField(
 
 
 fun isValidPhoneNumber(phone: String): Boolean {
-    val regex = Regex("^(?:\\+39)?3\\d{8,9}$")
+    val regex = Regex("^(?:\\+39)?\\d{8,9}$")
     return regex.matches(phone)
 }

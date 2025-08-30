@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.inforequest
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -33,8 +34,7 @@ import java.util.*
 @Composable
 fun InfoRequestScreen(
     navController: NavController,
-    viewModel: InfoRequestViewModel,
-    tags: List<Tags> = emptyList()
+    viewModel: InfoRequestViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val requestTags by viewModel.requestTags.collectAsStateWithLifecycle()
@@ -64,7 +64,8 @@ fun InfoRequestScreen(
         Box(modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
-            .padding(16.dp)) {
+            .padding(16.dp)
+            .background(MaterialTheme.colorScheme.background)) {
 
             when (uiState) {
                 is InfoRequestViewModel.UiState.Loading -> {

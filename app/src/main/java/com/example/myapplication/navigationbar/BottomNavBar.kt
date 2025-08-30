@@ -1,4 +1,4 @@
-package com.example.myapplication.navigation
+package com.example.myapplication.navigationbar
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -10,8 +10,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.toRoute
-import com.example.myapplication.ui.GetRescuedRoute
 
 @Composable
 fun BottomNavBar(navController: NavController) {

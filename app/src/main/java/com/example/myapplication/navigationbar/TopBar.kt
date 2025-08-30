@@ -1,4 +1,4 @@
-package com.example.myapplication.navigation
+package com.example.myapplication.navigationbar
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row

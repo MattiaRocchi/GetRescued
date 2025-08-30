@@ -662,15 +662,13 @@ fun ManageRequest(
                                     "In preparazione" -> {
                                         Text(
                                             "⏳ La richiesta è in preparazione per domani. Nessuna azione disponibile.",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            style = MaterialTheme.typography.bodySmall
                                         )
                                     }
                                     "Programmata" -> {
                                         Text(
                                             "📅 Puoi modificare, eliminare la richiesta o gestire i partecipanti.",
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                 }
