@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.example.myapplication.ui.GetRescuedRoute
+import com.example.myapplication.ui.composables.LegendDialog
 import openAddressInMaps
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -41,6 +41,7 @@ fun ManageRequest(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showCompleteDialog by remember { mutableStateOf(false) }
     var showExpiredDialog by remember { mutableStateOf(false) }
+    var showStatusLegend by remember { mutableStateOf(false) }
 
     // Ascolta eventi one-shot e mostra snackbar
     LaunchedEffect(viewModel) {
@@ -79,6 +80,9 @@ fun ManageRequest(
                             ) {
                                 Icon(Icons.Default.Edit, contentDescription = "Modifica")
                             }
+                        }
+                        IconButton(onClick = { showStatusLegend = true }) {
+                            Icon(Icons.Default.Info, contentDescription = "Info stati")
                         }
                     }
                 }
@@ -752,6 +756,12 @@ fun ManageRequest(
                     Text("Conferma", color = MaterialTheme.colorScheme.primary)
                 }
             }
+        )
+    }
+    // Dialog per La legenda
+    if (showStatusLegend) {
+        LegendDialog(
+            onDismiss = { showStatusLegend = false }
         )
     }
 }

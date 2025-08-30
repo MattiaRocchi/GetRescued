@@ -85,7 +85,12 @@ class AddRequestViewModel(
     fun onTitleChange(v: String) { _title.value = v }
     fun onDescriptionChange(v: String) { _description.value = v }
     fun onLocationChange(v: String) { _location.value = v }
-    fun onPeopleRequiredChange(v: Int) { _peopleRequired.value = maxOf(1, v) }
+    fun onPeopleRequiredChange(v: Int) {
+        // Accetta solo valori positivi, altrimenti mantiene il valore attuale
+        if (v > 0) {
+            _peopleRequired.value = v
+        }
+    }
     fun onDifficultyChange(v: String) { _difficulty.value = v }
     fun onScheduledDateChange(date: LocalDate) {
         // Assicuriamoci che la data non sia nel passato

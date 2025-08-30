@@ -3,6 +3,7 @@ package com.example.myapplication.navigationbar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,10 +16,13 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.myapplication.R
 import com.example.myapplication.ui.GetRescuedRoute
 
@@ -27,7 +31,8 @@ import com.example.myapplication.ui.GetRescuedRoute
 fun GetRescuedTopBar(
     navController: NavController,
     profileImage: Painter? = null,
-    isUserLoggedIn: Boolean = false
+    isUserLoggedIn: Boolean = false,
+    userProfilePhoto: String? = null
 ) {
     TopAppBar(
         title = {
@@ -42,10 +47,17 @@ fun GetRescuedTopBar(
         },
         actions = {
             IconButton(onClick = { navController.navigate(GetRescuedRoute.Profile) }) {
-                Icon(
-                    painter = profileImage ?: painterResource(id = R.drawable.ic_profile_placeholder),
+                Image(
+                    painter = if (!userProfilePhoto.isNullOrEmpty()) {
+                        rememberAsyncImagePainter(userProfilePhoto)
+                    } else {
+                        profileImage ?: painterResource(id = R.drawable.ic_profile_placeholder)
+                    },
                     contentDescription = "Profilo utente",
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
             }
             // Mostra icona settings solo se loggato

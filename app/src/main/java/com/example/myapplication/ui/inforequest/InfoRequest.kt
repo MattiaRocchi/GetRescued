@@ -149,21 +149,43 @@ fun InfoRequestScreen(
 
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ){
-                                    Text(
-                                        text = "Email: $creatorEmail",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Email,
+                                            contentDescription = "Email",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text(
+                                            text = "Email: $creatorEmail",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
                                 }
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ){
-                                    Text(
-                                        text = "Phone: $creatorPhone",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Phone,
+                                            contentDescription = "Phone",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text(
+                                            text = "Phone: $creatorPhone",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
                                 }
 
                                 HorizontalDivider()
@@ -172,15 +194,45 @@ fun InfoRequestScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Text("👥 Persone richieste: ${r.peopleRequired}", style = MaterialTheme.typography.bodyMedium)
-                                    Text("🤝 Partecipanti: ${r.rescuers.size}", style = MaterialTheme.typography.bodyMedium)
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.People,
+                                            contentDescription = "Persone richieste",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text("Persone richieste: ${r.peopleRequired}", style = MaterialTheme.typography.bodyMedium)
+                                    }
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Handshake,
+                                            contentDescription = "Partecipanti",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text("Partecipanti: ${r.rescuers.size}", style = MaterialTheme.typography.bodyMedium)
+                                    }
                                 }
 
                                 // Data di svolgimento prevista
-                                Text(
-                                    text = "📅 Data prevista: ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(r.scheduledDate))}",
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.DateRange,
+                                        contentDescription = "Data prevista",
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Text(
+                                        text = "Data prevista: ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(r.scheduledDate))}",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
 
                                 // Posizione con bottone Maps
                                 r.place?.let { place ->
@@ -189,11 +241,21 @@ fun InfoRequestScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(
-                                            text = "📍 $place",
-                                            style = MaterialTheme.typography.bodyMedium,
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp),
                                             modifier = Modifier.weight(1f)
-                                        )
+                                        ) {
+                                            Icon(
+                                                Icons.Default.LocationOn,
+                                                contentDescription = "Posizione",
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Text(
+                                                text = place,
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                        }
                                         OutlinedButton(
                                             onClick = { openAddressInMaps(context, place) },
                                             modifier = Modifier.padding(start = 8.dp)
@@ -211,7 +273,17 @@ fun InfoRequestScreen(
 
                                 HorizontalDivider()
 
-                                Text("📝 Descrizione:", style = MaterialTheme.typography.titleSmall)
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Description,
+                                        contentDescription = "Descrizione",
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Text("Descrizione:", style = MaterialTheme.typography.titleSmall)
+                                }
                                 Text(r.description, style = MaterialTheme.typography.bodyMedium)
                             }
                         }
@@ -266,11 +338,21 @@ fun InfoRequestScreen(
                                 elevation = CardDefaults.cardElevation(4.dp)
                             ) {
                                 Column(Modifier.padding(16.dp)) {
-                                    Text(
-                                        "📷 Foto allegate",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium
-                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.PhotoCamera,
+                                            contentDescription = "Foto allegate",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text(
+                                            "Foto allegate",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
                                     Spacer(Modifier.height(8.dp))
                                     LazyRow(
                                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -302,14 +384,24 @@ fun InfoRequestScreen(
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                                     )
                                 ) {
-                                    Text(
-                                        "🎯 Sei il creatore di questa richiesta",
+                                    Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(16.dp),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Medium
-                                    )
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Star,
+                                            contentDescription = "Creatore",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text(
+                                            "Sei il creatore di questa richiesta",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
                                 }
                             }
 
@@ -320,14 +412,24 @@ fun InfoRequestScreen(
                                             containerColor = MaterialTheme.colorScheme.primaryContainer
                                         )
                                     ) {
-                                        Text(
-                                            "✅ Sei stato approvato per questa richiesta!",
+                                        Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(16.dp),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Medium
-                                        )
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Default.CheckCircle,
+                                                contentDescription = "Approvato",
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Text(
+                                                "Sei stato approvato per questa richiesta!",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        }
                                     }
 
                                     OutlinedButton(
@@ -337,7 +439,13 @@ fun InfoRequestScreen(
                                             contentColor = MaterialTheme.colorScheme.error
                                         )
                                     ) {
-                                        Text("🚪 Mi tiro indietro")
+                                        Icon(
+                                            Icons.Default.ExitToApp,
+                                            contentDescription = "Mi tiro indietro",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(Modifier.width(4.dp))
+                                        Text("Mi tiro indietro")
                                     }
                                 }
                             }
@@ -348,14 +456,24 @@ fun InfoRequestScreen(
                                         containerColor = MaterialTheme.colorScheme.secondaryContainer
                                     )
                                 ) {
-                                    Text(
-                                        "⏳ Richiesta di partecipazione inviata, attendi l'approvazione del creatore",
+                                    Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(16.dp),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Medium
-                                    )
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Schedule,
+                                            contentDescription = "In attesa",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text(
+                                            "Richiesta di partecipazione inviata, attendi l'approvazione del creatore",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
                                 }
                             }
 
@@ -365,21 +483,30 @@ fun InfoRequestScreen(
                                         containerColor = MaterialTheme.colorScheme.errorContainer
                                     )
                                 ) {
-                                    Text(
-                                        "🚫 Posti esauriti",
+                                    Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(16.dp),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Medium
-                                    )
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Block,
+                                            contentDescription = "Posti esauriti",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text(
+                                            "Posti esauriti",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
                                 }
                             }
 
                             else -> {
                                 val canUserParticipate by viewModel.canParticipate.collectAsStateWithLifecycle()
-
-                                if (canUserParticipate) {
+                                if (canUserParticipate || requestTags.isEmpty()) {
                                     Button(
                                         onClick = { viewModel.participate() },
                                         modifier = Modifier.fillMaxWidth(),
@@ -387,7 +514,13 @@ fun InfoRequestScreen(
                                             containerColor = MaterialTheme.colorScheme.primary
                                         )
                                     ) {
-                                        Text("🤝 Richiedi di partecipare")
+                                        Icon(
+                                            Icons.Default.Handshake,
+                                            contentDescription = "Richiedi di partecipare",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(Modifier.width(4.dp))
+                                        Text("Richiedi di partecipare")
                                     }
                                 } else {
                                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -402,12 +535,23 @@ fun InfoRequestScreen(
                                                     .padding(16.dp),
                                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                                             ) {
-                                                Text(
-                                                    "⚠️ Non puoi partecipare a questa richiesta",
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    fontWeight = FontWeight.Medium,
-                                                    color = MaterialTheme.colorScheme.onErrorContainer
-                                                )
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.Warning,
+                                                        contentDescription = "Avvertimento",
+                                                        modifier = Modifier.size(16.dp),
+                                                        tint = MaterialTheme.colorScheme.onErrorContainer
+                                                    )
+                                                    Text(
+                                                        "Non puoi partecipare a questa richiesta",
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        fontWeight = FontWeight.Medium,
+                                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                                    )
+                                                }
                                                 Text(
                                                     "Ti mancano alcuni tag richiesti. Aggiorna il tuo profilo per partecipare.",
                                                     style = MaterialTheme.typography.bodySmall,

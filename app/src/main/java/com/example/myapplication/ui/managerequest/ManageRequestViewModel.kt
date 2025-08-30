@@ -270,7 +270,7 @@ class ManageRequestViewModel(
             val tagNames = requestTags.map { it.name }
 
             // Aggiorna le missioni per tutti gli utenti che hanno partecipato
-            val allParticipants = request.rescuers + request.sender
+            val allParticipants = request.rescuers
 
             for (participantId in allParticipants) {
                 // Aggiorna le missioni per ogni partecipante

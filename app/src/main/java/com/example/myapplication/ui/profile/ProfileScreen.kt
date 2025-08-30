@@ -61,19 +61,19 @@ fun ProfileScreen(
     var showTagsDialog by remember { mutableStateOf(false) }
 
 
-    // 📂 Launcher per la galleria
+    //Launcher per la galleria
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
             if (user != null) {
-                viewModel.updateProfilePhoto(it.toString()) // ✅ salva nel DB
+                viewModel.updateProfilePhoto(it.toString()) //salva nel DB
             }
         }
     }
 
 
-    // 📸 Gestione permessi fotocamera
+    // Gestione permessi fotocamera
     val cameraPermissions = rememberMultiplePermissions(
         listOf(Manifest.permission.CAMERA)
     ) { statuses ->
@@ -94,22 +94,22 @@ fun ProfileScreen(
         }
     }
 
-    // 🔹 Se la camera è attiva → mostra overlay CameraCapture
+    // Se la camera è attiva → mostra overlay CameraCapture
     if (showCamera) {
         CameraCapture(
             onImageFile = { uri ->
                 if (user != null) {
-                    viewModel.updateProfilePhoto(uri.toString()) // ✅ salva nel DB
+                    viewModel.updateProfilePhoto(uri.toString()) // salva nel DB
                 }
                 showCamera = false
             },
-            onBack = { showCamera = false }, // 🔙 torna indietro senza scattare
+            onBack = { showCamera = false }, //torna indietro senza scattare
             modifier = Modifier.fillMaxSize()
         )
         return
     }
 
-    // 🔹 Schermata profilo normale
+    // Schermata profilo normale
     if (user == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("Caricamento profilo...")
@@ -173,7 +173,7 @@ fun ProfileScreen(
                 )
 
 
-            // 🔹 Abitazione (se disponibile)
+            // Abitazione (se disponibile)
 
                 Text(
                     text = "🏠 ${

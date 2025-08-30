@@ -9,6 +9,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.navigationbar.BottomNavBar
@@ -22,6 +25,8 @@ import org.koin.android.ext.android.get
 import kotlinx.coroutines.flow.first
 import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.ui.theme.GetRescuedTheme
+import com.example.myapplication.data.database.UserWithInfo
+import com.example.myapplication.data.repositories.UserDaoRepository
 import com.example.myapplication.utils.WeeklyMissionsScheduler
 import kotlinx.coroutines.launch
 
@@ -30,14 +35,15 @@ class MainActivity : ComponentActivity() {
     private lateinit var weeklyMissionsScheduler: WeeklyMissionsScheduler
     private var isMusicServiceRunning = false
     private lateinit var settingsRepository: SettingsRepository
+    private lateinit var userRepository: UserDaoRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         weeklyMissionsScheduler = WeeklyMissionsScheduler(this)
         // Inizializza il repository una sola volta
         settingsRepository = get<SettingsRepository>()
+        userRepository = get<UserDaoRepository>()
 
         setContent {
             GetRescuedTheme {
@@ -45,6 +51,7 @@ class MainActivity : ComponentActivity() {
 
                 val validUserId by settingsRepository.validUserFlow.collectAsState(initial = null)
                 val musicEnabled by settingsRepository.musicEnabledFlow.collectAsState(initial = true)
+                var currentUser by remember { mutableStateOf<UserWithInfo?>(null) }
 
                 val startDestination = if (validUserId != null) {
                     GetRescuedRoute.Profile
@@ -52,7 +59,36 @@ class MainActivity : ComponentActivity() {
                     GetRescuedRoute.Login
                 }
 
-                // 🎵 Gestione musica e schedulazione reattiva ai cambiamenti di stato
+                // Carica i dati dell'utente quando validUserId cambia e refresh periodico
+                LaunchedEffect(validUserId) {
+                    val userId = validUserId
+                    if (userId != null) {
+                        // Caricamento iniziale
+                        try {
+                            val userData = userRepository.getUserWithInfo(userId)
+                            currentUser = userData
+                        } catch (e: Exception) {
+                            currentUser = null
+                        }
+
+                        // Refresh periodico ogni 5 secondi quando l'utente è loggato
+                        while (true) {
+                            kotlinx.coroutines.delay(5000L)
+                            try {
+                                val refreshedData = userRepository.getUserWithInfo(userId)
+                                if (refreshedData?.profileFoto != currentUser?.profileFoto) {
+                                    currentUser = refreshedData
+                                }
+                            } catch (e: Exception) {
+                                // Ignora errori durante il refresh
+                            }
+                        }
+                    } else {
+                        currentUser = null
+                    }
+                }
+
+                //Gestione musica e schedulazione reattiva ai cambiamenti di stato
                 LaunchedEffect(validUserId, musicEnabled) {
                     val isLoggedIn = validUserId != null
 
@@ -65,14 +101,14 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-
                 Scaffold(
                     topBar = {
                         if (validUserId != null) {
                             GetRescuedTopBar(
                                 navController = navController,
                                 profileImage = painterResource(id = R.drawable.ic_profile_placeholder),
-                                true
+                                isUserLoggedIn = true,
+                                userProfilePhoto = currentUser?.profileFoto
                             )
                         }
                     },
@@ -116,7 +152,7 @@ class MainActivity : ComponentActivity() {
         stopMusicService()
     }
 
-    // 🎵 Metodi helper per gestire il servizio musica
+    //Metodi helper per gestire il servizio musica
     private fun startMusicIfNotRunning() {
         if (!isMusicServiceRunning) {
             val musicIntent = Intent(this, MusicService::class.java)

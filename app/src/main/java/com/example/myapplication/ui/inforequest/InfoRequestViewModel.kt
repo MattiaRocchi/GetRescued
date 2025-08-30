@@ -13,6 +13,7 @@ import com.example.myapplication.data.repositories.UserDaoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import android.util.Log
 
 class InfoRequestViewModel(
     private val requestRepository: RequestDaoRepository,
@@ -46,94 +47,144 @@ class InfoRequestViewModel(
     val canParticipate: StateFlow<Boolean> = _canParticipate.asStateFlow()
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    // NUOVO: StateFlow per i tags della richiesta
+    // StateFlow per i tags della richiesta
     private val _requestTags = MutableStateFlow<List<Tags>>(emptyList())
     val requestTags: StateFlow<List<Tags>> = _requestTags.asStateFlow()
 
     init {
+        // Carica tutto insieme aspettando che il creator sia disponibile
         viewModelScope.launch {
-            combine(requestFlow, userIdFlow) { req, uid ->
-                if (req == null) {
-                    UiState.NotFound
+            requestFlow.collect { request ->
+                if (request == null) {
+                    _uiState.value = UiState.NotFound
                 } else {
-                    val isValidUser = uid > 0
-                    val isCreator = isValidUser && uid == req.sender
-                    val isParticipating = isValidUser && uid in req.rescuers
-                    val isFull = req.rescuers.size >= req.peopleRequired
+                    try {
+                        // Carica il creator prima di emettere Ready
+                        val creator = userDaoRepository.getUserWithInfo(request.sender)
+                        val userId = userIdFlow.first()
 
-                    // Controlla se l'utente ha una richiesta pending
-                    val isPending = if (isValidUser && !isCreator && !isParticipating) {
-                        try {
-                            val pendingRequests =
-                                requestRepository.getPendingRequestsForRequest(req.id)
-                            pendingRequests.any { it.userId == uid }
-                        } catch (e: Exception) {
-                            false
-                        }
-                    } else false
+                        val isValidUser = userId > 0
+                        val isCreator = isValidUser && userId == request.sender
+                        val isParticipating = isValidUser && userId in request.rescuers
+                        val isFull = request.rescuers.size >= request.peopleRequired
 
-                    UiState.Ready(
-                        request = req,
-                        creator = null,
-                        isCreator = isCreator,
-                        isParticipating = isParticipating,
-                        isPending = isPending,
-                        isFull = isFull
-                    )
-                }
-            }
-                .distinctUntilChanged()
-                .collect { s -> _uiState.value = s }
-        }
-
-        // Carica informazioni del creatore
-        viewModelScope.launch {
-            requestFlow
-                .filterNotNull()
-                .collect { req ->
-                    launch(Dispatchers.IO) {
-                        try {
-                            val creator: UserWithInfo? =
-                                userDaoRepository.getUserWithInfo(req.sender)
-                            _uiState.update { current ->
-                                when (current) {
-                                    is UiState.Ready -> {
-                                        if (current.request.id == req.id) {
-                                            current.copy(creator = creator)
-                                        } else current
-                                    }
-
-                                    else -> current
-                                }
+                        // Controlla se l'utente ha una richiesta pending
+                        val isPending = if (isValidUser && !isCreator && !isParticipating) {
+                            try {
+                                val pendingRequests = requestRepository.getPendingRequestsForRequest(request.id)
+                                pendingRequests.any { it.userId == userId }
+                            } catch (e: Exception) {
+                                false
                             }
-                        } catch (t: Throwable) {
-                            _events.tryEmit("Impossibile caricare informazioni creatore")
-                        }
+                        } else false
+
+                        _uiState.value = UiState.Ready(
+                            request = request,
+                            creator = creator,
+                            isCreator = isCreator,
+                            isParticipating = isParticipating,
+                            isPending = isPending,
+                            isFull = isFull
+                        )
+
+                        // IMPORTANTE: Aggiorna canParticipate ogni volta che cambia lo stato
+                        updateCanParticipate(userId, isCreator, isParticipating, isPending, isFull)
+
+                    } catch (e: Exception) {
+                        // Se fallisce il caricamento del creator, emette Ready con creator = null
+                        val userId = userIdFlow.first()
+                        val isValidUser = userId > 0
+                        val isCreator = isValidUser && userId == request.sender
+                        val isParticipating = isValidUser && userId in request.rescuers
+                        val isFull = request.rescuers.size >= request.peopleRequired
+
+                        val isPending = if (isValidUser && !isCreator && !isParticipating) {
+                            try {
+                                val pendingRequests = requestRepository.getPendingRequestsForRequest(request.id)
+                                pendingRequests.any { it.userId == userId }
+                            } catch (ex: Exception) {
+                                false
+                            }
+                        } else false
+
+                        _uiState.value = UiState.Ready(
+                            request = request,
+                            creator = null,
+                            isCreator = isCreator,
+                            isParticipating = isParticipating,
+                            isPending = isPending,
+                            isFull = isFull
+                        )
+
+                        // IMPORTANTE: Aggiorna canParticipate anche in caso di errore
+                        updateCanParticipate(userId, isCreator, isParticipating, isPending, isFull)
+
+                        _events.tryEmit("Errore nel caricamento delle informazioni del creatore")
                     }
                 }
+            }
         }
 
-        // NUOVO: Carica i tags della richiesta
+        // Carica i tags della richiesta e li mantiene aggiornati
         viewModelScope.launch {
             try {
                 val tags = tagsRepository.getTagsForRequest(requestId)
                 _requestTags.value = tags
+                Log.d("InfoRequestVM", "Loaded request tags: ${tags.map { it.name }}")
             } catch (e: Exception) {
+                Log.e("InfoRequestVM", "Error loading request tags", e)
                 _events.tryEmit("Errore nel caricamento dei tags")
                 _requestTags.value = emptyList()
             }
         }
+    }
 
-        viewModelScope.launch {
-            try {
-                val userId = userIdFlow.first()
-                if (userId > 0) {
-                    val hasRequiredTags = tagsRepository.userHasRequiredTags(userId, requestId)
-                    _canParticipate.value = hasRequiredTags
-                }
-            } catch (e: Exception) {
+    // Funzione separata per aggiornare canParticipate
+    private suspend fun updateCanParticipate(
+        userId: Int,
+        isCreator: Boolean,
+        isParticipating: Boolean,
+        isPending: Boolean,
+        isFull: Boolean
+    ) {
+        try {
+            Log.d("InfoRequestVM", "Updating canParticipate for user $userId")
+
+            // Se non è un utente valido, non può partecipare
+            if (userId <= 0) {
                 _canParticipate.value = false
+                Log.d("InfoRequestVM", "Invalid user ID, canParticipate = false")
+                return
             }
+
+            // Se è il creatore, sta già partecipando, ha pending, o è pieno, non può partecipare
+            if (isCreator || isParticipating || isPending || isFull) {
+                _canParticipate.value = false
+                Log.d("InfoRequestVM", "User cannot participate: creator=$isCreator, participating=$isParticipating, pending=$isPending, full=$isFull")
+                return
+            }
+
+            // Controlla se ha i tag richiesti
+            val hasRequiredTags = tagsRepository.userHasRequiredTags(userId, requestId)
+            _canParticipate.value = hasRequiredTags
+
+            Log.d("InfoRequestVM", "User has required tags: $hasRequiredTags")
+
+            // Debug: mostra i tag dell'utente e quelli richiesti
+            if (!hasRequiredTags) {
+                try {
+                    val userTags = tagsRepository.getTagsForUser(userId)
+                    val requiredTags = _requestTags.value
+                    Log.d("InfoRequestVM", "User tags: ${userTags.map { it.name }}")
+                    Log.d("InfoRequestVM", "Required tags: ${requiredTags.map { it.name }}")
+                } catch (e: Exception) {
+                    Log.e("InfoRequestVM", "Error getting tags for debugging", e)
+                }
+            }
+
+        } catch (e: Exception) {
+            Log.e("InfoRequestVM", "Error updating canParticipate", e)
+            _canParticipate.value = false
         }
     }
 
@@ -144,13 +195,22 @@ class InfoRequestViewModel(
                 val tags = tagsRepository.getTagsForRequest(requestId)
                 _requestTags.value = tags
 
-                // Ricarica il controllo dei tag per l'utente
-                val userId = userIdFlow.first()
-                if (userId > 0) {
-                    val hasRequiredTags = tagsRepository.userHasRequiredTags(userId, requestId)
-                    _canParticipate.value = hasRequiredTags
+                // Forza un refresh dello stato corrente
+                val currentState = _uiState.value
+                if (currentState is UiState.Ready) {
+                    val userId = userIdFlow.first()
+                    updateCanParticipate(
+                        userId = userId,
+                        isCreator = currentState.isCreator,
+                        isParticipating = currentState.isParticipating,
+                        isPending = currentState.isPending,
+                        isFull = currentState.isFull
+                    )
                 }
+
+                Log.d("InfoRequestVM", "Request refreshed successfully")
             } catch (e: Exception) {
+                Log.e("InfoRequestVM", "Error in refreshRequest", e)
                 _events.tryEmit("Errore nel refresh: ${e.message}")
             }
         }
@@ -180,20 +240,32 @@ class InfoRequestViewModel(
                 return@launch
             }
 
+            // Verifica nuovamente i tag prima di procedere
+            try {
+                val hasRequiredTags = tagsRepository.userHasRequiredTags(uid, requestId)
+                if (!hasRequiredTags) {
+                    _events.emit("Non hai tutti i tag richiesti per questa richiesta")
+                    return@launch
+                }
+            } catch (e: Exception) {
+                Log.e("InfoRequestVM", "Error checking tags in participate", e)
+                _events.emit("Errore nella verifica dei requisiti")
+                return@launch
+            }
+
             try {
                 val pendingRequest = PendingRequest(requestId = req.id, userId = uid)
                 requestRepository.insertPendingRequest(pendingRequest)
-                _events.emit("✅ Richiesta di partecipazione inviata! Attendi l'approvazione del creatore.")
+                _events.emit("Richiesta di partecipazione inviata! Attendi l'approvazione del creatore.")
 
             } catch (t: Throwable) {
                 if (t.message?.contains("UNIQUE constraint failed") == true) {
-                    _events.emit("⚠️ Hai già inviato una richiesta di partecipazione per questa richiesta")
+                    _events.emit("Hai già inviato una richiesta di partecipazione per questa richiesta")
                 } else {
-                    _events.emit("❌ Errore durante l'invio della richiesta: ${t.message ?: "sconosciuto"}")
+                    _events.emit("Errore durante l'invio della richiesta: ${t.message ?: "sconosciuto"}")
                 }
             }
 
-            // REFRESH DOPO IL SUCCESSO
             refreshRequest()
         }
     }
@@ -225,13 +297,12 @@ class InfoRequestViewModel(
             try {
                 val updated = req.copy(rescuers = req.rescuers - uid)
                 requestRepository.updateRequest(updated)
-                _events.emit("🚪 Ti sei tirato indietro dalla richiesta")
+                _events.emit("Ti sei tirato indietro dalla richiesta")
 
-                // REFRESH DOPO IL SUCCESSO
                 refreshRequest()
 
             } catch (t: Throwable) {
-                _events.emit("❌ Errore nel ritirarsi dalla richiesta: ${t.message ?: "sconosciuto"}")
+                _events.emit("Errore nel ritirarsi dalla richiesta: ${t.message ?: "sconosciuto"}")
             }
         }
     }

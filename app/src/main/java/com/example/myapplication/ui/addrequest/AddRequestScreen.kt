@@ -2,6 +2,7 @@ package com.example.myapplication.ui.addrequest
 
 import android.Manifest
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -26,6 +27,7 @@ import coil.compose.AsyncImage
 import com.example.myapplication.ui.composables.CameraCapture
 import com.example.myapplication.ui.composables.ImagePickerDialog
 import com.example.myapplication.ui.theme.UnpressableButtonDark
+import com.example.myapplication.ui.composables.LegendDialog
 import com.google.android.gms.common.SignInButton
 import openAddressInMaps
 import java.time.LocalDate
@@ -55,6 +57,7 @@ fun AddRequestScreen(
     var showCamera by remember { mutableStateOf(false) }
     var showTagDialog by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showStatusLegend by remember { mutableStateOf(false) }
 
     // State per il DatePicker
     val datePickerState = rememberDatePickerState(
@@ -76,6 +79,12 @@ fun AddRequestScreen(
     ) { granted ->
         if (granted) {
             showCamera = true
+        }else{
+            Toast.makeText(
+                context,
+                "Permesso fotocamera permanentemente negato. Abilitalo dalle impostazioni.",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
@@ -93,7 +102,22 @@ fun AddRequestScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                Text("Crea una nuova richiesta", style = MaterialTheme.typography.titleLarge)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Crea una nuova richiesta",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    IconButton(onClick = { showStatusLegend = true }) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = "Info stati"
+                        )
+                    }
+                }
             }
 
             item {
@@ -119,15 +143,43 @@ fun AddRequestScreen(
                 )
             }
 
+            //Item persone richieste
             item {
+                var peopleText by remember { mutableStateOf(peopleRequired.toString()) }
+                var hasUserStartedTyping by remember { mutableStateOf(false) }
+
                 OutlinedTextField(
-                    value = peopleRequired.toString(),
-                    onValueChange = { it.toIntOrNull()?.let(viewModel::onPeopleRequiredChange) },
+                    value = peopleText,
+                    onValueChange = { newText ->
+                        // Se è la prima volta che l'utente digita, cancella il contenuto esistente
+                        if (!hasUserStartedTyping && newText.length == peopleText.length + 1) {
+                            peopleText =
+                                newText.takeLast(1) // Prendi solo l'ultimo carattere digitato
+                            hasUserStartedTyping = true
+                        } else {
+                            peopleText = newText
+                        }
+
+                        // Se l'utente inserisce un numero valido, aggiorna il viewModel
+                        peopleText.toIntOrNull()?.let { number ->
+                            if (number > 0) {
+                                viewModel.onPeopleRequiredChange(number)
+                            }
+                        }
+                    },
                     label = { Text("Numero persone richieste *") },
                     modifier = Modifier.fillMaxWidth(),
                     isError = peopleRequired <= 0,
-                    leadingIcon = { Icon(Icons.Default.Group, contentDescription = null) }
+                    leadingIcon = { Icon(Icons.Default.Group, contentDescription = null) },
+                    singleLine = true
                 )
+
+                // Aggiorna il testo quando cambia peopleRequired dal viewModel
+                LaunchedEffect(peopleRequired) {
+                    if (!hasUserStartedTyping) {
+                        peopleText = peopleRequired.toString()
+                    }
+                }
             }
 
             item {
@@ -138,9 +190,13 @@ fun AddRequestScreen(
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Difficoltà *") },
-                        modifier = Modifier.fillMaxWidth().clickable { expanded = true },
+                        modifier = Modifier.fillMaxWidth(),
                         leadingIcon = { Icon(Icons.Default.TrendingUp, contentDescription = null) },
-                        trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) }
+                        trailingIcon = {
+                            IconButton(onClick = { expanded = true }) {
+                                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                            }
+                        }
                     )
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         listOf("Bassa", "Media", "Alta").forEach { diff ->
@@ -163,9 +219,13 @@ fun AddRequestScreen(
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Data di svolgimento *") },
-                    modifier = Modifier.fillMaxWidth().clickable { showDatePicker = true },
+                    modifier = Modifier.fillMaxWidth(),
                     leadingIcon = { Icon(Icons.Default.DateRange, contentDescription = null) },
-                    trailingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
+                    trailingIcon = {
+                        IconButton(onClick = { showDatePicker = true }) {
+                            Icon(Icons.Default.CalendarToday, contentDescription = null)
+                        }
+                    },
                     isError = scheduledDate.isBefore(LocalDate.now())
                 )
 
@@ -392,6 +452,12 @@ fun AddRequestScreen(
                     Text("Chiudi")
                 }
             }
+        )
+    }
+    // Dialog per La legenda
+    if (showStatusLegend) {
+        LegendDialog(
+            onDismiss = { showStatusLegend = false }
         )
     }
 }

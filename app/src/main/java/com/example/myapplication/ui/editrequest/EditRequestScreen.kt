@@ -2,6 +2,7 @@ package com.example.myapplication.ui.editrequest
 
 import android.Manifest
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
@@ -82,6 +83,12 @@ fun EditRequestScreen(
     ) { granted ->
         if (granted) {
             showCamera = true
+        }else{
+            Toast.makeText(
+                context,
+                "Permesso fotocamera permanentemente negato. Abilitalo dalle impostazioni.",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
@@ -159,14 +166,41 @@ fun EditRequestScreen(
 
                 // Numero persone richieste
                 item {
+                    var peopleText by remember { mutableStateOf(peopleRequired.toString()) }
+                    var hasUserStartedTyping by remember { mutableStateOf(false) }
+
                     OutlinedTextField(
-                        value = peopleRequired.toString(),
-                        onValueChange = { it.toIntOrNull()?.let(viewModel::onPeopleRequiredChange) },
-                        label = { Text("Numero persone richieste") },
-                        leadingIcon = { Icon(Icons.Default.Group, contentDescription = null) },
+                        value = peopleText,
+                        onValueChange = { newText ->
+                            // Se è la prima volta che l'utente digita, cancella il contenuto esistente
+                            if (!hasUserStartedTyping && newText.length == peopleText.length + 1) {
+                                peopleText =
+                                    newText.takeLast(1) // Prendi solo l'ultimo carattere digitato
+                                hasUserStartedTyping = true
+                            } else {
+                                peopleText = newText
+                            }
+
+                            // Se l'utente inserisce un numero valido, aggiorna il viewModel
+                            peopleText.toIntOrNull()?.let { number ->
+                                if (number > 0) {
+                                    viewModel.onPeopleRequiredChange(number)
+                                }
+                            }
+                        },
+                        label = { Text("Numero persone richieste *") },
                         modifier = Modifier.fillMaxWidth(),
+                        isError = peopleRequired <= 0,
+                        leadingIcon = { Icon(Icons.Default.Group, contentDescription = null) },
                         singleLine = true
                     )
+
+                    // Aggiorna il testo quando cambia peopleRequired dal viewModel
+                    LaunchedEffect(peopleRequired) {
+                        if (!hasUserStartedTyping) {
+                            peopleText = peopleRequired.toString()
+                        }
+                    }
                 }
 
                 // Difficoltà
@@ -177,19 +211,16 @@ fun EditRequestScreen(
                             value = difficulty,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Difficoltà") },
+                            label = { Text("Difficoltà *") },
+                            modifier = Modifier.fillMaxWidth(),
                             leadingIcon = { Icon(Icons.Default.TrendingUp, contentDescription = null) },
                             trailingIcon = {
                                 IconButton(onClick = { expanded = true }) {
-                                    Icon(Icons.Default.ArrowDropDown, contentDescription = "Seleziona")
+                                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                                 }
-                            },
-                            modifier = Modifier.fillMaxWidth().clickable { expanded = true }
+                            }
                         )
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
+                        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                             listOf("Bassa", "Media", "Alta").forEach { diff ->
                                 DropdownMenuItem(
                                     text = { Text(diff) },
@@ -209,10 +240,14 @@ fun EditRequestScreen(
                         value = scheduledDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Data di svolgimento") },
+                        label = { Text("Data di svolgimento *") },
+                        modifier = Modifier.fillMaxWidth(),
                         leadingIcon = { Icon(Icons.Default.DateRange, contentDescription = null) },
-                        trailingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
-                        modifier = Modifier.fillMaxWidth().clickable { showDatePicker = true },
+                        trailingIcon = {
+                            IconButton(onClick = { showDatePicker = true }) {
+                                Icon(Icons.Default.CalendarToday, contentDescription = null)
+                            }
+                        },
                         isError = scheduledDate.isBefore(LocalDate.now())
                     )
 
