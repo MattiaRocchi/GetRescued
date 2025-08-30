@@ -120,7 +120,7 @@ val appModule = module {
     viewModel { AddRequestViewModel(get(), get(), get()) } // get() → RequestDaoRepository
     viewModel { RequestsViewModel(get()) }   // get() → RequestDaoRepository
     viewModel { ProfileViewModel(get(), get(), get(), get()) }
-    viewModel { UserRequestListViewModel(get(), get()) }
+    viewModel { UserRequestListViewModel(get(), get(), get()) }
     viewModel { ChangeProfileViewModel(get(), get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { ParticipatingRequestsViewModel(get(), get()) }

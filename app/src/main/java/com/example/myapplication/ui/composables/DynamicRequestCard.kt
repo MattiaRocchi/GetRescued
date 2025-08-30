@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.data.database.PendingRequest
 import com.example.myapplication.data.database.Request
 import com.example.myapplication.data.database.Tags
 import com.example.myapplication.ui.theme.DifficulTask
@@ -35,6 +36,7 @@ import java.util.*
 fun DynamicRequestCard(
     request: Request,
     tags: List<Tags> = emptyList(),
+    pendingRequests: List<PendingRequest> = emptyList(),
     onClick: () -> Unit,
     currentUserId: Int = -1
 ) {
@@ -54,6 +56,7 @@ fun DynamicRequestCard(
 
     val isCompleted = request.rescuers.size >= request.peopleRequired
     val isCreatedByCurrentUser = currentUserId != -1 && currentUserId == request.sender
+    val hasPendingRequests = pendingRequests.isNotEmpty()
 
     Card(
         modifier = Modifier
@@ -202,6 +205,40 @@ fun DynamicRequestCard(
                                     )
                                 }
                             }
+                        }
+                    }
+                }
+                //Proposte di partecipazione
+                if (hasPendingRequests && isCreatedByCurrentUser) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Notifications,
+                                contentDescription = "Proposte",
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.tertiary
+                            )
+                            Text(
+                                text = "${pendingRequests.size} ${if (pendingRequests.size == 1) "proposta" else "proposte"} di partecipazione",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.tertiary,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Spacer(modifier = Modifier.weight(1f))
+                            Icon(
+                                imageVector = Icons.Default.ChevronRight,
+                                contentDescription = "Vedi dettagli",
+                                modifier = Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.tertiary
+                            )
                         }
                     }
                 }
