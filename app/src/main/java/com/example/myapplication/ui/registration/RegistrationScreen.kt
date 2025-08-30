@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -24,6 +27,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapplication.ui.GetRescuedRoute
@@ -35,6 +39,8 @@ import com.example.myapplication.ui.composables.PhoneTextField
 import com.example.myapplication.ui.composables.SurnameTextField
 import com.example.myapplication.ui.composables.isValidPhoneNumber
 import com.example.myapplication.ui.profile.TagPickerDialog
+import com.example.myapplication.ui.theme.UnpressableButtonDark
+import com.example.myapplication.utils.AppLogo
 import kotlinx.coroutines.launch
 
 
@@ -71,6 +77,16 @@ fun RegistrationScreen(
                 .imePadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            AppLogo()
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "Registrazione",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.width(12.dp))
             NameTextField(
                 value = viewModel.name,
                 onValueChange = {
@@ -138,6 +154,12 @@ fun RegistrationScreen(
             )
             Button(
                 onClick = { showTagsDialog = true },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                    disabledContainerColor = UnpressableButtonDark,
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimary
+                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Scegli i tuoi interessi (tag)")
@@ -160,6 +182,12 @@ fun RegistrationScreen(
                         }
                     )
                 },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary,
+                    disabledContainerColor = UnpressableButtonDark,
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimary
+                ),
                 enabled = !nameError && !surnameError && !emailError && !passwordError && !ageError
                             && !phoneNumberError,
 

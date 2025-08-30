@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
 import android.app.Activity
 import com.example.myapplication.utils.MusicService
+import com.example.myapplication.utils.PermissionStatus
 import kotlinx.coroutines.launch
 
 // -------------------------
@@ -150,20 +151,23 @@ fun SettingsScreen(
                 )
             }
 
-            // Volume slider
-            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
                 Text(text = "Volume: ${(musicVolume * 100).toInt()}%")
+
                 Slider(
                     value = musicVolume,
                     onValueChange = { v ->
-                        // ottimizzazione locale: aggiornare UI immediatamente
+                        // aggiorna subito lo stato (sia su drag che su click)
                         viewModel.setMusicVolume(v)
-                    },
-                    onValueChangeFinished = {
-                        // notify service
+
+                        // notifica subito anche il service (così reagisce anche al click)
                         val intent = Intent(context, MusicService::class.java).apply {
                             action = MusicService.ACTION_SET_VOLUME
-                            putExtra(MusicService.EXTRA_VOLUME, musicVolume)
+                            putExtra(MusicService.EXTRA_VOLUME, v)
                         }
                         context.startService(intent)
                     },
@@ -220,30 +224,8 @@ fun SettingsScreen(
                     }
                 }
             )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(
-                onClick = {
-                    scope.launch { snackbarHostState.showSnackbar("Impostazioni salvate") }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Salva")
-            }
         }
     }
-}
-
-// Enum per gli stati dei permessi (copiato dal tuo file Permission.kt)
-enum class PermissionStatus {
-    Unknown,
-    Granted,
-    Denied,
-    PermanentlyDenied;
-
-    val isGranted get() = this == Granted
-    val isDenied get() = this == Denied || this == PermanentlyDenied
 }
 
 // Funzione helper per determinare lo stato del permesso
@@ -357,33 +339,3 @@ private fun PermissionToggle(
     }
 }
 
-/*
-USO:
-- Aggiungi i permessi nel manifest:
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-- Registra il service nel manifest (se non lo fai, il sistema non lo troverà):
-    <service android:name="com.example.myapplication.utils.MusicService" />
-
-- Aggiungi le dipendenze Gradle (module: app):
-    implementation "androidx.datastore:datastore-preferences:1.0.0"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
-    implementation "androidx.activity:activity-compose:1.8.0"
-    implementation "androidx.compose.material3:material3:1.1.0"
-
-- Come integrare: crea SettingsRepository(context), crea SettingsViewModel(repository) (usa Koin/Hilt o ViewModelProvider), e usa SettingsScreen(viewModel = myViewModel) dentro la NavGraph.
-
-MIGLIORAMENTI (VERSIONE CORRETTA):
-- Ogni permesso ha il suo launcher separato per evitare richieste multiple
-- Gestione individuale degli stati dei permessi
-- Mostra un avviso elegante quando i permessi sono permanentemente negati
-- Disabilita lo switch quando il permesso è negato permanentemente
-- Fornisce un pulsante diretto per aprire le impostazioni dell'app
-- UI più pulita e user-friendly per la gestione degli errori
-
-NOTE:
-- Su Android 8+ se vuoi che la musica continui in background in modo affidabile quando l'app è in background per lungo tempo, valuta l'uso di un Foreground Service con Notification.
-- Le preferenze camera/location qui memorizzano solo lo "stato desiderato"; la gestione effettiva del permesso (revoca) dipende dal sistema.
-- Ogni permesso viene ora gestito singolarmente per evitare richieste indesiderate.
-*/

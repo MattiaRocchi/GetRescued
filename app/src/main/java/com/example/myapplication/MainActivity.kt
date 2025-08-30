@@ -12,7 +12,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.navigationbar.BottomNavBar
-import com.example.myapplication.ui.theme.MyApplicationTheme
 import androidx.compose.ui.res.painterResource
 import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.navigationbar.GetRescuedTopBar
@@ -22,6 +21,7 @@ import com.example.myapplication.utils.MusicService
 import org.koin.android.ext.android.get
 import kotlinx.coroutines.flow.first
 import androidx.lifecycle.lifecycleScope
+import com.example.myapplication.ui.theme.GetRescuedTheme
 import com.example.myapplication.utils.WeeklyMissionsScheduler
 import kotlinx.coroutines.launch
 
@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
         settingsRepository = get<SettingsRepository>()
 
         setContent {
-            MyApplicationTheme {
+            GetRescuedTheme {
                 val navController = rememberNavController()
 
                 val validUserId by settingsRepository.validUserFlow.collectAsState(initial = null)

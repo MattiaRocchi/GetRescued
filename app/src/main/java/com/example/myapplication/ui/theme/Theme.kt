@@ -10,6 +10,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import com.example.myapplication.ui.GetRescuedRoute
 
 private val DarkColorScheme = darkColorScheme(
     primary = PrimaryDark,
@@ -73,9 +74,9 @@ val DarkTitleColors = TitleColors(
 )
 
 @Composable
-fun MyApplicationTheme(
+fun GetRescuedTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current

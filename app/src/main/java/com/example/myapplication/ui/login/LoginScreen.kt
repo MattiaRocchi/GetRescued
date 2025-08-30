@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -16,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapplication.ui.GetRescuedRoute
@@ -24,6 +27,8 @@ import com.example.myapplication.ui.composables.PasswordTextField
 import com.example.myapplication.utils.MusicService
 import kotlinx.coroutines.launch
 import com.example.myapplication.R
+import com.example.myapplication.ui.theme.UnpressableButtonDark
+import com.example.myapplication.utils.AppLogo
 
 @Composable
 fun LoginScreen(
@@ -51,13 +56,15 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center
         ) {
 
-            /*Image(
-                painter = painterResource(id = R.drawable.ic_logo),
-                contentDescription = "App Logo",
-                modifier = Modifier
-                    .size(120.dp)
-                    .padding(bottom = 32.dp)
-            )*/
+            AppLogo()
+            Spacer(Modifier.height(16.dp))
+                Text(
+                    text = "Login",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.width(12.dp))
 
             // Campo Email
             EmailTextField(
@@ -107,6 +114,12 @@ fun LoginScreen(
                         }
                     )
                 },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary,
+                    disabledContainerColor = UnpressableButtonDark,
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimary
+                ),
                 enabled = !emailError && !passwordError,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -114,9 +127,11 @@ fun LoginScreen(
             }
 
             // Link alla registrazione
-            TextButton(onClick = {
-                navController.navigate(GetRescuedRoute.Registration)
-            }) {
+            TextButton(
+                onClick = {
+                    navController.navigate(GetRescuedRoute.Registration)
+                }
+            ) {
                 Text("Sei nuovo? Registrati")
             }
         }

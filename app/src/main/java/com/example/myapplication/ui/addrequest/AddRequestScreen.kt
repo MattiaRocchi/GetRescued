@@ -25,6 +25,7 @@ import androidx.core.content.PermissionChecker
 import coil.compose.AsyncImage
 import com.example.myapplication.ui.composables.CameraCapture
 import com.example.myapplication.ui.composables.ImagePickerDialog
+import com.example.myapplication.ui.theme.UnpressableButtonDark
 import com.google.android.gms.common.SignInButton
 import openAddressInMaps
 import java.time.LocalDate
@@ -285,6 +286,12 @@ fun AddRequestScreen(
                 Button(
                     onClick = { viewModel.submitRequest(onCreated) },
                     enabled = isFormValid,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary,
+                        contentColor = MaterialTheme.colorScheme.onTertiary,
+                        disabledContainerColor = UnpressableButtonDark,
+                        disabledContentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(Icons.Default.Send, contentDescription = null)
