@@ -6,9 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,8 +33,8 @@ fun BrowseRequestsScreen(
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 2 })
     val scope = rememberCoroutineScope()
 
-    val allVM: RequestsViewModel = koinViewModel()
-    val participatingVM: ParticipatingRequestsViewModel = koinViewModel()
+    val allValidRequest: RequestsViewModel = koinViewModel()
+    val participatingVR: ParticipatingRequestsViewModel = koinViewModel()
     val settingsRepository: SettingsRepository = koinInject()
     val tagsRepository: TagsRepository = koinInject()
 
@@ -59,8 +56,10 @@ fun BrowseRequestsScreen(
     var requestTagsMap by remember { mutableStateOf<Map<Int, List<Tags>>>(emptyMap()) }
 
     // Carica i tags per le richieste quando cambiano
-    val allRequests by allVM.availableRequests.collectAsState()
-    val participatingRequests by participatingVM.participation.collectAsState()
+    val allRequests by allValidRequest.availableRequests.collectAsState()
+    val rawParticipatingRequests by participatingVR.participation.collectAsState()
+    val participatingRequests = rawParticipatingRequests.filter { !it.completed }
+
 
     LaunchedEffect(allRequests, participatingRequests) {
         val allRequestIds = (allRequests + participatingRequests).map { it.id }.distinct()
@@ -173,14 +172,14 @@ private fun FilteredRequestsList(
                 val matchesDifficulty =
                     selectedDifficulty == null || request.difficulty == selectedDifficulty
 
-                // NUOVO: Filtro per tag richiesti
+                // Filtro per tag richiesti
                 val requestTags = requestTagsMap[request.id] ?: emptyList()
                 val matchesTags = selectedTags.isEmpty() ||
                         selectedTags.all { selectedTag ->
                             requestTags.any { requestTag -> requestTag.id == selectedTag.id }
                         }
 
-                // NUOVO: Filtro per nascondere le proprie richieste
+                //Filtro per nascondere le proprie richieste
                 val matchesOwnership = !hideMyRequests || (currentUserId != request.sender)
 
                 matchesSearch && matchesDifficulty && matchesTags && matchesOwnership

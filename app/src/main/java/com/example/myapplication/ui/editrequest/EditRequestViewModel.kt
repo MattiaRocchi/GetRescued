@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.Request
 import com.example.myapplication.data.database.Tags
+import com.example.myapplication.data.database.TagsRequest
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.TagsRepository
 import kotlinx.coroutines.flow.*
@@ -53,7 +54,7 @@ class EditRequestViewModel(
 
     // Tag attualmente associati alla richiesta
     val currentRequestTags: StateFlow<List<Tags>> =
-        tagsRepository.tagsForMissionFlow(requestId)
+        tagsRepository.getTagsForRequestFlow(requestId)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val _events = MutableSharedFlow<String>(extraBufferCapacity = 1)
@@ -172,17 +173,17 @@ class EditRequestViewModel(
                 repository.updateRequest(updated)
 
                 // Aggiorna i tag associati alla richiesta
-                tagsRepository.deleteTagsForMission(requestId)
+                tagsRepository.deleteTagsForRequest(requestId)
 
                 val tagsToAdd = _requiredTags.value.map { tag ->
-                    com.example.myapplication.data.database.TagsMission(
+                    TagsRequest(
                         idTags = tag.id,
-                        idMissionId = requestId
+                        idRequest = requestId
                     )
                 }
 
                 if (tagsToAdd.isNotEmpty()) {
-                    tagsRepository.insertTagsForMission(*tagsToAdd.toTypedArray())
+                    tagsRepository.insertTagsForRequest(*tagsToAdd.toTypedArray())
                 }
 
                 _events.tryEmit("Richiesta aggiornata con successo")

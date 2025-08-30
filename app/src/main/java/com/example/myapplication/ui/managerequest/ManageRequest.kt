@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.myapplication.ui.GetRescuedRoute
 import openAddressInMaps
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -39,11 +40,19 @@ fun ManageRequest(
     // Stati per i dialog di conferma
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showCompleteDialog by remember { mutableStateOf(false) }
+    var showExpiredDialog by remember { mutableStateOf(false) }
 
     // Ascolta eventi one-shot e mostra snackbar
     LaunchedEffect(viewModel) {
         viewModel.events.collect { msg ->
             snackbarHostState.showSnackbar(msg)
+        }
+    }
+
+    LaunchedEffect(uiState) {
+        val state = uiState
+        if (state is ManageRequestViewModel.UiState.Ready && state.isExpired) {
+            showExpiredDialog = true
         }
     }
 
@@ -64,7 +73,7 @@ fun ManageRequest(
                             IconButton(
                                 onClick = {
                                     navController.navigate(
-                                        com.example.myapplication.ui.GetRescuedRoute.EditRequest(state.request.id)
+                                        GetRescuedRoute.EditRequest(state.request.id)
                                     )
                                 }
                             ) {
@@ -329,6 +338,246 @@ fun ManageRequest(
                                         }
                                     }
                                 }
+
+                                HorizontalDivider()
+                                // Sezione foto (se presenti)
+                                if (r.fotos.isNotEmpty()) {
+                                    Column(Modifier.padding(16.dp)) {
+                                        Text(
+                                            "📷 Foto allegate",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Spacer(Modifier.height(8.dp))
+                                        LazyRow(
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            modifier = Modifier.height(120.dp)
+                                        ) {
+                                            items(r.fotos) { photoUri ->
+                                                AsyncImage(
+                                                    model = photoUri,
+                                                    contentDescription = "Foto della richiesta",
+                                                    modifier = Modifier
+                                                        .size(120.dp)
+                                                        .clip(RoundedCornerShape(8.dp)),
+                                                    contentScale = ContentScale.Crop
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Sezione Richieste di Partecipazione Pending (solo se può gestire partecipanti)
+                        if (state.pendingParticipants.isNotEmpty()) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                elevation = CardDefaults.cardElevation(4.dp)
+                            ) {
+                                Column(Modifier.padding(16.dp)) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(bottom = 12.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Notifications,
+                                            contentDescription = "Richieste pending",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(
+                                            "Richieste di Partecipazione (${state.pendingParticipants.size})",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+
+                                    state.pendingParticipants.forEach { user ->
+                                        Card(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 4.dp),
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                                            )
+                                        ) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(12.dp),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Column(modifier = Modifier.weight(1f)) {
+                                                    Text(
+                                                        "${user.name} ${user.surname}",
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        fontWeight = FontWeight.Medium
+                                                    )
+                                                    Text(
+                                                        user.email,
+                                                        style = MaterialTheme.typography.bodySmall,
+                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    )
+                                                }
+
+                                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                    IconButton(
+                                                        onClick = { viewModel.approveParticipant(user.id) },
+                                                        colors = IconButtonDefaults.iconButtonColors(
+                                                            containerColor = MaterialTheme.colorScheme.primary,
+                                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                                        )
+                                                    ) {
+                                                        Icon(
+                                                            Icons.Default.Check,
+                                                            contentDescription = "Approva",
+                                                            modifier = Modifier.size(18.dp)
+                                                        )
+                                                    }
+                                                    if (state.canManageParticipants){
+                                                        IconButton(
+                                                            onClick = { viewModel.rejectParticipant(user.id) },
+                                                            colors = IconButtonDefaults.iconButtonColors(
+                                                                containerColor = MaterialTheme.colorScheme.error,
+                                                                contentColor = MaterialTheme.colorScheme.onError
+                                                            )
+                                                        ) {
+                                                            Icon(
+                                                                Icons.Default.Close,
+                                                                contentDescription = "Rifiuta",
+                                                                modifier = Modifier.size(18.dp)
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Sezione Partecipanti Approvati (solo se può gestire partecipanti e ci sono partecipanti)
+                        if (state.canManageParticipants && state.approvedParticipants.isNotEmpty()) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                elevation = CardDefaults.cardElevation(4.dp)
+                            ) {
+                                Column(Modifier.padding(16.dp)) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(bottom = 12.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Group,
+                                            contentDescription = "Partecipanti approvati",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(
+                                            "Partecipanti Approvati (${state.approvedParticipants.size})",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+
+                                    state.approvedParticipants.forEach { user ->
+                                        Card(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 4.dp),
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                                            )
+                                        ) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(12.dp),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Column(modifier = Modifier.weight(1f)) {
+                                                    Text(
+                                                        "${user.name} ${user.surname}",
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        fontWeight = FontWeight.Medium
+                                                    )
+                                                    Text(
+                                                        user.email,
+                                                        style = MaterialTheme.typography.bodySmall,
+                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    )
+                                                }
+
+                                                IconButton(
+                                                    onClick = { viewModel.removeParticipant(user.id) },
+                                                    colors = IconButtonDefaults.iconButtonColors(
+                                                        containerColor = MaterialTheme.colorScheme.error,
+                                                        contentColor = MaterialTheme.colorScheme.onError
+                                                    )
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.PersonRemove,
+                                                        contentDescription = "Rimuovi",
+                                                        modifier = Modifier.size(18.dp)
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Sezione informativa se non può gestire partecipanti
+                        if (!state.canManageParticipants && (state.pendingParticipants.isNotEmpty() || state.approvedParticipants.isNotEmpty())) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                elevation = CardDefaults.cardElevation(4.dp)
+                            ) {
+                                Column(Modifier.padding(16.dp)) {
+                                    Text(
+                                        "👥 Partecipanti",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(bottom = 8.dp)
+                                    )
+
+                                    if (state.approvedParticipants.isNotEmpty()) {
+                                        Text(
+                                            "✅ Approvati: ${state.approvedParticipants.size}/${r.peopleRequired}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        state.approvedParticipants.forEach { user ->
+                                            Text(
+                                                "• ${user.name} ${user.surname}",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                            )
+                                        }
+                                    }
+
+                                    if (state.pendingParticipants.isNotEmpty()) {
+                                        Text(
+                                            "⏳ In attesa: ${state.pendingParticipants.size}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier.padding(top = 8.dp)
+                                        )
+                                        Text(
+                                            "Non puoi più gestire le richieste di partecipazione.",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                        )
+                                    }
+                                }
                             }
                         }
 
@@ -431,5 +680,80 @@ fun ManageRequest(
                 }
             }
         }
+    }
+    // Dialog di conferma eliminazione
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Conferma eliminazione") },
+            text = {
+                Text("Sei sicuro di voler eliminare questa richiesta? L'azione non può essere annullata.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        viewModel.deleteRequest {
+                            navController.popBackStack()
+                        }
+                    }
+                ) {
+                    Text("Elimina", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Annulla")
+                }
+            }
+        )
+    }
+
+    // Dialog di conferma completamento
+    if (showCompleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showCompleteDialog = false },
+            title = { Text("Completa richiesta") },
+            text = {
+                Text("Confermi che la richiesta è stata portata a termine? Verranno assegnati XP e aggiornate le missioni di tutti i partecipanti.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showCompleteDialog = false
+                        viewModel.markAsCompleted {
+                            navController.popBackStack()
+                        }
+                    }
+                ) {
+                    Text("Completa", color = MaterialTheme.colorScheme.primary)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCompleteDialog = false }) {
+                    Text("Annulla")
+                }
+            }
+        )
+    }
+    // Dialog per richiesta scaduta
+    if (showExpiredDialog) {
+        AlertDialog(
+            onDismissRequest = { }, // Non permettere di chiudere senza confermare
+            title = { Text("Richiesta Scaduta") },
+            text = {
+                Text("La richiesta è stata completata in automatico perché scaduta.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showExpiredDialog = false
+                        navController.navigate(GetRescuedRoute.ManageRequests)
+                    }
+                ) {
+                    Text("Conferma", color = MaterialTheme.colorScheme.primary)
+                }
+            }
+        )
     }
 }

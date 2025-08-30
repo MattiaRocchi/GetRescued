@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.Request
 import com.example.myapplication.data.database.Tags
+import com.example.myapplication.data.database.TagsMission
 import com.example.myapplication.data.database.TagsRequest
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
@@ -39,11 +40,11 @@ class AddRequestViewModel(
     private val _photos = MutableStateFlow<List<String>>(emptyList())
     val photos: StateFlow<List<String>> = _photos.asStateFlow()
 
-    // Campo per la data di svolgimento
+    // Nuovo campo per la data di svolgimento
     private val _scheduledDate = MutableStateFlow(LocalDate.now())
     val scheduledDate: StateFlow<LocalDate> = _scheduledDate.asStateFlow()
 
-    // Corretto: usa Tags invece di TitleBadge
+    // Cambiato da TitleBadge a Tags
     private val _requiredTags = MutableStateFlow<List<Tags>>(emptyList())
     val requiredTags: StateFlow<List<Tags>> = _requiredTags.asStateFlow()
 
@@ -107,7 +108,7 @@ class AddRequestViewModel(
         }
     }
 
-    // Gestisce Tags invece di TitleBadge
+    // Cambiato per gestire Tags invece di TitleBadge
     fun addRequiredTag(tag: Tags) {
         val current = _requiredTags.value.toMutableList()
         if (!current.contains(tag)) {
@@ -147,26 +148,25 @@ class AddRequestViewModel(
             )
 
             try {
-                // CORREZIONE: Inserisci la richiesta e ottieni l'ID generato
-                val insertedId = repository.insertRequest(request)
+                // Inserisci la richiesta e ottieni l'ID
+                val requestId = repository.insertRequest(request)
 
-                // CORREZIONE: Se ci sono tag richiesti, collegali alla richiesta usando l'ID corretto
+                // Se ci sono tag richiesti, collegali alla richiesta
                 if (_requiredTags.value.isNotEmpty()) {
                     val tagsToAdd = _requiredTags.value.map { tag ->
                         TagsRequest(
                             idTags = tag.id,
-                            idRequest = insertedId.toInt() // Usa l'ID restituito dall'inserimento
+                            idRequest = requestId.hashCode()
                         )
                     }
-                    repository.insertTagsForRequest(*tagsToAdd.toTypedArray())
+                    tagsRepository.insertTagsForRequest(*tagsToAdd.toTypedArray())
                 }
 
                 // Reset form
                 resetForm()
                 onSuccess()
             } catch (e: Exception) {
-                // Handle error - potresti voler esporre questo errore all'UI
-                println("Errore durante la creazione della richiesta: ${e.message}")
+                // Handle error
             }
         }
     }

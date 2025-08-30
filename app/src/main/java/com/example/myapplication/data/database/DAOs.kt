@@ -240,7 +240,7 @@ interface MissionDao {
         VALUES (:missionId, :userId, :progression, :active, :claimable)
 """)
     suspend fun setUserGeneralMissions(missionId: Int, userId: Int,
-                                       progression: Int = 0, active: Int = 1, claimable: Int = 1)
+                                       progression: Int = 0, active: Int = 1, claimable: Int = 0)
 
     @Query("SELECT m.id FROM Mission m WHERE type = 1")
     suspend fun getAllGeneralMissions(): List<Int>
@@ -397,11 +397,11 @@ interface TagDao {
     @Transaction
     @Query("""
         SELECT t.* FROM Tags t
-        INNER JOIN TagsMission tm ON t.id = tm.idTags
-        WHERE tm.idMissionId = :missionId
+        INNER JOIN TagsRequest tr ON t.id = tr.idTags
+        WHERE tr.idRequest = :requestid
         ORDER BY t.name
     """)
-    fun getTagsForMission(missionId: Int): Flow<List<Tags>>
+    fun getTagsForRequestFlow(requestid: Int): Flow<List<Tags>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertTagsForMission(vararg tm: TagsMission)

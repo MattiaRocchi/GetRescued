@@ -41,6 +41,9 @@ class InfoRequestViewModel(
     private val requestFlow: Flow<Request?> = requestRepository.getRequestByIdFlow(requestId)
     private val userIdFlow: Flow<Int> = settingsRepository.userIdFlow
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
+
+    private val _canParticipate = MutableStateFlow(false)
+    val canParticipate: StateFlow<Boolean> = _canParticipate.asStateFlow()
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     // NUOVO: StateFlow per i tags della richiesta
@@ -61,7 +64,8 @@ class InfoRequestViewModel(
                     // Controlla se l'utente ha una richiesta pending
                     val isPending = if (isValidUser && !isCreator && !isParticipating) {
                         try {
-                            val pendingRequests = requestRepository.getPendingRequestsForRequest(req.id)
+                            val pendingRequests =
+                                requestRepository.getPendingRequestsForRequest(req.id)
                             pendingRequests.any { it.userId == uid }
                         } catch (e: Exception) {
                             false
@@ -89,7 +93,8 @@ class InfoRequestViewModel(
                 .collect { req ->
                     launch(Dispatchers.IO) {
                         try {
-                            val creator: UserWithInfo? = userDaoRepository.getUserWithInfo(req.sender)
+                            val creator: UserWithInfo? =
+                                userDaoRepository.getUserWithInfo(req.sender)
                             _uiState.update { current ->
                                 when (current) {
                                     is UiState.Ready -> {
@@ -97,6 +102,7 @@ class InfoRequestViewModel(
                                             current.copy(creator = creator)
                                         } else current
                                     }
+
                                     else -> current
                                 }
                             }
@@ -115,6 +121,37 @@ class InfoRequestViewModel(
             } catch (e: Exception) {
                 _events.tryEmit("Errore nel caricamento dei tags")
                 _requestTags.value = emptyList()
+            }
+        }
+
+        viewModelScope.launch {
+            try {
+                val userId = userIdFlow.first()
+                if (userId > 0) {
+                    val hasRequiredTags = tagsRepository.userHasRequiredTags(userId, requestId)
+                    _canParticipate.value = hasRequiredTags
+                }
+            } catch (e: Exception) {
+                _canParticipate.value = false
+            }
+        }
+    }
+
+    fun refreshRequest() {
+        viewModelScope.launch {
+            try {
+                // Ricarica i tag della richiesta
+                val tags = tagsRepository.getTagsForRequest(requestId)
+                _requestTags.value = tags
+
+                // Ricarica il controllo dei tag per l'utente
+                val userId = userIdFlow.first()
+                if (userId > 0) {
+                    val hasRequiredTags = tagsRepository.userHasRequiredTags(userId, requestId)
+                    _canParticipate.value = hasRequiredTags
+                }
+            } catch (e: Exception) {
+                _events.tryEmit("Errore nel refresh: ${e.message}")
             }
         }
     }
@@ -144,13 +181,10 @@ class InfoRequestViewModel(
             }
 
             try {
-                // Crea una richiesta di partecipazione pending invece di approvare direttamente
                 val pendingRequest = PendingRequest(requestId = req.id, userId = uid)
-
-                // Inserisci la richiesta pending nel database
                 requestRepository.insertPendingRequest(pendingRequest)
-
                 _events.emit("✅ Richiesta di partecipazione inviata! Attendi l'approvazione del creatore.")
+
             } catch (t: Throwable) {
                 if (t.message?.contains("UNIQUE constraint failed") == true) {
                     _events.emit("⚠️ Hai già inviato una richiesta di partecipazione per questa richiesta")
@@ -158,6 +192,9 @@ class InfoRequestViewModel(
                     _events.emit("❌ Errore durante l'invio della richiesta: ${t.message ?: "sconosciuto"}")
                 }
             }
+
+            // REFRESH DOPO IL SUCCESSO
+            refreshRequest()
         }
     }
 
@@ -189,6 +226,10 @@ class InfoRequestViewModel(
                 val updated = req.copy(rescuers = req.rescuers - uid)
                 requestRepository.updateRequest(updated)
                 _events.emit("🚪 Ti sei tirato indietro dalla richiesta")
+
+                // REFRESH DOPO IL SUCCESSO
+                refreshRequest()
+
             } catch (t: Throwable) {
                 _events.emit("❌ Errore nel ritirarsi dalla richiesta: ${t.message ?: "sconosciuto"}")
             }

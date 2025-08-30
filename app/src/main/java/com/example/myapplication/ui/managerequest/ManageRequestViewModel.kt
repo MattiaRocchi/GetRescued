@@ -66,7 +66,7 @@ class ManageRequestViewModel(
     init {
         viewModelScope.launch {
             // Prima controlla e marca le richieste scadute
-            checkAndMarkExpiredRequests()
+            //checkAndMarkExpiredRequests()
 
             // Poi procedi con il normale caricamento
             combine(requestFlow, userIdFlow) { req, uid ->
@@ -130,6 +130,7 @@ class ManageRequestViewModel(
         }
     }
 
+    // Modifica approveParticipant
     fun approveParticipant(userId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val current = _uiState.value
@@ -137,27 +138,24 @@ class ManageRequestViewModel(
 
             val request = current.request
 
-            // Verifica se l'utente è già approvato
             if (userId in request.rescuers) {
                 _events.tryEmit("Questo utente è già approvato")
                 return@launch
             }
 
-            // Verifica se ci sono ancora posti disponibili
             if (request.rescuers.size >= request.peopleRequired) {
                 _events.tryEmit("Non ci sono più posti disponibili")
                 return@launch
             }
 
             try {
-                // Aggiungi l'utente alla lista dei rescuers
                 val updatedRequest = request.copy(rescuers = request.rescuers + userId)
                 requestRepository.updateRequest(updatedRequest)
-
-                // Rimuovi dalla tabella pending requests
                 requestRepository.deletePendingRequest(request.id, userId)
-
                 _events.tryEmit("Partecipante approvato con successo!")
+
+                // REFRESH DOPO IL SUCCESSO
+                refreshRequest()
 
             } catch (e: Exception) {
                 _events.tryEmit("Errore nell'approvazione: ${e.message}")
@@ -165,16 +163,18 @@ class ManageRequestViewModel(
         }
     }
 
+    // Modifica rejectParticipant
     fun rejectParticipant(userId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val current = _uiState.value
             if (current !is UiState.Ready) return@launch
 
             try {
-                // Rimuovi dalla tabella pending requests
                 requestRepository.deletePendingRequest(current.request.id, userId)
-
                 _events.tryEmit("Richiesta di partecipazione rifiutata")
+
+                // REFRESH DOPO IL SUCCESSO
+                refreshRequest()
 
             } catch (e: Exception) {
                 _events.tryEmit("Errore nel rifiuto: ${e.message}")
@@ -182,6 +182,7 @@ class ManageRequestViewModel(
         }
     }
 
+    // Modifica removeParticipant
     fun removeParticipant(userId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val current = _uiState.value
@@ -195,11 +196,12 @@ class ManageRequestViewModel(
             }
 
             try {
-                // Rimuovi l'utente dalla lista dei rescuers
                 val updatedRequest = request.copy(rescuers = request.rescuers - userId)
                 requestRepository.updateRequest(updatedRequest)
-
                 _events.tryEmit("Partecipante rimosso dalla richiesta")
+
+                // REFRESH DOPO IL SUCCESSO
+                refreshRequest()
 
             } catch (e: Exception) {
                 _events.tryEmit("Errore nella rimozione: ${e.message}")
@@ -247,10 +249,10 @@ class ManageRequestViewModel(
                 requestRepository.updateRequest(updatedRequest)
 
                 // Aggiorna le missioni e XP per tutti i partecipanti
-                updateMissionsForCompletion(updatedRequest)
+                updateMissionsForCompletion(request)
 
                 _events.tryEmit("Richiesta contrassegnata come completata")
-                onCompleted()
+                //onCompleted()
             } catch (e: Exception) {
                 _events.tryEmit("Errore nel completamento: ${e.message}")
             }
@@ -303,6 +305,15 @@ class ManageRequestViewModel(
 
         } catch (e: Exception) {
             _events.tryEmit("Errore nel processo di auto-completamento: ${e.message}")
+        }
+    }
+
+    fun refreshRequest() {
+        viewModelScope.launch {
+            val current = _uiState.value
+            if (current is UiState.Ready) {
+                loadParticipants(current.request)
+            }
         }
     }
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.data.database.Tags
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -26,11 +27,14 @@ import openAddressInMaps
 import java.text.SimpleDateFormat
 import java.util.*
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InfoRequestScreen(
     navController: NavController,
-    viewModel: InfoRequestViewModel
+    viewModel: InfoRequestViewModel,
+    tags: List<Tags> = emptyList()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val requestTags by viewModel.requestTags.collectAsStateWithLifecycle()
@@ -86,6 +90,18 @@ fun InfoRequestScreen(
                             "${creator.name} ${creator.surname}"
                         }
                     }
+                    val creatorEmail: String = run {
+                        val creator = state.creator
+                        creator?.email ?: "Sconosciuto"
+                    }
+                    val creatorPhone: String = run {
+                        val creator = state.creator
+                        if (creator == null) {
+                            "Sconosciuto"
+                        } else {
+                            "${creator.phoneNumber}"
+                        }
+                    }
 
                     Column(
                         modifier = Modifier
@@ -128,6 +144,25 @@ fun InfoRequestScreen(
                                             fontWeight = FontWeight.Medium
                                         )
                                     }
+                                }
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ){
+                                    Text(
+                                        text = "Email: $creatorEmail",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ){
+                                    Text(
+                                        text = "Phone: $creatorPhone",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
                                 }
 
                                 HorizontalDivider()
@@ -180,7 +215,7 @@ fun InfoRequestScreen(
                             }
                         }
 
-                        // NUOVO: Sezione tag richiesti
+                        // Sezione tag richiesti
                         if (requestTags.isNotEmpty()) {
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
@@ -223,7 +258,6 @@ fun InfoRequestScreen(
                                 }
                             }
                         }
-
                         // Sezione foto (se presenti)
                         if (r.fotos.isNotEmpty()) {
                             Card(
@@ -342,14 +376,45 @@ fun InfoRequestScreen(
                             }
 
                             else -> {
-                                Button(
-                                    onClick = { viewModel.participate() },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary
-                                    )
-                                ) {
-                                    Text("🤝 Richiedi di partecipare")
+                                val canUserParticipate by viewModel.canParticipate.collectAsStateWithLifecycle()
+
+                                if (canUserParticipate) {
+                                    Button(
+                                        onClick = { viewModel.participate() },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary
+                                        )
+                                    ) {
+                                        Text("🤝 Richiedi di partecipare")
+                                    }
+                                } else {
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Card(
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.7f)
+                                            )
+                                        ) {
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(16.dp),
+                                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                                            ) {
+                                                Text(
+                                                    "⚠️ Non puoi partecipare a questa richiesta",
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    fontWeight = FontWeight.Medium,
+                                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                                )
+                                                Text(
+                                                    "Ti mancano alcuni tag richiesti. Aggiorna il tuo profilo per partecipare.",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

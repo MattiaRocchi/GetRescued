@@ -88,6 +88,10 @@ class MissionRepository(private val missionDao: MissionDao) {
                 if (requestTags.contains(mission.tag)) {
                     updateGeneralMissionUser(mission.id, userId)
                 }
+
+                if(requestTags.isEmpty() && mission.tag.isEmpty()){
+                    updateGeneralMissionUser(mission.id, userId)
+                }
             }
 
             // Ottieni tutte le missioni settimanali attive dell'utente
@@ -95,6 +99,10 @@ class MissionRepository(private val missionDao: MissionDao) {
             for (mission in weeklyMissions) {
                 // Controlla se il tag della missione corrisponde a uno dei tag della richiesta
                 if (requestTags.contains(mission.tag)) {
+                    updateWeeklyMissionUser(mission.id, userId)
+                }
+
+                if(requestTags.isEmpty() && mission.tag.isEmpty()){
                     updateWeeklyMissionUser(mission.id, userId)
                 }
             }

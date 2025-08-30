@@ -17,7 +17,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ManageRequestsScreen(
+fun ManageSlideRequests(
     navController: NavController
     // NON PIÙ parametri repository/settings - Koin gestisce tutto!
 ) {

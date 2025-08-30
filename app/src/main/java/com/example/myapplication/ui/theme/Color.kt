@@ -15,7 +15,6 @@ val Pink40 = Color(0xFF7D5260)
  val EasyTask = Color(0xFF4C7744)
 val MediumTask = Color(0xFF9E8C3C)
 val DifficulTask = Color(0xFF8C3C3C)
-val ColossalTask = Color(0xFF9C76D9)
 val BackGround = Color(0xFFFFFFFF)
 val Primary = Color(0xFFAAAAAA)
 val OnPrimary = Color(0xFFFFFFFF)
@@ -32,10 +31,20 @@ val TertiaryContainer = Color(0xFFFFE0B2)
 val OnTertiaryContainer = Color(0xFF993900)
 val UnpressableButton = Color(0xFFBDBDBD)
 //dark color
-val EasyTaskDark = Color(0xFF558B2F)
-val MediumTaskDark = Color(0xFFFFC107)
-val DifficulTaskDark = Color(0xFFD84315)
-val ColossalTaskDark = Color(0xFF7E57C2)
+val EasyTaskLogo = Color(
+ red = (0x4C / 255f * 1.1f).coerceAtMost(1f),
+ green = (0x77 / 255f * 1.6f).coerceAtMost(1f),
+ blue = (0x44 / 255f))
+val MediumTaskLogo = Color(
+ red = (158 / 255f * 1.12f).coerceAtMost(1f),
+ green = (140 / 255f * 1.4f).coerceAtMost(1f),
+ blue = (60 / 255f * 1.05f).coerceAtMost(1f)
+)
+val DifficulTaskLogo = Color(
+ red = (140 / 255f * 1.3f).coerceAtMost(1f),
+ green = (60 / 255f * 1.8f).coerceAtMost(1f),
+ blue = (60 / 255f)
+)
 
 val BackGroundDark = Color(0xFF121212)
 val PrimaryDark = Color(0xFFB0BEC5)

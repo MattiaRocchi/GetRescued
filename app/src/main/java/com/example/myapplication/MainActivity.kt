@@ -68,13 +68,19 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     topBar = {
-                        GetRescuedTopBar(
-                            navController = navController,
-                            profileImage = painterResource(id = R.drawable.ic_profile_placeholder),
-                            (validUserId != null)
-                        )
+                        if (validUserId != null) {
+                            GetRescuedTopBar(
+                                navController = navController,
+                                profileImage = painterResource(id = R.drawable.ic_profile_placeholder),
+                                true
+                            )
+                        }
                     },
-                    bottomBar = { BottomNavBar(navController) }
+                    bottomBar = {
+                        if (validUserId != null) {
+                            BottomNavBar(navController)
+                        }
+                    }
                 ) { padding ->
                     GetRescuedNavGraph(
                         navController = navController,

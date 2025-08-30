@@ -20,8 +20,11 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.data.database.Request
 import com.example.myapplication.data.database.Tags
 import com.example.myapplication.ui.theme.DifficulTask
+import com.example.myapplication.ui.theme.DifficulTaskLogo
 import com.example.myapplication.ui.theme.EasyTask
+import com.example.myapplication.ui.theme.EasyTaskLogo
 import com.example.myapplication.ui.theme.MediumTask
+import com.example.myapplication.ui.theme.MediumTaskLogo
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -42,6 +45,13 @@ fun DynamicRequestCard(
         else -> EasyTask
     }
 
+    val backgroundColorLogo = when (request.difficulty) {
+        "Bassa" -> EasyTaskLogo
+        "Media" -> MediumTaskLogo
+        "Alta" -> DifficulTaskLogo
+        else -> EasyTaskLogo
+    }
+
     val isCompleted = request.rescuers.size >= request.peopleRequired
     val isCreatedByCurrentUser = currentUserId != -1 && currentUserId == request.sender
 
@@ -53,7 +63,6 @@ fun DynamicRequestCard(
         colors = CardDefaults.cardColors(containerColor = backgroundColor)
     ) {
         Column {
-            // Barra colorata in base alla difficoltà
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -77,10 +86,7 @@ fun DynamicRequestCard(
                     )
 
                     Surface(
-                        color = backgroundColor.copy(
-                            red = (backgroundColor.red * 1.1f).coerceAtMost(1f),
-                            green = (backgroundColor.green * 1.6f).coerceAtMost(1f)
-                        ),
+                        color = backgroundColorLogo,
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
                             .padding(start = 8.dp)

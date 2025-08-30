@@ -9,7 +9,7 @@ import com.example.myapplication.ui.SettingsScreen.SettingsScreen
 import com.example.myapplication.ui.SettingsScreen.SettingsViewModel
 import com.example.myapplication.ui.addrequest.AddRequestScreen
 import com.example.myapplication.ui.addrequest.AddRequestViewModel
-import com.example.myapplication.ui.slide.ManageRequestsScreen
+import com.example.myapplication.ui.slide.ManageSlideRequests
 import com.example.myapplication.ui.changeProfile.ChangeProfileScreen
 import com.example.myapplication.ui.changeProfile.ChangeProfileViewModel
 import com.example.myapplication.ui.editrequest.EditRequestScreen
@@ -146,7 +146,7 @@ fun GetRescuedNavGraph(
             InfoRequestScreen(navController = navController, viewModel = viewModel)
         }
         composable<GetRescuedRoute.ManageRequests> {
-            ManageRequestsScreen(navController = navController)
+            ManageSlideRequests(navController = navController)
         }
         composable<GetRescuedRoute.EditRequest> { backStackEntry ->
             val args = backStackEntry.toRoute<GetRescuedRoute.EditRequest>()

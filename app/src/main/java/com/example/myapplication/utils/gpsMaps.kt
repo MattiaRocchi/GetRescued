@@ -33,7 +33,7 @@ fun openAddressInMaps(context: Context, address: String) {
     }
 }
 
-//Apre Google Maps con coordinate GPS
+//Apre Google Maps con coordinate GPS //Attualmente non usata
 fun openLocationInMaps(context: Context, latitude: Double, longitude: Double) {
     val geoUri = Uri.parse("geo:$latitude,$longitude?z=15") // z=15 è lo zoom
     val intent = Intent(Intent.ACTION_VIEW, geoUri).apply {
