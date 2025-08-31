@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -24,6 +25,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.ui.composables.LegendDialog
+import com.example.myapplication.ui.composables.createRequestStatusLegendItems
 import openAddressInMaps
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -941,6 +943,9 @@ fun ManageRequest(
     // Dialog per La legenda
     if (showStatusLegend) {
         LegendDialog(
+            title = "Legenda stati richiesta",
+            titleIcon = Icons.AutoMirrored.Filled.Assignment,
+            items = createRequestStatusLegendItems(),
             onDismiss = { showStatusLegend = false }
         )
     }

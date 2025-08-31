@@ -14,6 +14,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Assignment
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,18 +32,18 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.ui.composables.CameraCapture
 import com.example.myapplication.ui.composables.ImagePickerDialog
+import com.example.myapplication.ui.composables.LegendDialog
+import com.example.myapplication.ui.composables.createInfoAppLegendItems
 import com.example.myapplication.ui.theme.UnpressableButtonDark
 import com.example.myapplication.utils.MusicService
 import com.example.myapplication.utils.PermissionStatus
 import com.example.myapplication.utils.rememberMultiplePermissions
-
 @Composable
 fun ProfileScreen(
     navController: NavHostController,
     viewModel: ProfileViewModel,
 ) {
     val context = LocalContext.current
-
 
     // Dati dal ViewModel
     val user by viewModel.user.collectAsState()
@@ -48,22 +52,20 @@ fun ProfileScreen(
     val allTags by viewModel.allTags.collectAsState()
     val selectedIds = viewModel.getSelectedTagIds()
 
-
-
     // Stati UI
     var showChangePicDialog by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
     var showTitleDialog by remember { mutableStateOf(false) }
     var showTagsDialog by remember { mutableStateOf(false) }
+    var showInfoappLegend by remember { mutableStateOf(false) }
 
-
-    //Launcher per la galleria
+    // Launcher per la galleria
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
             if (user != null) {
-                viewModel.updateProfilePhoto(it.toString()) //salva nel DB
+                viewModel.updateProfilePhoto(it.toString())
             }
         }
     }
@@ -95,11 +97,11 @@ fun ProfileScreen(
         CameraCapture(
             onImageFile = { uri ->
                 if (user != null) {
-                    viewModel.updateProfilePhoto(uri.toString()) // salva nel DB
+                    viewModel.updateProfilePhoto(uri.toString())
                 }
                 showCamera = false
             },
-            onBack = { showCamera = false }, //torna indietro senza scattare
+            onBack = { showCamera = false },
             modifier = Modifier.fillMaxSize()
         )
         return
@@ -118,6 +120,37 @@ fun ProfileScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Header con titolo e icona info
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Il Mio Profilo",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                IconButton(
+                    onClick = { showInfoappLegend = true },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(
+                            MaterialTheme.colorScheme.primaryContainer,
+                            CircleShape
+                        )
+                ) {
+                    Icon(
+                        Icons.Default.Info,
+                        contentDescription = "Info app",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+
             // Foto profilo cliccabile
             Box(
                 modifier = Modifier
@@ -158,19 +191,41 @@ fun ProfileScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
+            Spacer(Modifier.height(8.dp))
 
-
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Phone,
+                    contentDescription = "Telefono",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp)
+                )
                 Text(
-                    text = "📞 ${user?.phoneNumber?: ("Non inserita, " +
-                            "cambia i tuoi dati per aggiungere numero di telefono")
-                    }",
+                    text = user?.phoneNumber ?: "Non inserita, cambia i tuoi dati per aggiungere numero di telefono",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
+            }
 
-
-            // Abitazione (se disponibile)
-
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Home,
+                    contentDescription = "Abitazione",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp)
+                )
                 Text(
                     text = "🏠 ${
                         user?.habitation ?: ("Non inserita, " +
@@ -179,7 +234,9 @@ fun ProfileScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
+            }
 
+            Spacer(Modifier.height(16.dp))
 
             //Cambio titolo
             Row(
@@ -187,8 +244,8 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
-                    onClick = { /* eventualmente aprire dialogo qui */ },
-                    modifier = Modifier.weight(1f), // usa peso invece di fillMaxWidth
+                    onClick = {},
+                    modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = rarityToColor(activeTitle?.rarity ?: "Common"),
                         contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -203,8 +260,6 @@ fun ProfileScreen(
                 }
 
                 Spacer(Modifier.width(8.dp))
-
-
 
                 IconButton(
                     onClick = { showTitleDialog = true },
@@ -230,10 +285,9 @@ fun ProfileScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-
                 Button(
-                    onClick = { /* eventualmente aprire dialogo qui */ },
-                    modifier = Modifier.weight(1f), // usa peso invece di fillMaxWidth
+                    onClick = {  },
+                    modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -250,18 +304,20 @@ fun ProfileScreen(
                 Spacer(Modifier.width(8.dp))
 
                 IconButton(
-                    onClick = { showTagsDialog = true },
+                    onClick = { showInfoappLegend = true },
                     modifier = Modifier
                         .size(40.dp)
                         .background(
-                            MaterialTheme.colorScheme.onSecondaryContainer,
+                            MaterialTheme.colorScheme.onPrimary,
                             CircleShape
                         )
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = "Gestisci Tags",
-                        tint = MaterialTheme.colorScheme.secondaryContainer
+                        Icons.Default.Info,
+                        contentDescription = "Info app",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier
+                            .size(25.dp)
                     )
                 }
             }
@@ -270,7 +326,7 @@ fun ProfileScreen(
             Spacer(Modifier.height(18.dp))
             Button(
                 onClick = {
-                        navController.navigate(GetRescuedRoute.ChangeProfile)
+                    navController.navigate(GetRescuedRoute.ChangeProfile)
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -319,8 +375,6 @@ fun ProfileScreen(
         )
     }
 
-
-
     if (showTitleDialog) {
         TitlePickerDialog(
             titles = userTitles,
@@ -342,6 +396,15 @@ fun ProfileScreen(
                 viewModel.updateUserTags(selectedTags)
                 showTagsDialog = false
             }
+        )
+    }
+
+    if (showInfoappLegend) {
+        LegendDialog(
+            title = "Info su getRescued",
+            titleIcon = Icons.AutoMirrored.Filled.Assignment,
+            items = createInfoAppLegendItems(),
+            onDismiss = { showInfoappLegend = false }
         )
     }
 }

@@ -100,57 +100,57 @@
   },
   {
 
-    "name": "MedioMan!",
-    "description": "Completa 10 richieste con il tag Casalinghe",
-    "exp": 7000,
+    "name": "Mago del pulito!",
+    "description": "Completa 10 richieste con il tag Pulizie",
+    "exp": 4000,
     "titleBadge": 12,
     "Requirement": 10,
-    "Tag": "Casalinghe"
+    "Tag": "Pulizie"
   },
   {
 
-    "name": "Pompiere Novello",
-    "description": "Completa 2 richieste con tag Pompiere",
+    "name": "Falegname Novello",
+    "description": "Completa 2 richieste con tag Falegname",
     "exp": 200,
     "titleBadge": 13,
     "Requirement": 2,
-    "Tag": "Pompiere"
+    "Tag": "Falegname"
   },
   {
 
-    "name": "Pompiere Amatoriale",
-    "description": "Completa 5 richieste con tag Pompiere",
+    "name": "Falegname Amatoriale",
+    "description": "Completa 5 richieste con tag Falegname",
     "exp": 500,
     "titleBadge": 14,
     "Requirement": 5,
-    "Tag": "Pompiere"
+    "Tag": "Falegname"
   },
   {
 
-    "name": "Pompiere Diligente",
-    "description": "Completa 10 richieste con tag Pompiere",
+    "name": "Falegname Diligente",
+    "description": "Completa 10 richieste con tag Falegname",
     "exp": 1000,
     "titleBadge": 15,
     "Requirement": 10,
-    "Tag": "Pompiere"
+    "Tag": "Falegname"
   },
   {
 
-    "name": "Pompiere Esperto",
-    "description": "Completa 20 richieste con tag Pompiere",
+    "name": "Falegname Esperto",
+    "description": "Completa 20 richieste con tag Falegname",
     "exp": 3000,
     "titleBadge": 16,
     "Requirement": 20,
-    "Tag": "Pompiere"
+    "Tag": "Falegname"
   },
   {
 
-    "name": "Pompiere Eroe",
-    "description": "Completa 50 richieste con tag Pompiere",
+    "name": "Mastro Falegname",
+    "description": "Completa 50 richieste con tag Falegname",
     "exp": 10000,
     "titleBadge": 17,
     "Requirement": 50,
-    "Tag": "Pompiere"
+    "Tag": "Falegname"
   },
   {
 
@@ -190,7 +190,7 @@
   },
   {
 
-    "name": "Elettricista Idraulico",
+    "name": "Elettricista Provetto",
     "description": "Completa 50 richieste con tag Elettricista",
     "exp": 10000,
     "titleBadge": 22,
@@ -199,7 +199,7 @@
   },
   {
 
-    "name": "Amante delle palle di pelo",
+    "name": "Amante degli animali",
     "description": "Completa 10 richieste con tag Animali",
     "exp": 2000,
     "titleBadge": 23,

@@ -1,17 +1,27 @@
 package com.example.myapplication.ui.registration
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -33,16 +43,17 @@ import androidx.navigation.NavHostController
 import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.ui.composables.AgeTextField
 import com.example.myapplication.ui.composables.EmailTextField
+import com.example.myapplication.ui.composables.LegendDialog
 import com.example.myapplication.ui.composables.NameTextField
 import com.example.myapplication.ui.composables.PasswordTextField
 import com.example.myapplication.ui.composables.PhoneTextField
 import com.example.myapplication.ui.composables.SurnameTextField
+import com.example.myapplication.ui.composables.createInfoAppLegendItems
 import com.example.myapplication.ui.composables.isValidPhoneNumber
 import com.example.myapplication.ui.profile.TagPickerDialog
 import com.example.myapplication.ui.theme.UnpressableButtonDark
 import com.example.myapplication.utils.AppLogo
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun RegistrationScreen(
@@ -55,6 +66,7 @@ fun RegistrationScreen(
 
     val allTags by viewModel.allTags.collectAsState()
     var showTagsDialog by remember { mutableStateOf(false) }
+    var showInfoappLegend by remember { mutableStateOf(false) }
 
     var nameError by remember { mutableStateOf(false) }
     var surnameError by remember { mutableStateOf(false) }
@@ -66,7 +78,6 @@ fun RegistrationScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
-
 
         Column(
             modifier = Modifier
@@ -80,12 +91,41 @@ fun RegistrationScreen(
 
             AppLogo()
             Spacer(Modifier.height(16.dp))
-            Text(
-                text = "Registrazione",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
-            )
+
+            // Header con titolo e icona info
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Registrazione",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+
+                IconButton(
+                    onClick = { showInfoappLegend = true },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(
+                            MaterialTheme.colorScheme.onPrimary,
+                            CircleShape
+                        )
+                ) {
+                    Icon(
+                        Icons.Default.Info,
+                        contentDescription = "Info app",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier
+                            .size(25.dp)
+                    )
+                }
+            }
+
             Spacer(Modifier.width(12.dp))
             NameTextField(
                 value = viewModel.name,
@@ -107,8 +147,6 @@ fun RegistrationScreen(
             )
 
             Spacer(Modifier.height(8.dp))
-
-
 
             EmailTextField(
                 value = viewModel.email,
@@ -145,13 +183,16 @@ fun RegistrationScreen(
             Spacer(Modifier.height(16.dp))
 
             PhoneTextField(
-                value = viewModel.phoneNumber.toString(),
+                value = viewModel.phoneNumber,
                 onValueChange = {
                     viewModel.onPhoneNumberChange(it)
                     phoneNumberError = it.isNotBlank() && !isValidPhoneNumber(it)
                 },
                 phoneError = phoneNumberError
             )
+
+            Spacer(Modifier.height(8.dp))
+
             Button(
                 onClick = { showTagsDialog = true },
                 colors = ButtonDefaults.buttonColors(
@@ -165,6 +206,7 @@ fun RegistrationScreen(
                 Text("Scegli i tuoi interessi (tag)")
             }
 
+            Spacer(Modifier.height(8.dp))
 
             Button(
                 onClick = {
@@ -189,7 +231,7 @@ fun RegistrationScreen(
                     disabledContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 enabled = !nameError && !surnameError && !emailError && !passwordError && !ageError
-                            && !phoneNumberError,
+                        && !phoneNumberError,
 
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -211,6 +253,16 @@ fun RegistrationScreen(
                         viewModel.onTagsSelected(selected)
                         showTagsDialog = false
                     }
+                )
+            }
+
+            // InfoApp Legend Dialog
+            if (showInfoappLegend) {
+                LegendDialog(
+                    title = "Info su getRescued",
+                    titleIcon = Icons.AutoMirrored.Filled.Assignment,
+                    items = createInfoAppLegendItems(),
+                    onDismiss = { showInfoappLegend = false }
                 )
             }
         }

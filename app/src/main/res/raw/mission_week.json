@@ -1,7 +1,7 @@
 [
   {
 
-    "name": "Missione 1",
+    "name": "Completa richieste 1",
     "description": "Completa 1 richieste",
     "exp": 50,
     "Requirement": 1,
@@ -10,7 +10,7 @@
   },
   {
 
-    "name": "Missione 2",
+    "name": "Completa richieste  2",
     "description": "Completa 3 richieste",
     "exp": 150,
     "Requirement": 3,
@@ -19,7 +19,7 @@
   },
   {
 
-    "name": "Missione 3",
+    "name": "Completa richieste  3",
     "description": "Completa 5 richieste",
     "exp": 300,
     "Requirement": 5,
@@ -28,7 +28,7 @@
   },
   {
 
-    "name": "Missione 4",
+    "name": "Completa richieste  4",
     "description": "Completa 10 richieste",
     "exp": 600,
     "Requirement": 10,
@@ -37,7 +37,7 @@
   },
   {
 
-    "name": "Missione 5",
+    "name": "Completa richieste  5",
     "description": "Completa 15 richieste",
     "exp": 1000,
     "Requirement": 15,
@@ -82,20 +82,20 @@
   },
   {
 
-    "name": "Missione Pompiere",
+    "name": "Missione Falegname",
     "description": "Completa 1 richieste con tag Pompiere",
     "exp": 100,
     "Requirement": 1,
-    "Tag": "Pompiere",
+    "Tag": "Falegname",
     "type": 0
   },
   {
 
-    "name": "Missione Pompiere",
+    "name": "Missione Falegname",
     "description": "Completa 3 richieste con tag Pompiere",
     "exp": 250,
     "Requirement": 3,
-    "Tag": "Pompiere",
+    "Tag": "Falegname",
     "type": 0
   },
   {
@@ -115,5 +115,24 @@
     "Requirement": 3,
     "Tag": "Animali",
     "type": 0
+  },
+  {
+
+    "name": "Missione Pulizie",
+    "description": "Completa 1 richieste con tag Pulizie",
+    "exp": 100,
+    "Requirement": 1,
+    "Tag": "Pulizie",
+    "type": 0
+  },
+  {
+
+    "name": "Missione Pulizie",
+    "description": "Completa 3 richieste con tag Pulizie",
+    "exp": 250,
+    "Requirement": 3,
+    "Tag": "Pulizie",
+    "type": 0
   }
+
 ]

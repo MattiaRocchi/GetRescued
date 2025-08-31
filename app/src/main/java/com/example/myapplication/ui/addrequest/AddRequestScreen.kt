@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,6 +28,7 @@ import com.example.myapplication.ui.composables.CameraCapture
 import com.example.myapplication.ui.composables.ImagePickerDialog
 import com.example.myapplication.ui.theme.UnpressableButtonDark
 import com.example.myapplication.ui.composables.LegendDialog
+import com.example.myapplication.ui.composables.createRequestStatusLegendItems
 import openAddressInMaps
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -455,6 +457,9 @@ fun AddRequestScreen(
     // Dialog per La legenda
     if (showStatusLegend) {
         LegendDialog(
+            title = "Legenda stati richiesta",
+            titleIcon = Icons.AutoMirrored.Filled.Assignment,
+            items = createRequestStatusLegendItems(),
             onDismiss = { showStatusLegend = false }
         )
     }

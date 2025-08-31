@@ -14,18 +14,18 @@
   { "id": 9, "name": "Idraulico Diligente", "rarity": "Epic" },
   { "id": 10, "name": "Idraulico Esperto", "rarity": "Mythic" },
   { "id": 11, "name": "Maestro Idraulico", "rarity": "Legendary" },
-  { "id": 12, "name": "MedioMan!", "rarity": "Legendary" },
-  { "id": 13, "name": "Pompiere Novello", "rarity": "Rare" },
-  { "id": 14, "name": "Pompiere Amatoriale", "rarity": "superRare" },
-  { "id": 15, "name": "Pompiere Diligente", "rarity": "Epic" },
-  { "id": 16, "name": "Pompiere Esperto", "rarity": "Mythic" },
-  { "id": 17, "name": "Pompiere Eroe", "rarity": "Legendary" },
+  { "id": 12, "name": "Maestro del pulito!", "rarity": "Epic" },
+  { "id": 13, "name": "Falegname Novello", "rarity": "Rare" },
+  { "id": 14, "name": "Falegname Amatoriale", "rarity": "superRare" },
+  { "id": 15, "name": "Falegname Diligente", "rarity": "Epic" },
+  { "id": 16, "name": "Falegname Esperto", "rarity": "Mythic" },
+  { "id": 17, "name": "Falegname Eroe", "rarity": "Legendary" },
   { "id": 18, "name": "Elettricista Novello", "rarity": "Rare" },
   { "id": 19, "name": "Elettricista Amatoriale", "rarity": "superRare" },
   { "id": 20, "name": "Elettricista Diligente", "rarity": "Epic" },
   { "id": 21, "name": "Elettricista Esperto", "rarity": "Mythic" },
-  { "id": 22, "name": "Elettricista Idraulico", "rarity": "Legendary" },
-  { "id": 23, "name": "Amante delle palle di pelo", "rarity": "Epic" }
+  { "id": 22, "name": "Elettricista Provetto", "rarity": "Legendary" },
+  { "id": 23, "name": "Amante delle palle degli animali", "rarity": "Epic" }
 
 ]
 

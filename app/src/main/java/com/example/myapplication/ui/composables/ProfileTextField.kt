@@ -222,6 +222,6 @@ fun PhoneTextField(
 
 
 fun isValidPhoneNumber(phone: String): Boolean {
-    val regex = Regex("^(?:\\+39)?\\d{8,9}$")
+    val regex = Regex("^(?:\\+39)?\\d{8,10}$")
     return regex.matches(phone)
 }
