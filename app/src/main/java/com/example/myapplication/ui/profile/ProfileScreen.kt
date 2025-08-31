@@ -139,14 +139,16 @@ fun ProfileScreen(
                     modifier = Modifier
                         .size(40.dp)
                         .background(
-                            MaterialTheme.colorScheme.primaryContainer,
+                            MaterialTheme.colorScheme.onPrimary,
                             CircleShape
                         )
                 ) {
                     Icon(
                         Icons.Default.Info,
                         contentDescription = "Info app",
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier
+                            .size(25.dp)
                     )
                 }
             }
@@ -227,10 +229,8 @@ fun ProfileScreen(
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
-                    text = "🏠 ${
-                        user?.habitation ?: ("Non inserita, " +
-                                "cambia i tuoi dati per aggiungere abitazione")
-                    }",
+                    text = user?.habitation ?: ("Non inserita, " +
+                                "cambia i tuoi dati per aggiungere abitazione"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -302,24 +302,22 @@ fun ProfileScreen(
                 }
 
                 Spacer(Modifier.width(8.dp))
-
                 IconButton(
-                    onClick = { showInfoappLegend = true },
+                    onClick = { showTagsDialog = true },
                     modifier = Modifier
                         .size(40.dp)
                         .background(
-                            MaterialTheme.colorScheme.onPrimary,
+                            MaterialTheme.colorScheme.onSecondaryContainer,
                             CircleShape
                         )
                 ) {
                     Icon(
-                        Icons.Default.Info,
-                        contentDescription = "Info app",
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier
-                            .size(25.dp)
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Gestisci Tags",
+                        tint = MaterialTheme.colorScheme.secondaryContainer
                     )
                 }
+
             }
 
 
