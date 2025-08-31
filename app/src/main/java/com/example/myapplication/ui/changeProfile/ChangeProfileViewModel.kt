@@ -26,8 +26,6 @@ class ChangeProfileViewModel(
         private set
     var surname by mutableStateOf("")
         private set
-    var email by mutableStateOf("")
-        private set
     var ageText by mutableStateOf("")
         private set
     var habitation by mutableStateOf<String?>(null)
@@ -67,7 +65,6 @@ class ChangeProfileViewModel(
         originalUser = null
         name = ""
         surname = ""
-        email = ""
         ageText = ""
         habitation = null
         phoneNumber = null
@@ -84,7 +81,6 @@ class ChangeProfileViewModel(
                 originalUser = u
                 name = u.name
                 surname = u.surname
-                email = u.email
                 ageText = u.age.toString()
                 habitation = u.habitation
                 phoneNumber = u.phoneNumber
@@ -102,7 +98,6 @@ class ChangeProfileViewModel(
     // onChange helpers
     fun onNameChange(v: String) { name = v }
     fun onSurnameChange(v: String) { surname = v }
-    fun onEmailChange(v: String) { email = v }
     fun onAgeTextChange(v: String) { ageText = v }
     fun onHabitationChange(v: String?) { habitation = v }
     fun onPhoneNumberChange(v: String?) { phoneNumber = v }
@@ -131,46 +126,19 @@ class ChangeProfileViewModel(
 
             isSaving = true
             try {
-                if (email.trim() == orig.email.trim()) {
-                    // update standard
-                    val updatedUser = orig.copy(
-                        name = name.trim(),
-                        surname = surname.trim(),
-                        email = email.trim(),
-                        password = if (wantChangePassword) PasswordHasher.hash(newPassword) else orig.password,
-                        age = age,
-                        habitation = habitation?.trim(),
-                        phoneNumber = phoneNumber?.trim()
-                    )
-                    userDaoRepository.updateUser(updatedUser)
-                    originalUser = updatedUser
-                    loadCurrentUser(orig.id)
-                    onSuccess()
-                } else {
-                    // ==== EMAIL CHANGED FLOW ====
-                    val newUser = orig.copy(
-                        id = 0, // nuovo record
-                        name = name.trim(),
-                        surname = surname.trim(),
-                        email = email.trim(),
-                        password = if (wantChangePassword) PasswordHasher.hash(newPassword) else orig.password,
-                        age = age,
-                        habitation = habitation?.trim(),
-                        phoneNumber = phoneNumber?.trim()
-                    )
-
-                    val newIdLong = userDaoRepository.insertUserWithInfo(newUser)
-                    val newId = newIdLong.toInt()
-
-                    // aggiorna sessione
-                    settingsRepository.setLoggedInUser(newId)
-
-                    // eventuale migrazione dati vecchio utente
-                    userDaoRepository.insertUserWithInfoChange(newUser, orig.id)
-
-                    loadCurrentUser(newId)
-                    onSuccess()
-                }
+                // update standard
+                val updatedUser = orig.copy(
+                    name = name.trim(),
+                    surname = surname.trim(),
+                    password = if (wantChangePassword) PasswordHasher.hash(newPassword) else orig.password,
+                    age = age,
+                    habitation = habitation?.trim(),
+                    phoneNumber = phoneNumber?.trim()
+                )
+                userDaoRepository.updateUser(updatedUser)
+                originalUser = updatedUser
+                loadCurrentUser(orig.id)
+                onSuccess()
             } catch (t: Throwable) {
                 t.printStackTrace()
                 onError(t.message ?: "Errore durante il salvataggio")

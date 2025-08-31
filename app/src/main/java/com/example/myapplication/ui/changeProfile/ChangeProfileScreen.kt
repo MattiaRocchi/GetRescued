@@ -28,7 +28,6 @@ fun ChangeProfileScreen(
     // bind ai campi del VM
     val name by remember { derivedStateOf { viewModel.name } }
     val surname by remember { derivedStateOf { viewModel.surname } }
-    val email by remember { derivedStateOf { viewModel.email } }
     val ageText by remember { derivedStateOf { viewModel.ageText } }
     val habitation by remember { derivedStateOf { viewModel.habitation } }
     val phone by remember { derivedStateOf { viewModel.phoneNumber } }
@@ -42,6 +41,7 @@ fun ChangeProfileScreen(
     var surnameError by remember { mutableStateOf(false) }
     var ageError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
+    var phoneNumberError by remember { mutableStateOf(false) }
     var confirmPassError by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -76,12 +76,6 @@ fun ChangeProfileScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            ProfileTextField(value = email, onValueChange = {
-                viewModel.onEmailChange(it)
-            }, label = "Email")
-
-            Spacer(Modifier.height(8.dp))
-
             ProfileTextField(value = ageText, onValueChange = {
                 viewModel.onAgeTextChange(it); ageError = it.toIntOrNull()?.let { n -> n <= 0 } ?: true
             }, label = "Età")
@@ -98,10 +92,13 @@ fun ChangeProfileScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            ProfileTextField(
+            PhoneTextField(
                 value = phone ?: "",
-                onValueChange = { viewModel.onPhoneNumberChange(it) },
-                label = "Telefono (facoltativo)"
+                onValueChange = {
+                    viewModel.onPhoneNumberChange(it)
+                    phoneNumberError = it.isNotBlank() && !isValidPhoneNumber(it)
+                },
+                phoneError = phoneNumberError
             )
 
             Spacer(Modifier.height(12.dp))
