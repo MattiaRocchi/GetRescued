@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.composables
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -213,6 +214,7 @@ fun DynamicRequestCard(
                     Surface(
                         color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f),
                         shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(1.dp,MaterialTheme.colorScheme.onPrimary),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
@@ -224,12 +226,12 @@ fun DynamicRequestCard(
                                 imageVector = Icons.Default.Notifications,
                                 contentDescription = "Proposte",
                                 modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.tertiary
+                                tint = MaterialTheme.colorScheme.onError
                             )
                             Text(
                                 text = "${pendingRequests.size} ${if (pendingRequests.size == 1) "proposta" else "proposte"} di partecipazione",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.tertiary,
+                                color = MaterialTheme.colorScheme.onError,
                                 fontWeight = FontWeight.Medium
                             )
                             Spacer(modifier = Modifier.weight(1f))
@@ -237,7 +239,7 @@ fun DynamicRequestCard(
                                 imageVector = Icons.Default.ChevronRight,
                                 contentDescription = "Vedi dettagli",
                                 modifier = Modifier.size(14.dp),
-                                tint = MaterialTheme.colorScheme.tertiary
+                                tint = MaterialTheme.colorScheme.onError,
                             )
                         }
                     }

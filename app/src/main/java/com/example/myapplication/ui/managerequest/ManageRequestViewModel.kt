@@ -48,6 +48,8 @@ class ManageRequestViewModel(
             val canMarkCompleted: Boolean get() = request.isScheduledForToday() || request.isScheduledInPast()
             val canManageParticipants: Boolean get() = request.canBeModified()
             val isExpired: Boolean get() = request.isScheduledInPast()
+
+            val isComplete: Boolean get() = request.completed
             val isInPreparation: Boolean get() = request.isScheduledForTomorrow()
             val requestState: String get() = request.getRequestState()
         }

@@ -8,6 +8,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -55,6 +57,9 @@ fun ManageRequest(
         if (state is ManageRequestViewModel.UiState.Ready && state.isExpired) {
             showExpiredDialog = true
         }
+        if(state is ManageRequestViewModel.UiState.Ready && state.isComplete){
+            navController.navigate(GetRescuedRoute.ManageRequests)
+        }
     }
 
     Scaffold(
@@ -63,7 +68,7 @@ fun ManageRequest(
                 title = { Text("Gestione richiesta") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Indietro")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
                     }
                 },
                 actions = {
@@ -108,6 +113,7 @@ fun ManageRequest(
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text("Richiesta non trovata")
                     }
+                    navController.navigate(GetRescuedRoute.ManageRequests)
                 }
 
                 is ManageRequestViewModel.UiState.NotAuthorized -> {
@@ -175,22 +181,38 @@ fun ManageRequest(
                                             },
                                             shape = RoundedCornerShape(12.dp)
                                         ) {
-                                            Text(
-                                                text = state.requestState,
-                                                modifier = Modifier.padding(
-                                                    horizontal = 8.dp,
-                                                    vertical = 4.dp
-                                                ),
-                                                style = MaterialTheme.typography.labelMedium,
-                                                fontWeight = FontWeight.Medium,
-                                                color = when (state.requestState) {
-                                                    "Scaduta" -> MaterialTheme.colorScheme.onErrorContainer
-                                                    "In corso" -> MaterialTheme.colorScheme.onSecondaryContainer
-                                                    "In preparazione" -> MaterialTheme.colorScheme.onTertiaryContainer
-                                                    "Programmata" -> MaterialTheme.colorScheme.onPrimaryContainer
-                                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
-                                                }
-                                            )
+                                            Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier.padding(horizontal = 8.dp)
+                                            ) {
+                                                Icon(
+                                                    modifier = Modifier.size(14.dp),
+                                                    imageVector = when (state.requestState) {
+                                                        "Scaduta" -> Icons.Default.Schedule
+                                                        "In corso" -> Icons.Default.PlayArrow
+                                                        "In preparazione" -> Icons.Default.Build
+                                                        "Programmata" -> Icons.Default.Schedule
+                                                        else -> Icons.Default.Schedule
+                                                    },
+                                                    contentDescription = null,
+                                                )
+                                                Text(
+                                                    text = state.requestState,
+                                                    modifier = Modifier.padding(
+                                                        vertical = 4.dp
+                                                    ),
+                                                    style = MaterialTheme.typography.labelMedium,
+                                                    fontWeight = FontWeight.Medium,
+                                                    color = when (state.requestState) {
+                                                        "Scaduta" -> MaterialTheme.colorScheme.onErrorContainer
+                                                        "In corso" -> MaterialTheme.colorScheme.onSecondaryContainer
+                                                        "In preparazione" -> MaterialTheme.colorScheme.onTertiaryContainer
+                                                        "Programmata" -> MaterialTheme.colorScheme.onPrimaryContainer
+                                                        else -> MaterialTheme.colorScheme.onSurfaceVariant
+                                                    }
+                                                )
+                                            }
+
                                         }
 
                                         // Badge difficoltà
@@ -221,53 +243,98 @@ fun ManageRequest(
                                 // Informazioni richiesta
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        "👥 Persone richieste: ${r.peopleRequired}",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Group,
+                                            contentDescription = "Persone richieste",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text(
+                                            "Persone richieste: ${r.peopleRequired}",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
                                 }
 
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        "🤝 Richieste ricevute: ${state.pendingParticipants.size}",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Handshake,
+                                            contentDescription = "Richieste ricevute",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text(
+                                            "Richieste ricevute: ${state.pendingParticipants.size}",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
                                 }
 
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        "✅ Approvati: ${r.rescuers.size}",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.CheckCircle,
+                                            contentDescription = "Approvati",
+                                            modifier = Modifier.size(16.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                        Text(
+                                            "Approvati: ${r.rescuers.size}",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
                                 }
 
                                 // Data di svolgimento
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    val scheduledDate =
-                                        java.time.Instant.ofEpochMilli(r.scheduledDate)
-                                            .atZone(java.time.ZoneId.systemDefault())
-                                            .toLocalDate()
-                                    Text(
-                                        "📅 Data: ${
-                                            scheduledDate.format(
-                                                DateTimeFormatter.ofLocalizedDate(
-                                                    FormatStyle.MEDIUM
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.CalendarToday,
+                                            contentDescription = "Data",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        val scheduledDate =
+                                            java.time.Instant.ofEpochMilli(r.scheduledDate)
+                                                .atZone(java.time.ZoneId.systemDefault())
+                                                .toLocalDate()
+                                        Text(
+                                            "Data: ${
+                                                scheduledDate.format(
+                                                    DateTimeFormatter.ofLocalizedDate(
+                                                        FormatStyle.MEDIUM
+                                                    )
                                                 )
-                                            )
-                                        }",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                            }",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
                                 }
 
                                 // Posizione con bottone Maps
@@ -277,11 +344,21 @@ fun ManageRequest(
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(
-                                            text = "📍 $place",
-                                            style = MaterialTheme.typography.bodyMedium,
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp),
                                             modifier = Modifier.weight(1f)
-                                        )
+                                        ) {
+                                            Icon(
+                                                Icons.Default.LocationOn,
+                                                contentDescription = "Posizione",
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Text(
+                                                text = place,
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                        }
                                         OutlinedButton(
                                             onClick = { openAddressInMaps(context, place) },
                                             modifier = Modifier.padding(start = 8.dp)
@@ -299,16 +376,36 @@ fun ManageRequest(
 
                                 HorizontalDivider()
 
-                                Text("📝 Descrizione:", style = MaterialTheme.typography.titleSmall)
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Description,
+                                        contentDescription = "Descrizione",
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Text("Descrizione:", style = MaterialTheme.typography.titleSmall)
+                                }
                                 Text(r.description, style = MaterialTheme.typography.bodyMedium)
 
                                 if (state.requestTags.isNotEmpty()) {
                                     HorizontalDivider()
 
-                                    Text(
-                                        "🏷️ Tag richiesti:",
-                                        style = MaterialTheme.typography.titleSmall
-                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.AutoMirrored.Filled.Label,
+                                            contentDescription = "Tag richiesti",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text(
+                                            "Tag richiesti:",
+                                            style = MaterialTheme.typography.titleSmall
+                                        )
+                                    }
 
                                     @OptIn(ExperimentalLayoutApi::class)
                                     FlowRow(
@@ -347,11 +444,21 @@ fun ManageRequest(
                                 // Sezione foto (se presenti)
                                 if (r.fotos.isNotEmpty()) {
                                     Column(Modifier.padding(16.dp)) {
-                                        Text(
-                                            "📷 Foto allegate",
-                                            style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.Medium
-                                        )
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Default.PhotoCamera,
+                                                contentDescription = "Foto allegate",
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Text(
+                                                "Foto allegate",
+                                                style = MaterialTheme.typography.titleMedium,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        }
                                         Spacer(Modifier.height(8.dp))
                                         LazyRow(
                                             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -545,19 +652,40 @@ fun ManageRequest(
                                 elevation = CardDefaults.cardElevation(4.dp)
                             ) {
                                 Column(Modifier.padding(16.dp)) {
-                                    Text(
-                                        "👥 Partecipanti",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
                                         modifier = Modifier.padding(bottom = 8.dp)
-                                    )
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Group,
+                                            contentDescription = "Partecipanti",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text(
+                                            "Partecipanti",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
 
                                     if (state.approvedParticipants.isNotEmpty()) {
-                                        Text(
-                                            "✅ Approvati: ${state.approvedParticipants.size}/${r.peopleRequired}",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Default.CheckCircle,
+                                                contentDescription = "Approvati",
+                                                modifier = Modifier.size(16.dp),
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                            Text(
+                                                "Approvati: ${state.approvedParticipants.size}/${r.peopleRequired}",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
                                         state.approvedParticipants.forEach { user ->
                                             Text(
                                                 "• ${user.name} ${user.surname}",
@@ -568,12 +696,23 @@ fun ManageRequest(
                                     }
 
                                     if (state.pendingParticipants.isNotEmpty()) {
-                                        Text(
-                                            "⏳ In attesa: ${state.pendingParticipants.size}",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.secondary,
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp),
                                             modifier = Modifier.padding(top = 8.dp)
-                                        )
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Schedule,
+                                                contentDescription = "In attesa",
+                                                modifier = Modifier.size(16.dp),
+                                                tint = MaterialTheme.colorScheme.secondary
+                                            )
+                                            Text(
+                                                "In attesa: ${state.pendingParticipants.size}",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.secondary
+                                            )
+                                        }
                                         Text(
                                             "Non puoi più gestire le richieste di partecipazione.",
                                             style = MaterialTheme.typography.bodySmall,
@@ -650,30 +789,72 @@ fun ManageRequest(
                                 Spacer(Modifier.height(8.dp))
                                 when (state.requestState) {
                                     "Scaduta" -> {
-                                        Text(
-                                            "⚠️ La richiesta è scaduta. Verrà completata automaticamente.",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.error
-                                        )
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Warning,
+                                                contentDescription = "Avviso",
+                                                modifier = Modifier.size(16.dp),
+                                                tint = MaterialTheme.colorScheme.error
+                                            )
+                                            Text(
+                                                "La richiesta è scaduta. Verrà completata automaticamente.",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        }
                                     }
                                     "In corso" -> {
-                                        Text(
-                                            "▶️ La richiesta è in corso oggi. Puoi contrassegnarla come completata.",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.secondary
-                                        )
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Default.PlayArrow,
+                                                contentDescription = "In corso",
+                                                modifier = Modifier.size(16.dp),
+                                                tint = MaterialTheme.colorScheme.secondary
+                                            )
+                                            Text(
+                                                "La richiesta è in corso oggi. Puoi contrassegnarla come completata.",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.secondary
+                                            )
+                                        }
                                     }
                                     "In preparazione" -> {
-                                        Text(
-                                            "⏳ La richiesta è in preparazione per domani. Nessuna azione disponibile.",
-                                            style = MaterialTheme.typography.bodySmall
-                                        )
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Schedule,
+                                                contentDescription = "In preparazione",
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Text(
+                                                "La richiesta è in preparazione per domani. Nessuna azione disponibile.",
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
+                                        }
                                     }
                                     "Programmata" -> {
-                                        Text(
-                                            "📅 Puoi modificare, eliminare la richiesta o gestire i partecipanti.",
-                                            style = MaterialTheme.typography.bodySmall,
-                                        )
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Default.CalendarToday,
+                                                contentDescription = "Programmata",
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Text(
+                                                "Puoi modificare, eliminare la richiesta o gestire i partecipanti.",
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -744,7 +925,7 @@ fun ManageRequest(
             onDismissRequest = { }, // Non permettere di chiudere senza confermare
             title = { Text("Richiesta Scaduta") },
             text = {
-                Text("La richiesta è stata completata in automatico perché scaduta.")
+                Text("La richiesta è stata completata in automatico perchè scaduta.")
             },
             confirmButton = {
                 TextButton(
