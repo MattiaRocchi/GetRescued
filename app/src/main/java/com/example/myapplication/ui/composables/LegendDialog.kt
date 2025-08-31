@@ -216,17 +216,17 @@ fun createInfoAppLegendItems(): List<LegendItemData> {
             title = "Profilo",
             description = "Da qui puoi vedere e modificare le tue informazioni personali come " +
                     "le tue abilità (Tags), cambiare titolo e visualizzare il tuo livello di " +
-                    "esperienza. Puoi anche inserire una foto profilo cliccando sull'icono " +
-                    "circolare ad in alto al centro con le tue iniziali (nota: la foto sarà " +
-                    "visualizzabile ai creatori della richieste se richiedi di partecipare) ",
+                    "esperienza. Puoi anche inserire una foto profilo cliccando sull'icona " +
+                    "circolare con le tue iniziali (nota: la foto sarà " +
+                    "visualizzabile ai creatori delle richieste) ",
             color = MaterialTheme.colorScheme.tertiaryContainer,
             onColor = MaterialTheme.colorScheme.onTertiaryContainer,
             icon = Icons.Default.Build
         ),
         LegendItemData(
             title = "Richieste",
-            description = "Tutti gli utenti possono creare una richesta o partecipare ad una se " +
-                    "hanno le abilità adeguate(Tags). Ricordatevi di accettare i partecipanti se" +
+            description = "Tutti gli utenti possono creare una richesta. Per partecipare è necessario " +
+                    "avere le abilità adeguate(Tags). Ricordatevi di accettare i partecipanti se" +
                     " siete i creatori della richiesta! (maggiori info nella sezione " +
                     "'Crea richiesta')",
             color = MaterialTheme.colorScheme.secondaryContainer,
