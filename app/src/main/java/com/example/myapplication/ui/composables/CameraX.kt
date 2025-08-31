@@ -16,13 +16,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cached
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -32,12 +29,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.core.net.toUri
 
 @Composable
 fun CameraCapture(
@@ -48,26 +43,26 @@ fun CameraCapture(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // 🔹 Mantieni lo stato anche dopo la rotazione
+    //Mantieni lo stato anche dopo la rotazione
     var useFrontCamera by rememberSaveable { mutableStateOf(false) }
     var isCapturing by remember { mutableStateOf(false) }
 
-    // 🔹 Crea ImageCapture una sola volta
+    //Crea ImageCapture una sola volta
     val imageCapture = remember {
         ImageCapture.Builder()
             .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
             .build()
     }
 
-    // 🔹 PreviewView persistente
+    // PreviewView
     val previewView = remember {
         PreviewView(context).apply { scaleType = PreviewView.ScaleType.FILL_CENTER }
     }
 
-    // 🔹 CameraProvider
+    // CameraProvider
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
 
-    // 🔹 Bind/Unbind quando cambia lifecycleOwner o useFrontCamera
+    // Bind/Unbind quando cambia lifecycleOwner o useFrontCamera
     DisposableEffect(lifecycleOwner, useFrontCamera) {
         val cameraProvider = cameraProviderFuture.get()
         val previewUseCase = Preview.Builder().build().apply {
@@ -117,7 +112,7 @@ fun CameraCapture(
             )
         }
 
-        // 📸 Pulsante scatto (grande e rotondo)
+        // Pulsante scatto
         IconButton(
             onClick = {
                 if (isCapturing) return@IconButton
@@ -160,7 +155,7 @@ fun CameraCapture(
             )
         }
 
-        // 🔄 Pulsante switch camera
+        //Pulsante switch camera
         IconButton(
             onClick = { useFrontCamera = !useFrontCamera },
             modifier = Modifier
@@ -179,7 +174,7 @@ fun CameraCapture(
 
 }
 
-// 🔹 Crea file temporaneo
+//Crea file temporaneo
 private fun createFile(context: Context): File {
     val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
     val storageDir = context.externalCacheDir

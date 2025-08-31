@@ -13,7 +13,7 @@ class MusicService : Service() {
         const val ACTION_START = "com.example.myapplication.action.START_MUSIC"
         const val ACTION_STOP = "com.example.myapplication.action.STOP_MUSIC"
         const val ACTION_SET_VOLUME = "com.example.myapplication.action.SET_VOLUME"
-        const val EXTRA_VOLUME = "extra_volume" // float 0f..1f
+        const val EXTRA_VOLUME = "extra_volume"
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -35,7 +35,7 @@ class MusicService : Service() {
             }
 
             ACTION_SET_VOLUME -> {
-                val vol = intent?.getFloatExtra(EXTRA_VOLUME, 0.5f) ?: 0.5f
+                val vol = intent.getFloatExtra(EXTRA_VOLUME, 0.5f)
                 setPlayerVolume(vol)
             }
 

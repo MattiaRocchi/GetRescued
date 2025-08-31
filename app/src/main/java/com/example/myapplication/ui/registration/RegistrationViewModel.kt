@@ -53,10 +53,10 @@ class RegistrationViewModel(
     private val _allTags = MutableStateFlow<List<Tags>>(emptyList())
     val allTags: StateFlow<List<Tags>> = _allTags
     init {
-        // 🔹 ogni volta che cambia userId → ricarico tutto (inclusi tags)
+        //ogni volta che cambia userId → ricarico tutto (inclusi tags)
         viewModelScope.launch {
                     try {
-                        _allTags.value = tagsRepository.getAll()          // <-- List<Tags>
+                        _allTags.value = tagsRepository.getAll()
                     } catch (t: Throwable) {
                         t.printStackTrace()
                         _allTags.value = emptyList()

@@ -1,8 +1,5 @@
 package com.example.myapplication.data.database
 
-
-import android.graphics.Color
-import androidx.compose.runtime.Composable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
@@ -20,7 +17,7 @@ data class Request(
     @ColumnInfo(name= "peopleRequired") val peopleRequired: Int,
 
     @ColumnInfo(name= "place") val place: String? = null,
-    @ColumnInfo(name= "fotos") var fotos: List<String>, //quale tipo sarebbe meglio usare per questo?
+    @ColumnInfo(name= "fotos") var fotos: List<String>,
     @ColumnInfo(name= "description") var description: String,
     @ColumnInfo(name = "date") val date: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "scheduledDate") val scheduledDate: Long,
@@ -71,15 +68,6 @@ data class Request(
             isScheduledForToday() -> "In corso"
             isScheduledForTomorrow() -> "In preparazione"
             else -> "Programmata"
-        }
-    }
-
-    fun getAvailableActions(): List<String> {
-        return when {
-            isScheduledInPast() -> listOf("complete")
-            isScheduledForToday() -> listOf("complete")
-            isScheduledForTomorrow() -> emptyList()
-            else -> listOf("edit", "delete", "manage_participants")
         }
     }
 }
@@ -146,7 +134,7 @@ data class UserInfo(
     @PrimaryKey val id: Int, //Id dell'utente di riferimento
     @ColumnInfo(name= "activeTitle") var activeTitle: Int,
     @ColumnInfo(name= "exp") val exp: Int,
-    @ColumnInfo(name= "profileFoto") val profileFoto: String?, //quale tipo sarebbe meglio utilizzare?
+    @ColumnInfo(name= "profileFoto") val profileFoto: String?,
 )
 @Entity(primaryKeys = ["userId", "badgeId"])
 data class UserBadgeCrossRef(

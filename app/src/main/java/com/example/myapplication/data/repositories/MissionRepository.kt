@@ -9,11 +9,8 @@ import kotlinx.coroutines.flow.Flow
 class MissionRepository(private val missionDao: MissionDao) {
 
     // Mission CRUD
-    suspend fun getAllMissions() = missionDao.getAll()
     suspend fun insert(mission: Mission) = missionDao.insert(mission)
     suspend fun getById(id: Int) = missionDao.getById(id)
-    suspend fun update(mission: Mission) = missionDao.update(mission)
-    suspend fun delete(mission: Mission) = missionDao.delete(mission)
 
     // General Missions
     fun getUserGeneralMissions(userId: Int): Flow<List<GeneralMissionUser>> =
@@ -21,19 +18,12 @@ class MissionRepository(private val missionDao: MissionDao) {
 
     suspend fun userMissionsGeneral(userId: Int): List<Mission> =
         missionDao.userMissionsGeneral(userId)
-
-    suspend fun getUserGeneralMissionsCompleted(userId: Int): List<Mission> =
-        missionDao.getUserGeneralMissionsCompleted(userId)
-
     // Weekly Missions
     fun getUserWeeklyMissions(userId: Int): Flow<List<WeeklyMissionUser>> =
         missionDao.getUserWeeklyMissions(userId)
 
     suspend fun userMissionsWeekly(userId: Int): List<Mission> =
         missionDao.userMissionsWeekly(userId)
-
-    suspend fun getUserWeeklyMissionsCompleted(userId: Int): List<Mission> =
-        missionDao.getUserWeeklyMissionsCompleted(userId)
 
     // Reset & assign new missions
     suspend fun setWeeklyMissionsUser(userId: Int) {
@@ -118,7 +108,7 @@ class MissionRepository(private val missionDao: MissionDao) {
                 "Bassa" -> 25
                 "Media" -> 35
                 "Alta" -> 50
-                else -> 25 // Default fallback
+                else -> 25
             }
             missionDao.addUserExp(userId, expToAdd)
         } catch (e: Exception) {

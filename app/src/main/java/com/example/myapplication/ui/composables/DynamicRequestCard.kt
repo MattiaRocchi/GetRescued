@@ -29,10 +29,6 @@ import com.example.myapplication.ui.theme.MediumTask
 import com.example.myapplication.ui.theme.MediumTaskLogo
 import java.text.SimpleDateFormat
 import java.util.*
-
-/**
- * Card condivisa per visualizzare una richiesta con colori dinamici e supporto tags
- */
 @Composable
 fun DynamicRequestCard(
     request: Request,
@@ -150,7 +146,7 @@ fun DynamicRequestCard(
                     }
                 }
 
-                // Tag richiesti - MIGLIORATO
+                // Tag richiesti
                 if (tags.isNotEmpty()) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -306,7 +302,7 @@ fun DynamicRequestCard(
                     )
                 }
 
-                // Etichetta creatore - MOSTRA SOLO SE È CREATA DALL'UTENTE CORRENTE
+                // Etichetta creatore
                 if (isCreatedByCurrentUser) {
                     Surface(
                         color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f),
@@ -337,9 +333,7 @@ fun DynamicRequestCard(
     }
 }
 
-/**
- * Filtro completo per le richieste con tutti i parametri richiesti
- */
+//Filtro completo per le richieste
 @Composable
 fun RequestFilter(
     searchQuery: String,

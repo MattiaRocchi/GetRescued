@@ -10,7 +10,6 @@ import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.data.repositories.TagsRepository
 import com.example.myapplication.data.repositories.UserDaoRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import android.util.Log
@@ -20,7 +19,7 @@ class InfoRequestViewModel(
     private val userDaoRepository: UserDaoRepository,
     private val settingsRepository: SettingsRepository,
     private val tagsRepository: TagsRepository,
-    private val requestId: Int // Ora iniettato da Koin con parametersOf
+    private val requestId: Int
 ) : ViewModel() {
 
     sealed class UiState {
@@ -87,7 +86,7 @@ class InfoRequestViewModel(
                             isFull = isFull
                         )
 
-                        // IMPORTANTE: Aggiorna canParticipate ogni volta che cambia lo stato
+                        // Aggiorna canParticipate ogni volta che cambia lo stato
                         updateCanParticipate(userId, isCreator, isParticipating, isPending, isFull)
 
                     } catch (e: Exception) {
@@ -116,7 +115,7 @@ class InfoRequestViewModel(
                             isFull = isFull
                         )
 
-                        // IMPORTANTE: Aggiorna canParticipate anche in caso di errore
+                        // Aggiorna canParticipate anche in caso di errore
                         updateCanParticipate(userId, isCreator, isParticipating, isPending, isFull)
 
                         _events.tryEmit("Errore nel caricamento delle informazioni del creatore")

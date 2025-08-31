@@ -10,14 +10,9 @@ class RequestsViewModel(
     private val repository: RequestDaoRepository
 ) : ViewModel() {
 
-    // Tutte le richieste (utile per debug o altre funzionalità)
-    val requests: StateFlow<List<Request>> =
-        repository.getAllRequests()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
     // Richieste disponibili: non completate e con posti liberi
     val availableRequests: StateFlow<List<Request>> =
-        repository.getOpenRequests() // Usa già getOpenRequests() che filtra per completed = 0
+        repository.getOpenRequests() // filtra per completed = 0
             .map { requests ->
                 requests.filter { request ->
                     // Filtra solo le richieste che hanno ancora posti liberi

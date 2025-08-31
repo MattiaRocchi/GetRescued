@@ -40,7 +40,7 @@ class EditRequestViewModel(
     private val _images = MutableStateFlow<List<String>>(emptyList())
     val images: StateFlow<List<String>> = _images
 
-    // Nuovo campo per la data di svolgimento
+    // Campo per la data di svolgimento
     private val _scheduledDate = MutableStateFlow(LocalDate.now())
     val scheduledDate: StateFlow<LocalDate> = _scheduledDate
 

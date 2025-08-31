@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.*
 class UserRequestListViewModel(
     private val repository: RequestDaoRepository,
     private val settingsRepository: SettingsRepository,
-    private val tagsRepository: TagsRepository // AGGIUNTO: per recuperare i tag
+    private val tagsRepository: TagsRepository
 ) : ViewModel() {
 
     private val userIdFlow: Flow<Int> =
@@ -25,7 +25,7 @@ class UserRequestListViewModel(
             .flatMapLatest { uid -> repository.getRequestsByUser(uid) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // AGGIUNTO: Funzioni suspend per ottenere i dati extra
+    //Funzioni suspend per ottenere i dati extra
     suspend fun getTagsForRequest(requestId: Int): List<Tags> {
         return tagsRepository.getTagsForRequest(requestId)
     }

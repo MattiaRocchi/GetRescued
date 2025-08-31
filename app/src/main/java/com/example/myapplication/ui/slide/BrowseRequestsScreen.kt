@@ -47,7 +47,7 @@ fun BrowseRequestsScreen(
     var selectedDifficulty by remember { mutableStateOf<String?>(null) }
     var selectedTags by remember { mutableStateOf<List<Tags>>(emptyList()) }
     var sortByDate by remember { mutableStateOf(true) } // true = più recenti, false = più vecchi
-    var hideMyRequests by remember { mutableStateOf(false) } // NUOVO filtro
+    var hideMyRequests by remember { mutableStateOf(false) }
 
     // Carica tutti i tag disponibili
     val availableTags by tagsRepository.allTagsFlow().collectAsState(initial = emptyList())

@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.PermissionChecker
 import coil.compose.AsyncImage
@@ -28,7 +27,6 @@ import com.example.myapplication.ui.composables.CameraCapture
 import com.example.myapplication.ui.composables.ImagePickerDialog
 import com.example.myapplication.ui.theme.UnpressableButtonDark
 import com.example.myapplication.ui.composables.LegendDialog
-import com.google.android.gms.common.SignInButton
 import openAddressInMaps
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.database.Request
 import com.example.myapplication.data.database.Tags
-import com.example.myapplication.data.database.TagsMission
 import com.example.myapplication.data.database.TagsRequest
 import com.example.myapplication.data.repositories.RequestDaoRepository
 import com.example.myapplication.data.repositories.SettingsRepository
@@ -14,7 +13,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
-import kotlin.math.absoluteValue
 
 class AddRequestViewModel(
     private val repository: RequestDaoRepository,

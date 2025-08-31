@@ -1,8 +1,6 @@
 package com.example.myapplication.ui.composables
 
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -22,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import kotlin.String
 
 @Composable
@@ -135,7 +132,7 @@ fun NameTextField(
 
 }
 
-// 🔹 COGNOME
+//COGNOME
 @Composable
 fun SurnameTextField(
     value: String,
@@ -162,7 +159,7 @@ fun SurnameTextField(
     )
     if (surnameError) Text("Inserisci il cognome", color = MaterialTheme.colorScheme.error)
 }
-// 🔹 ETÀ
+//ETÀ
 @Composable
 fun AgeTextField(
     value: String,
@@ -190,9 +187,8 @@ fun AgeTextField(
     )
     if (ageError) Text("Inserisci un'età valida", color = MaterialTheme.colorScheme.error)
 }
-// -----------------------------
+
 // Phone number
-// -----------------------------
 @Composable
 fun PhoneTextField(
     value: String,

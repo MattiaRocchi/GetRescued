@@ -2,10 +2,8 @@ package com.example.myapplication.data.database
 
 
 import androidx.room.Database
-
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-
 import com.example.myapplication.data.utils.Converters
 
 
@@ -24,7 +22,6 @@ import com.example.myapplication.data.utils.Converters
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
-    // Definisci qui i DAO man mano
 
     abstract fun userDao(): UserDao
 

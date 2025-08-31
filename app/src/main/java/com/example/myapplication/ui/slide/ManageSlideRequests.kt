@@ -19,12 +19,9 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ManageSlideRequests(
     navController: NavController
-    // NON PIÙ parametri repository/settings - Koin gestisce tutto!
 ) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 2 })
     val scope = rememberCoroutineScope()
-
-    // SEMPLICISSIMO - tutto tramite Koin
     val createdVM: UserRequestListViewModel = koinViewModel()
     val addVM: AddRequestViewModel = koinViewModel()
 

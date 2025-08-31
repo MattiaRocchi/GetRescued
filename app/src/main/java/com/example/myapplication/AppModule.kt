@@ -53,7 +53,6 @@ val appModule = module {
             .build()
 
         // Precarica i TitleBadge dal JSON in res/raw se il DB è vuoto.
-        // Nota: questo è lanciato in background e non blocca la creazione del singleton.
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val isEmpty = db.tagDao().getAllTags().firstOrNull().isNullOrEmpty() // o una count sync se preferisci

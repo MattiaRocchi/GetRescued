@@ -2,12 +2,12 @@ package com.example.myapplication.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Task colors (mantenuti uguali)
+// Task colors
 val EasyTask = Color(0xFF4C7744)
 val MediumTask = Color(0xFF9E8C3C)
 val DifficulTask = Color(0xFF8C3C3C)
 
-// LIGHT THEME COLORS - Versione più morbida
+// LIGHT THEME COLORS
 val BackGround = Color(0xFFFFFFFF)
 val Primary = Color(0xFF1E88E5) // Blu leggermente più tenue
 val OnPrimary = Color(0xFFFFFFFF) // Bianco per contrasto ottimale
@@ -24,9 +24,7 @@ val OnTertiary = Color(0xFFFFFFFF) // Bianco per contrasto
 val TertiaryContainer = Color(0xFFE1BEE7) // Container viola chiaro
 val OnTertiaryContainer = Color(0xFF4A148C) // Viola scuro per testo
 
-val UnpressableButton = Color(0xFFBDBDBD) // Mantenuto
-
-// DARK THEME COLORS - Migliorati
+// DARK THEME COLORS
 val EasyTaskLogo = Color(
  red = (0x4C / 255f * 1.1f).coerceAtMost(1f),
  green = (0x77 / 255f * 1.6f).coerceAtMost(1f),
@@ -43,7 +41,7 @@ val DifficulTaskLogo = Color(
  blue = (60 / 255f)
 )
 
-val BackGroundDark = Color(0xFF121212) // Mantenuto
+val BackGroundDark = Color(0xFF121212)
 val PrimaryDark = Color(0xFF42A5F5) // Blu più chiaro e vivace per dark theme
 val OnPrimaryDark = Color(0xFF000000) // Nero per contrasto ottimale
 val PrimaryContainerDark = Color(0xFF1565C0) // Container blu scuro
@@ -59,9 +57,9 @@ val OnTertiaryDark = Color(0xFF000000) // Nero per contrasto
 val TertiaryContainerDark = Color(0xFF7B1FA2) // Container viola scuro
 val OnTertiaryContainerDark = Color(0xFFE1BEE7) // Viola chiaro per testo
 
-val UnpressableButtonDark = Color(0xFF757575) // Mantenuto
+val UnpressableButtonDark = Color(0xFF757575)
 
-// Rarity colors (mantenuti uguali)
+// Rarity colors
 val Mythic = Color(0xFFFE0000)
 val MythicDark = Color(0xFFB71C1C)
 val Leggendary = Color(0xFFFFC501)

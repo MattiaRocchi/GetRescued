@@ -14,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,12 +25,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import com.example.myapplication.data.database.Tags
 import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.ui.composables.CameraCapture
 import com.example.myapplication.ui.composables.ImagePickerDialog
-import com.example.myapplication.ui.theme.LocalTitleColors
-import com.example.myapplication.ui.theme.TitleColors
 import com.example.myapplication.ui.theme.UnpressableButtonDark
 import com.example.myapplication.utils.MusicService
 import com.example.myapplication.utils.PermissionStatus
@@ -289,7 +285,7 @@ fun ProfileScreen(
                         context.stopService(musicIntent)
 
                         navController.navigate(GetRescuedRoute.Login) {
-                            // Pulisci tutto il back stack come suggerito dalle slide
+                            // Pulisci tutto il back stack
                             popUpTo(0) { inclusive = true }
                             launchSingleTop = true
                         }
@@ -308,7 +304,7 @@ fun ProfileScreen(
         }
     }
 
-    // 🔹 Dialog scelta immagine (camera o galleria)
+    // Dialog scelta immagine (camera o galleria)
     if (showChangePicDialog) {
         ImagePickerDialog(
             onDismiss = { showChangePicDialog = false },

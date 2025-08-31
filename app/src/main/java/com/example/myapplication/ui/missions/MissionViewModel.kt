@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -134,7 +133,7 @@ class MissionViewModel(
 
                 missionRepository.claimGeneralMission(missionId, currentUserId)
 
-                // Check if mission has a title badge reward
+                // Controllo se la missione ha dei title come reward
                 val newTitle = missionRepository.getMissionTitleById(missionId)
                 if (newTitle != null) {
                     titleBadgeRepository.insertUserBadgeCrossRef(currentUserId, newTitle)
@@ -157,7 +156,7 @@ class MissionViewModel(
 
                 missionRepository.claimWeeklyMission(missionId, currentUserId)
 
-                // Check if mission has a title badge reward
+                //  Controllo se la missione ha dei title come reward
                 val newTitle = missionRepository.getMissionTitleById(missionId)
                 if (newTitle != null) {
                     titleBadgeRepository.insertUserBadgeCrossRef(currentUserId, newTitle)

@@ -53,7 +53,7 @@ fun RegistrationScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val allTags by viewModel.allTags.collectAsState() // puoi caricarli via ViewModel
+    val allTags by viewModel.allTags.collectAsState()
     var showTagsDialog by remember { mutableStateOf(false) }
 
     var nameError by remember { mutableStateOf(false) }

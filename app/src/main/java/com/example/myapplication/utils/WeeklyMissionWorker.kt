@@ -7,10 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.*
-import java.util.concurrent.TimeUnit
 import com.example.myapplication.data.repositories.SettingsRepository
-import  com.example.myapplication.data.database.MissionDao
 import com.example.myapplication.data.repositories.MissionRepository
 import kotlinx.coroutines.flow.first
 
@@ -33,7 +30,7 @@ class WeeklyMissionsWorker(
                 // Esegui la funzione per resettare le missioni settimanali
                 missionRepository.setWeeklyMissionsUser(userId)
 
-                // Log per debug (opzionale)
+                // Log per debug
                 android.util.Log.d("WeeklyMissionsWorker", "Missioni settimanali aggiornate per utente $userId")
 
                 Result.success()

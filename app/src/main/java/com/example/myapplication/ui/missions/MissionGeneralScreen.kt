@@ -45,7 +45,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.myapplication.ui.GetRescuedRoute
-import com.example.myapplication.ui.theme.UnpressableButton
 import com.example.myapplication.ui.theme.UnpressableButtonDark
 
 @Composable

@@ -23,15 +23,6 @@ class ManageRequestViewModel(
     private val requestId: Int
 ) : ViewModel() {
 
-    private suspend fun checkAndMarkExpiredRequests() {
-        try {
-            val currentTime = System.currentTimeMillis()
-            requestRepository.markExpiredRequestsAsCompleted(currentTime)
-        } catch (e: Exception) {
-            _events.tryEmit("Errore nel controllo richieste scadute: ${e.message}")
-        }
-    }
-
     sealed class UiState {
         object Loading : UiState()
         object NotFound : UiState()
@@ -50,7 +41,6 @@ class ManageRequestViewModel(
             val isExpired: Boolean get() = request.isScheduledInPast()
 
             val isComplete: Boolean get() = request.completed
-            val isInPreparation: Boolean get() = request.isScheduledForTomorrow()
             val requestState: String get() = request.getRequestState()
         }
     }
@@ -285,28 +275,6 @@ class ManageRequestViewModel(
             _events.tryEmit("Missioni e XP aggiornati per tutti i partecipanti!")
         } catch (e: Exception) {
             _events.tryEmit("Errore nell'aggiornamento delle missioni: ${e.message}")
-        }
-    }
-
-    //metodo per gestire l'auto-completamento con aggiornamento missioni
-    suspend fun processAutoCompletedRequests() {
-        try {
-            // Prima ottieni le richieste che stanno per essere auto-completate
-            val currentTime = System.currentTimeMillis()
-            val expiredRequests = requestRepository.getExpiredRequests(currentTime)
-
-            // Per ogni richiesta scaduta, aggiorna le missioni prima di marcarla come completata
-            for (request in expiredRequests) {
-                if (!request.completed) {
-                    updateMissionsForCompletion(request)
-                }
-            }
-
-            // Poi marca tutte come completate
-            requestRepository.markExpiredRequestsAsCompleted(currentTime)
-
-        } catch (e: Exception) {
-            _events.tryEmit("Errore nel processo di auto-completamento: ${e.message}")
         }
     }
 

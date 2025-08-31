@@ -37,10 +37,6 @@ private val LightColorScheme = lightColorScheme(
     primary = Primary,
     secondary = Secondary,
     tertiary = Tertiary,
-
-//onBackground = Color(0xFF1C1B1F),
-    //onSurface = Color(0xFF1C1B1F),
-    //surface = Color(0xFFFFFBFE),
     background = BackGround,
 
     onPrimary = OnPrimary,

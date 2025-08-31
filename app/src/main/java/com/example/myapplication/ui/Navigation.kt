@@ -35,55 +35,37 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 sealed interface GetRescuedRoute {
-    //definisci come data object le route che non richiedono parametri quando vendono percorse
 
     @Serializable
     data object Profile : GetRescuedRoute
-
     @Serializable
     data object Registration : GetRescuedRoute
-
-
-    @Serializable
-    data class InfoRequest(val requestId: Int) : GetRescuedRoute
-
     @Serializable
     data object Requests : GetRescuedRoute
-
     @Serializable
     data object ChangeProfile : GetRescuedRoute
-
     @Serializable
     data object Login : GetRescuedRoute
-
     @Serializable
     data object Settings : GetRescuedRoute
-
-    //definisci come data class le route che richiedono parametri quando vendono percorse
-    @Serializable
-    data class AddRequest(val requestId: Int) : GetRescuedRoute
-
-    @Serializable
-    data class ManageRequestDetails(val requestId: Int) : GetRescuedRoute
-
     @Serializable
     object ManageRequests : GetRescuedRoute
-
     @Serializable
     object BrowseRequests : GetRescuedRoute
-
     @Serializable
     object MissionGeneral : GetRescuedRoute
-
     @Serializable
     object MissionWeek : GetRescuedRoute
 
 
     @Serializable
     data class EditRequest(val requestId: Int) : GetRescuedRoute
-
-
-
+    @Serializable
+    data class InfoRequest(val requestId: Int) : GetRescuedRoute
+    @Serializable
+    data class AddRequest(val requestId: Int) : GetRescuedRoute
+    @Serializable
+    data class ManageRequestDetails(val requestId: Int) : GetRescuedRoute
 }
 @Composable
 fun GetRescuedNavGraph(

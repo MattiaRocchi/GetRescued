@@ -12,7 +12,6 @@ import com.example.myapplication.data.repositories.UserDaoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -42,10 +41,9 @@ class ProfileViewModel(
     val allTags: StateFlow<List<Tags>> = _allTags
 
     private val _userTags = MutableStateFlow<List<Tags>>(emptyList())
-    val userTags: StateFlow<List<Tags>> = _userTags
 
     init {
-        // 🔹 ogni volta che cambia userId → ricarico tutto (inclusi tags)
+        //ogni volta che cambia userId → ricarico tutto (inclusi tags)
         viewModelScope.launch {
             userId.collect { id ->
                 if (id != -1) {
@@ -80,18 +78,16 @@ class ProfileViewModel(
         }
     }
 
-    // === funzioni esposte per la UI ===
+    //funzioni esposte per la UI
 
     /**
      * Restituisce l'insieme degli id dei tag attualmente selezionati dall'utente.
-     * Utile per passare direttamente a TagPickerDialog(selectedTagIds = ...)
      */
     fun getSelectedTagIds(): Set<Int> =
         _userTags.value.map { it.id }.toSet()
 
     /**
      * Aggiorna i tag dell'utente: salva i nuovi tag nel DB e ricarica lo stato locale.
-     * selectedIds può venire dal TagPickerDialog (Set<Int>).
      */
     fun updateUserTags(selectedIds: Set<Int>) {
         viewModelScope.launch {
@@ -111,8 +107,6 @@ class ProfileViewModel(
             }
         }
     }
-
-    // ... resto delle funzioni già presenti ...
 
     fun updateProfilePhoto(newUri: String) {
         viewModelScope.launch {

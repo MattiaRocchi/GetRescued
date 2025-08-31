@@ -72,7 +72,7 @@ fun MissionCardWeekly(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Header with mission type and status
+            //Header con mission type e status
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -130,7 +130,7 @@ fun MissionCardWeekly(
             Spacer(modifier = Modifier.height(8.dp))
 
 
-            // Mission title and description
+            // Mission title e description
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -164,7 +164,7 @@ fun MissionCardWeekly(
             if (!isFinished) {
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Progress section - only shown for active/claimable missions
+                // Sezione per la progessione/claim
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -274,7 +274,7 @@ fun MissionCardGeneral(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Header with mission type and status
+            // Header con mission type e status
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -331,7 +331,7 @@ fun MissionCardGeneral(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Mission title and description
+            // Mission title e description
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -365,7 +365,7 @@ fun MissionCardGeneral(
             if (!isFinished) {
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Progress section - only shown for active/claimable missions
+                //Sezione per la progessione/claim
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,

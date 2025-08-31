@@ -1,7 +1,5 @@
 package com.example.myapplication.ui.SettingsScreen
 
-//TODO Se i permessi risultano permanentemente negati non li richiede più
-
 import android.Manifest
 import android.content.Intent
 import android.net.Uri
@@ -22,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -32,14 +29,6 @@ import android.app.Activity
 import com.example.myapplication.utils.MusicService
 import com.example.myapplication.utils.PermissionStatus
 import kotlinx.coroutines.launch
-
-// -------------------------
-// SettingsScreen (Compose)
-// - switch Music ON/OFF
-// - slider Volume
-// - switches for Camera and Location that trigger permission requests
-// -------------------------
-
 @Composable
 fun SettingsScreen(
     navController: NavHostController,

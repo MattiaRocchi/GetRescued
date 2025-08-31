@@ -1,7 +1,6 @@
 
 package com.example.myapplication.data.database
 
-import android.nfc.Tag
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -9,7 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import kotlinx.coroutines.flow.Flow //
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
@@ -436,18 +435,23 @@ interface TagDao {
     // Controlla se l'utente ha tutti i tag richiesti per una richiesta
     @Query("""
     SELECT CASE 
+        WHEN (
+            -- Se la richiesta non ha tag richiesti, ritorna true
+            (SELECT COUNT(*) FROM TagsRequest WHERE idRequest = :requestId) = 0
+        ) THEN 1
         WHEN EXISTS (
             SELECT 1
             FROM TagsRequest tr
             JOIN TagsUser tu ON tr.idTags = tu.idTags
             WHERE tr.idRequest = :requestId
               AND tu.idUser = :userId
-        ) THEN 1 ELSE 0 
+        ) THEN 1 
+        ELSE 0 
     END
 """)
     suspend fun userHasRequiredTags(userId: Int, requestId: Int): Boolean
 
-    // Request tags - NUOVO
+    // Request tags
     @Transaction
     @Query("""
         SELECT t.* FROM Tags t
