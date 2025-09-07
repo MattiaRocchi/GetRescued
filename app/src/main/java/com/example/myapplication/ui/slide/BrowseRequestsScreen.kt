@@ -109,6 +109,8 @@ fun BrowseRequestsScreen(
                 text = { Text("A cui partecipo") }
             )
         }
+        Spacer(Modifier.height(12.dp))
+
 
         HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
             when (page) {

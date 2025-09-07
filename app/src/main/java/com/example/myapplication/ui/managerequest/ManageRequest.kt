@@ -932,7 +932,9 @@ fun ManageRequest(
                 TextButton(
                     onClick = {
                         showExpiredDialog = false
-                        navController.navigate(GetRescuedRoute.ManageRequests)
+                        viewModel.markAsCompleted {
+                            navController.popBackStack()
+                        }
                     }
                 ) {
                     Text("Conferma", color = MaterialTheme.colorScheme.primary)

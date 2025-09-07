@@ -175,7 +175,7 @@ fun RegistrationScreen(
                 value = viewModel.age.toString(),
                 onValueChange = {
                     viewModel.onAgeChange(it)
-                    ageError = it.toIntOrNull()?.let { n -> n <= 0 } ?: true
+                    ageError = it.toIntOrNull()?.let { n -> n <= 0 || n>=120} ?: true
                 },
                 ageError = ageError
             )

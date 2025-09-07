@@ -74,7 +74,8 @@ fun ChangeProfileScreen(
             Spacer(Modifier.height(8.dp))
 
             ProfileTextField(value = ageText, onValueChange = {
-                viewModel.onAgeTextChange(it); ageError = it.toIntOrNull()?.let { n -> n <= 0 } ?: true
+                viewModel.onAgeTextChange(it); ageError = it.toIntOrNull()?.let { n -> n <= 0
+                    || n>=120} ?: true
             }, label = "Età")
 
             if (ageError) Text("Inserisci un'età valida", color = MaterialTheme.colorScheme.error)

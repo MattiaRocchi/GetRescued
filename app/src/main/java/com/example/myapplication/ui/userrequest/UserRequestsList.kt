@@ -11,21 +11,22 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.data.database.PendingRequest
 import com.example.myapplication.data.database.Tags
-import com.example.myapplication.data.repositories.SettingsRepository
 import com.example.myapplication.ui.GetRescuedRoute
 import com.example.myapplication.ui.composables.DynamicRequestCard
-import org.koin.compose.koinInject
+
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun UserRequestsList(
     navController: NavController,
     viewModel: UserRequestListViewModel
+
 ) {
     val request by viewModel.myRequests.collectAsState()
     val filterRequests = request.filter { !it.completed }
-    val settingsRepository: SettingsRepository = koinInject()
-    val currentUserId by settingsRepository.userIdFlow.collectAsState(initial = -1)
+
+    val currentUserId by viewModel.userIdFlow.collectAsState(initial = -1)
 
     // Stati per gestire tag e proposte di ogni richiesta
     val scope = rememberCoroutineScope()

@@ -118,15 +118,10 @@ fun InfoRequestScreen(
                                     text = r.title,
                                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                                 )
-
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = "Creato da: $creatorName",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                ){
                                     Surface(
                                         color = when (r.difficulty) {
                                             "Bassa" -> MaterialTheme.colorScheme.primaryContainer
@@ -143,6 +138,18 @@ fun InfoRequestScreen(
                                             fontWeight = FontWeight.Medium
                                         )
                                     }
+                                }
+
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = "Creato da: $creatorName",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+
                                 }
 
                                 Row(
@@ -188,10 +195,7 @@ fun InfoRequestScreen(
 
                                 HorizontalDivider()
 
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
+
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -214,7 +218,7 @@ fun InfoRequestScreen(
                                         )
                                         Text("Partecipanti: ${r.rescuers.size}", style = MaterialTheme.typography.bodyMedium)
                                     }
-                                }
+
 
                                 // Data di svolgimento prevista
                                 Row(

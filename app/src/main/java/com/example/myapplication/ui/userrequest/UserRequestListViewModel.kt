@@ -16,7 +16,7 @@ class UserRequestListViewModel(
     private val tagsRepository: TagsRepository
 ) : ViewModel() {
 
-    private val userIdFlow: Flow<Int> =
+    val userIdFlow: Flow<Int> =
         settingsRepository.userIdFlow.filter { it != -1 }
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
